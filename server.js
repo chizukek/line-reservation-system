@@ -17,9 +17,10 @@ const PORT = 3000;
 const validPatients = ["10001", "10002", "10003"];
 
 app.get("/", async (req, res) => {
+  const week = Number(req.query.week || 0);
   const dates = [];
 
-  for (let i = 0; i < 14; i++) {
+  for (let i = week * 7; i < week * 7 + 7; i++) {
     const d = new Date();
     d.setDate(d.getDate() + i);
 
@@ -108,10 +109,28 @@ app.get("/", async (req, res) => {
     <table border="1" cellpadding="10">
       <tr>
         <th>時間</th>
-        ${dates.map((date) => `<th>${date}</th>`).join("")}
+        ${dates
+          .map((date) => {
+            const d = new Date(date);
+            const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+            const label = `${d.getMonth() + 1}/${d.getDate()}(${weekdays[d.getDay()]})`;
+            return `<th>${label}</th>`;
+          })
+          .join("")}
       </tr>
       ${rows}
     </table>
+    <br><br>
+
+    <a href="/?week=${Math.max(0, week - 1)}">
+    ← 前の週
+    </a>
+
+    &nbsp;&nbsp;&nbsp;
+
+    <a href="/?week=${week + 1}">
+    次の週 →
+    </a>
     <br>
 <a href="/cancel-input">予約をキャンセルする</a>
   `);
