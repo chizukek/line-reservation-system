@@ -1,10 +1,18 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const express = require("express");
+const session = require("express-session");
 const ADMIN_PASSWORD = "1234";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: "admin-secret-key",
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 const PORT = 3000;
 const validPatients = ["10001", "10002", "10003"];
 
@@ -281,10 +289,14 @@ app.post("/admin-login", (req, res) => {
     `);
   }
 
+  req.session.isAdmin = true;
   res.redirect("/admin");
 });
 
 app.get("/admin", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
   const reservations = await prisma.reservation.findMany({
     orderBy: {
       createdAt: "desc",
