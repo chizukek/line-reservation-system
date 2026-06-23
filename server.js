@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const express = require("express");
+const ADMIN_PASSWORD = "1234";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -250,6 +251,37 @@ app.post("/reserve", async (req, res) => {
     <p>予約を保存しました。</p>
     <a href="/">戻る</a>
   `);
+});
+
+app.get("/admin-login", (req, res) => {
+  res.send(`
+    <h1>管理者ログイン</h1>
+
+    <form action="/admin-login" method="POST">
+      <input
+        type="password"
+        name="password"
+        placeholder="パスワード"
+        required
+      >
+
+      <button type="submit">ログイン</button>
+    </form>
+  `);
+});
+
+app.post("/admin-login", (req, res) => {
+  const password = req.body.password;
+
+  if (password !== ADMIN_PASSWORD) {
+    return res.send(`
+      <h1>ログイン失敗</h1>
+      <p>パスワードが違います。</p>
+      <a href="/admin-login">戻る</a>
+    `);
+  }
+
+  res.redirect("/admin");
 });
 
 app.get("/admin", async (req, res) => {
