@@ -316,7 +316,17 @@ app.get("/admin", async (req, res) => {
   if (!req.session.isAdmin) {
     return res.redirect("/admin-login");
   }
+
+  const searchPatientNumber = String(req.query.patientNumber || "").trim();
+
+  const where = {};
+
+  if (searchPatientNumber) {
+    where.patientNumber = searchPatientNumber;
+  }
+
   const reservations = await prisma.reservation.findMany({
+    where,
     orderBy: {
       createdAt: "desc",
     },
@@ -339,6 +349,20 @@ app.get("/admin", async (req, res) => {
 
   res.send(`
     <h1>予約一覧</h1>
+    <p>検索中の患者番号：${searchPatientNumber || "なし"}</p>
+<p>検索結果：${reservations.length}件</p>
+    <form method="GET" action="/admin">
+  <input
+    type="text"
+    name="patientNumber"
+    placeholder="患者番号"
+    value="${searchPatientNumber}"
+  >
+
+  <button type="submit">検索</button>
+</form>
+
+<br>
     <ul>${list}</ul>
     <a href="/">戻る</a>
   `);
