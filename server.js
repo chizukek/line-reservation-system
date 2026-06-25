@@ -318,19 +318,19 @@ app.get("/admin", async (req, res) => {
   }
 
   const searchPatientNumber = String(req.query.patientNumber || "").trim();
-
+  const searchDate = String(req.query.date || "").trim();
   const where = {};
 
   if (searchPatientNumber) {
     where.patientNumber = searchPatientNumber;
   }
 
+  if (searchDate) {
+    where.date = searchDate;
+  }
+
   const reservations = await prisma.reservation.findMany({
-    where: searchPatientNumber
-      ? {
-          patientNumber: searchPatientNumber,
-        }
-      : {},
+    where,
     include: {
       patient: true,
     },
@@ -339,22 +339,23 @@ app.get("/admin", async (req, res) => {
     },
   });
 
-  const list = reservations
+  const tableRows = reservations
     .map(
       (r) => `
-    <li>
-${r.date} ${r.slot}
-/
-${r.patient.name}
-（${r.patientNumber}）
-/
-予約番号：${r.reservationCode}
-      <form action="/cancel" method="POST" style="display:inline;">
-        <input type="hidden" name="id" value="${r.id}">
-        <button type="submit">キャンセル</button>
-      </form>
-    </li>
-  `,
+      <tr>
+        <td>${r.date}</td>
+        <td>${r.slot}</td>
+        <td>${r.patient.name}</td>
+        <td>${r.patientNumber}</td>
+        <td>${r.reservationCode}</td>
+        <td>
+          <form action="/cancel" method="POST">
+            <input type="hidden" name="id" value="${r.id}">
+            <button type="submit">キャンセル</button>
+          </form>
+        </td>
+      </tr>
+    `,
     )
     .join("");
 
@@ -363,6 +364,16 @@ ${r.patient.name}
     <p>検索中の患者番号：${searchPatientNumber || "なし"}</p>
 <p>検索結果：${reservations.length}件</p>
     <form method="GET" action="/admin">
+    <br><br>
+
+<label>日付</label><br>
+<input
+  type="date"
+  name="date"
+  value="${searchDate}"
+>
+
+<br><br>
   <input
     type="text"
     name="patientNumber"
@@ -373,8 +384,25 @@ ${r.patient.name}
   <button type="submit">検索</button>
 </form>
 
+<p>
+患者番号：${searchPatientNumber || "指定なし"}
+／
+日付：${searchDate || "指定なし"}
+</p>
+
 <br>
-    <ul>${list}</ul>
+    <table border="1" cellpadding="8">
+  <tr>
+    <th>日付</th>
+    <th>時間</th>
+    <th>氏名</th>
+    <th>患者番号</th>
+    <th>予約番号</th>
+    <th>操作</th>
+  </tr>
+
+  ${tableRows}
+</table>
     <a href="/">戻る</a>
   `);
 });
@@ -436,9 +464,17 @@ app.post("/cancel-patient", async (req, res) => {
         gte: today,
       },
     },
-    orderBy: {
-      date: "asc",
+    include: {
+      patient: true,
     },
+    orderBy: [
+      {
+        date: "asc",
+      },
+      {
+        slot: "asc",
+      },
+    ],
   });
   if (reservations.length === 0) {
     return res.send(`
@@ -448,17 +484,23 @@ app.post("/cancel-patient", async (req, res) => {
         `);
   }
 
-  const list = reservations
+  const tableRows = reservations
     .map(
       (r) => `
-            <li>
-${r.date} ${r.slot} / 予約番号：${r.reservationCode}
-                <form action="/cancel-patient-confirm" method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="${r.id}">
-                    <button type="submit">キャンセルする</button>
-                </form>
-            </li>
-        `,
+      <tr>
+        <td>${r.date}</td>
+        <td>${r.slot}</td>
+        <td>${r.patient.name}</td>
+        <td>${r.patientNumber}</td>
+        <td>${r.reservationCode}</td>
+        <td>
+          <form action="/cancel" method="POST">
+            <input type="hidden" name="id" value="${r.id}">
+            <button type="submit">キャンセル</button>
+          </form>
+        </td>
+      </tr>
+    `,
     )
     .join("");
 
@@ -466,9 +508,18 @@ ${r.date} ${r.slot} / 予約番号：${r.reservationCode}
         <h1>予約一覧</h1>
         <p>患者番号：${patientNumber}</p>
         <p>氏名：${patient.name}</p>
-        <ul>
-            ${list}
-        </ul>
+        <table border="1" cellpadding="8">
+  <tr>
+    <th>日付</th>
+    <th>時間</th>
+    <th>氏名</th>
+    <th>患者番号</th>
+    <th>予約番号</th>
+    <th>操作</th>
+  </tr>
+
+  ${tableRows}
+</table>
 
         <a href="/">トップへ戻る</a>
     `);
