@@ -326,7 +326,14 @@ app.get("/admin", async (req, res) => {
   }
 
   const reservations = await prisma.reservation.findMany({
-    where,
+    where: searchPatientNumber
+      ? {
+          patientNumber: searchPatientNumber,
+        }
+      : {},
+    include: {
+      patient: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -336,8 +343,12 @@ app.get("/admin", async (req, res) => {
     .map(
       (r) => `
     <li>
-      ${r.date} ${r.slot} / 患者番号：${r.patientNumber} / 予約番号：${r.reservationCode}
-
+${r.date} ${r.slot}
+/
+${r.patient.name}
+（${r.patientNumber}）
+/
+予約番号：${r.reservationCode}
       <form action="/cancel" method="POST" style="display:inline;">
         <input type="hidden" name="id" value="${r.id}">
         <button type="submit">キャンセル</button>
