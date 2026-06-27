@@ -1,0 +1,38 @@
+<%- include("partials/header", { title: "電話予約" }) %>
+
+<h1>電話予約</h1>
+
+<% if (error) { %>
+  <p class="error">
+    <%= error %>
+  </p>
+<% } %>
+
+<form action="/admin/add" method="POST">
+  <label>患者番号</label><br>
+  <input type="text" name="patientNumber" required>
+
+  <br><br>
+
+  <label>日付</label><br>
+  <input type="date" name="date" required>
+
+  <br><br>
+
+  <label>時間</label><br>
+  <select name="slot">
+    <% slots.forEach(slot => { %>
+      <option value="<%= slot %>"><%= slot %></option>
+    <% }) %>
+  </select>
+
+  <br><br>
+
+  <button type="submit">確認</button>
+</form>
+
+<br>
+
+<a href="/admin">戻る</a>
+
+<%- include("partials/footer") %>

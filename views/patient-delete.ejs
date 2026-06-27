@@ -1,0 +1,20 @@
+<%- include("partials/header", { title: "患者削除確認" }) %>
+
+<h1>患者削除確認</h1>
+
+<p>患者番号：<%= patient.patientNumber %></p>
+<p>氏名：<%= patient.name %></p>
+
+<p class="error">
+  本当にこの患者を削除しますか？
+</p>
+
+<form action="/admin/patients/delete/<%= patient.id %>" method="POST">
+  <button type="submit">削除する</button>
+</form>
+
+<br>
+
+<a href="/admin/patients">戻る</a>
+
+<%- include("partials/footer") %>

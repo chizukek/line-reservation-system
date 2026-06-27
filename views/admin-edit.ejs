@@ -1,0 +1,39 @@
+<%- include("partials/header", { title: "予約変更" }) %>
+
+<h1>予約変更</h1>
+
+<% if (error) { %>
+  <p class="error">
+    <%= error %>
+  </p>
+<% } %>
+
+<p>患者番号：<%= reservation.patientNumber %></p>
+<p>氏名：<%= reservation.patient.name %></p>
+<p>現在の予約：<%= reservation.date %> <%= reservation.slot %></p>
+
+<form action="/admin/edit/<%= reservation.id %>" method="POST">
+  <label>変更後の日付</label><br>
+  <input type="date" name="date" value="<%= reservation.date %>" required>
+
+  <br><br>
+
+  <label>変更後の時間</label><br>
+  <select name="slot">
+    <% slots.forEach(slot => { %>
+      <option value="<%= slot %>" <%= slot === reservation.slot ? "selected" : "" %>>
+        <%= slot %>
+      </option>
+    <% }) %>
+  </select>
+
+  <br><br>
+
+  <button type="submit">変更する</button>
+</form>
+
+<br>
+
+<a href="/admin">戻る</a>
+
+<%- include("partials/footer") %>

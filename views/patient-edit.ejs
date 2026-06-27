@@ -1,0 +1,45 @@
+<%- include("partials/header", { title: "患者編集" }) %>
+
+<h1>患者編集</h1>
+
+<% if (error) { %>
+  <p class="error">
+    <%= error %>
+  </p>
+<% } %>
+
+<form action="/admin/patients/edit/<%= patient.id %>" method="POST">
+
+  <label>患者番号</label><br>
+  <input
+    type="text"
+    name="patientNumber"
+    value="<%= patient.patientNumber %>"
+    required
+  >
+
+  <br><br>
+
+  <label>氏名</label><br>
+  <input
+    type="text"
+    name="name"
+    value="<%= patient.name %>"
+    required
+  >
+
+  <br><br>
+
+  <button type="submit">
+    保存
+  </button>
+
+</form>
+
+<br>
+
+<a href="/admin/patients">
+戻る
+</a>
+
+<%- include("partials/footer") %>

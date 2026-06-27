@@ -1,0 +1,29 @@
+<%- include("partials/header", { title: "患者登録" }) %>
+
+<h1>患者登録</h1>
+
+<% if (error) { %>
+  <p class="error">
+    <%= error %>
+  </p>
+<% } %>
+
+<form action="/admin/patients/add" method="POST">
+  <label>患者番号</label><br>
+  <input type="text" name="patientNumber" required>
+
+  <br><br>
+
+  <label>氏名</label><br>
+  <input type="text" name="name" required>
+
+  <br><br>
+
+  <button type="submit">登録</button>
+</form>
+
+<br>
+
+<a href="/admin/patients">戻る</a>
+
+<%- include("partials/footer") %>

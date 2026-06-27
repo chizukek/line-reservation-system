@@ -8,7 +8,10 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+app.set("view engine", "ejs");
+app.set("views", "views");
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -331,6 +334,7 @@ app.get("/admin", async (req, res) => {
   const searchPatientNumber = String(req.query.patientNumber || "").trim();
   const searchDate = String(req.query.date || "").trim();
   const today = new Date().toLocaleDateString("sv-SE");
+
   const where = {};
 
   if (searchPatientNumber) {
@@ -349,97 +353,13 @@ app.get("/admin", async (req, res) => {
     orderBy: [{ date: "asc" }, { slot: "asc" }],
   });
 
-  const tableRows = reservations
-    .map(
-      (r) => `
-      <tr>
-        <td>${r.date}</td>
-        <td>${r.slot}</td>
-        <td>${r.patient.name}</td>
-        <td>${r.patientNumber}</td>
-        <td>${r.reservationCode}</td>
-        <td>
-          <a href="/admin/edit/${r.id}">変更</a>
-
-          <form action="/cancel" method="POST">
-            <input type="hidden" name="from" value="admin"> 
-            <input type="hidden" name="id" value="${r.id}">
-            <button type="submit">キャンセル</button>
-          </form>
-        </td>
-      </tr>
-    `,
-    )
-    .join("");
-
-  res.send(`
-    <h1>予約一覧</h1>
-    <p>
-  <a href="/admin/add">
-    📞 電話予約を追加
-  </a>
-  <p>
-  <a href="/admin/patients">
-    👤 患者管理
-  </a>
-</p>
-</p>
-    <p>検索中の患者番号：${searchPatientNumber || "なし"}</p>
-<p>検索結果：${reservations.length}件</p>
-    <form method="GET" action="/admin">
-    <br><br>
-
-<label>日付</label><br>
-<input
-  type="date"
-  name="date"
-  value="${searchDate}"
->
-
-<br><br>
-  <input
-    type="text"
-    name="patientNumber"
-    placeholder="患者番号"
-    value="${searchPatientNumber}"
-  >
-
-  <button type="submit">検索</button>
-</form>
-
-<br>
-
-<a href="/admin?date=${today}">
-  今日の予約
-</a>
-
-&nbsp;&nbsp;
-
-<a href="/admin">
-  全件表示
-</a>
-
-<p>
-患者番号：${searchPatientNumber || "指定なし"}
-／
-日付：${searchDate || "指定なし"}
-</p>
-
-<br>
-    <table border="1" cellpadding="8">
-  <tr>
-    <th>日付</th>
-    <th>時間</th>
-    <th>氏名</th>
-    <th>患者番号</th>
-    <th>予約番号</th>
-    <th>操作</th>
-  </tr>
-
-  ${tableRows}
-</table>
-    <a href="/">戻る</a>
-  `);
+  res.render("admin", {
+    title: "予約一覧",
+    reservations,
+    searchPatientNumber,
+    searchDate,
+    today,
+  });
 });
 
 app.get("/admin/add", (req, res) => {
@@ -447,42 +367,11 @@ app.get("/admin/add", (req, res) => {
     return res.redirect("/admin-login");
   }
 
-  res.send(`
-    <h1>電話予約</h1>
-
-    <form action="/admin/add" method="POST">
-
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" required>
-
-      <br><br>
-
-      <label>日付</label><br>
-      <input type="date" name="date" required>
-
-      <br><br>
-
-      <label>時間</label><br>
-
-      <select name="slot">
-        ${config.allSlots
-          .map((slot) => `<option value="${slot}">${slot}</option>`)
-          .join("")}
-      </select>
-      <br><br>
-
-      <button type="submit">
-        確認
-      </button>
-
-    </form>
-
-    <br>
-
-    <a href="/admin">
-      戻る
-    </a>
-  `);
+  res.render("admin-add", {
+    title: "電話予約",
+    slots: config.allSlots,
+    error: null,
+  });
 });
 
 app.post("/admin/add", async (req, res) => {
@@ -499,15 +388,11 @@ app.post("/admin/add", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-      <h1>電話予約</h1>
-
-      <p style="color:red;">
-        患者番号が見つかりません。
-      </p>
-
-      <a href="/admin/add">戻る</a>
-    `);
+    return res.render("admin-add", {
+      title: "電話予約",
+      slots: config.allSlots,
+      error: "患者番号が見つかりません。",
+    });
   }
 
   res.send(`
@@ -637,39 +522,12 @@ app.get("/admin/edit/:id", async (req, res) => {
     `);
   }
 
-  res.send(`
-    <h1>予約変更</h1>
-
-    <p>患者番号：${reservation.patientNumber}</p>
-    <p>氏名：${reservation.patient.name}</p>
-    <p>現在の予約：${reservation.date} ${reservation.slot}</p>
-
-    <form action="/admin/edit/${reservation.id}" method="POST">
-      <label>変更後の日付</label><br>
-      <input type="date" name="date" value="${reservation.date}" required>
-
-      <br><br>
-
-      <label>変更後の時間</label><br>
-      <select name="slot">
-        ${config.allSlots
-          .map(
-            (slot) =>
-              `<option value="${slot}" ${
-                slot === reservation.slot ? "selected" : ""
-              }>${slot}</option>`,
-          )
-          .join("")}
-      </select>
-
-      <br><br>
-
-      <button type="submit">変更する</button>
-    </form>
-
-    <br>
-    <a href="/admin">戻る</a>
-  `);
+  res.render("admin-edit", {
+    title: "予約変更",
+    reservation,
+    slots: config.allSlots,
+    error: null,
+  });
 });
 
 app.post("/admin/edit/:id", async (req, res) => {
@@ -692,14 +550,23 @@ app.post("/admin/edit/:id", async (req, res) => {
     `);
   }
 
+  const renderEdit = (error) => {
+    return res.render("admin-edit", {
+      title: "予約変更",
+      reservation: {
+        ...reservation,
+        date,
+        slot,
+      },
+      slots: config.allSlots,
+      error,
+    });
+  };
+
   const availableSlots = config.getSlotsForDate(date);
 
   if (!availableSlots.includes(slot)) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>${date} ${slot} は診療時間外です。</p>
-      <a href="/admin/edit/${id}">戻る</a>
-    `);
+    return renderEdit(`${date} ${slot} は診療時間外です。`);
   }
 
   const sameDayReservation = await prisma.reservation.findFirst({
@@ -713,12 +580,9 @@ app.post("/admin/edit/:id", async (req, res) => {
   });
 
   if (sameDayReservation) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>同じ日にすでに予約があります。</p>
-      <p>既存予約：${sameDayReservation.date} ${sameDayReservation.slot}</p>
-      <a href="/admin/edit/${id}">戻る</a>
-    `);
+    return renderEdit(
+      `同じ日にすでに予約があります。既存予約：${sameDayReservation.date} ${sameDayReservation.slot}`,
+    );
   }
 
   const count = await prisma.reservation.count({
@@ -732,11 +596,7 @@ app.post("/admin/edit/:id", async (req, res) => {
   });
 
   if (count >= 2) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>${date} ${slot} は満員です。</p>
-      <a href="/admin/edit/${id}">戻る</a>
-    `);
+    return renderEdit(`${date} ${slot} は満員です。`);
   }
 
   await prisma.reservation.update({
@@ -747,14 +607,7 @@ app.post("/admin/edit/:id", async (req, res) => {
     },
   });
 
-  res.send(`
-    <h1>予約変更完了</h1>
-    <p>患者番号：${reservation.patientNumber}</p>
-    <p>氏名：${reservation.patient.name}</p>
-    <p>変更後：${date} ${slot}</p>
-
-    <a href="/admin">予約一覧へ戻る</a>
-  `);
+  res.redirect("/admin");
 });
 
 app.get("/admin/patients", async (req, res) => {
@@ -768,52 +621,10 @@ app.get("/admin/patients", async (req, res) => {
     },
   });
 
-  const rows = patients
-    .map(
-      (p) => `
-      <tr>
-        <td>${p.patientNumber}</td>
-        <td>${p.name}</td>
-        <td>
-          <a href="/admin/patients/edit/${p.id}">
-            編集
-          </a>
-
-          &nbsp;
-
-          <a href="/admin/patients/delete/${p.id}">
-            削除
-          </a>
-        </td>
-      </tr>
-    `,
-    )
-    .join("");
-  res.send(`
-    <h1>患者一覧</h1>
-
-    <p>
-      <a href="/admin/patients/add">
-        ＋患者登録
-      </a>
-    </p>
-
-    <table border="1" cellpadding="8">
-      <tr>
-        <th>患者番号</th>
-        <th>氏名</th>
-        <th>操作</th>
-      </tr>
-
-      ${rows}
-    </table>
-
-    <br>
-
-    <a href="/admin">
-      戻る
-    </a>
-  `);
+  res.render("patients", {
+    title: "患者一覧",
+    patients,
+  });
 });
 
 app.get("/admin/patients/add", (req, res) => {
@@ -821,26 +632,10 @@ app.get("/admin/patients/add", (req, res) => {
     return res.redirect("/admin-login");
   }
 
-  res.send(`
-    <h1>患者登録</h1>
-
-    <form action="/admin/patients/add" method="POST">
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" required>
-
-      <br><br>
-
-      <label>氏名</label><br>
-      <input type="text" name="name" required>
-
-      <br><br>
-
-      <button type="submit">登録</button>
-    </form>
-
-    <br>
-    <a href="/admin/patients">戻る</a>
-  `);
+  res.render("patient-add", {
+    title: "患者登録",
+    error: null,
+  });
 });
 
 app.post("/admin/patients/add", async (req, res) => {
@@ -858,11 +653,10 @@ app.post("/admin/patients/add", async (req, res) => {
   });
 
   if (existingPatient) {
-    return res.send(`
-      <h1>患者登録</h1>
-      <p style="color:red;">この患者番号はすでに登録されています。</p>
-      <a href="/admin/patients/add">戻る</a>
-    `);
+    res.render("patient-add", {
+      title: "患者登録",
+      error: "この患者番号はすでに登録されています。",
+    });
   }
 
   await prisma.patient.create({
@@ -893,26 +687,11 @@ app.get("/admin/patients/edit/:id", async (req, res) => {
     `);
   }
 
-  res.send(`
-    <h1>患者編集</h1>
-
-    <form action="/admin/patients/edit/${patient.id}" method="POST">
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" value="${patient.patientNumber}" required>
-
-      <br><br>
-
-      <label>氏名</label><br>
-      <input type="text" name="name" value="${patient.name}" required>
-
-      <br><br>
-
-      <button type="submit">保存</button>
-    </form>
-
-    <br>
-    <a href="/admin/patients">戻る</a>
-  `);
+  res.render("patient-edit", {
+    title: "患者編集",
+    patient,
+    error: null,
+  });
 });
 
 app.post("/admin/patients/edit/:id", async (req, res) => {
@@ -945,11 +724,15 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   });
 
   if (duplicate) {
-    return res.send(`
-      <h1>患者編集</h1>
-      <p style="color:red;">この患者番号はすでに使われています。</p>
-      <a href="/admin/patients/edit/${id}">戻る</a>
-    `);
+    return res.render("patient-edit", {
+      title: "患者編集",
+      patient: {
+        id,
+        patientNumber,
+        name,
+      },
+      error: "この患者番号はすでに使われています。",
+    });
   }
 
   await prisma.patient.update({
@@ -981,23 +764,10 @@ app.get("/admin/patients/delete/:id", async (req, res) => {
     `);
   }
 
-  res.send(`
-    <h1>患者削除確認</h1>
-
-    <p>患者番号：${patient.patientNumber}</p>
-    <p>氏名：${patient.name}</p>
-
-    <p style="color:red;">
-      本当にこの患者を削除しますか？
-    </p>
-
-    <form action="/admin/patients/delete/${patient.id}" method="POST">
-      <button type="submit">削除する</button>
-    </form>
-
-    <br>
-    <a href="/admin/patients">戻る</a>
-  `);
+  res.render("patient-delete", {
+    title: "患者削除確認",
+    patient,
+  });
 });
 
 app.post("/admin/patients/delete/:id", async (req, res) => {

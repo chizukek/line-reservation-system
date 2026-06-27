@@ -1,0 +1,74 @@
+<%- include("partials/header", { title: "予約一覧" }) %>
+
+<h1>予約一覧</h1>
+
+<p>
+  <a href="/admin/add">📞 電話予約を追加</a>
+</p>
+
+<p>
+  <a href="/admin/patients">👤 患者管理</a>
+</p>
+
+<p>検索中の患者番号：<%= searchPatientNumber || "なし" %></p>
+<p>検索結果：<%= reservations.length %>件</p>
+
+<form method="GET" action="/admin">
+  <label>日付</label><br>
+  <input type="date" name="date" value="<%= searchDate %>">
+
+  <br><br>
+
+  <input
+    type="text"
+    name="patientNumber"
+    placeholder="患者番号"
+    value="<%= searchPatientNumber %>"
+  >
+
+  <button type="submit">検索</button>
+</form>
+
+<br>
+
+<a href="/admin?date=<%= today %>">今日の予約</a>
+&nbsp;&nbsp;
+<a href="/admin">全件表示</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+  <tr>
+    <th>日付</th>
+    <th>時間</th>
+    <th>氏名</th>
+    <th>患者番号</th>
+    <th>予約番号</th>
+    <th>操作</th>
+  </tr>
+
+  <% reservations.forEach(r => { %>
+    <tr>
+      <td><%= r.date %></td>
+      <td><%= r.slot %></td>
+      <td><%= r.patient.name %></td>
+      <td><%= r.patientNumber %></td>
+      <td><%= r.reservationCode %></td>
+      <td>
+        <a href="/admin/edit/<%= r.id %>">変更</a>
+
+        <form action="/cancel" method="POST" style="display:inline;">
+          <input type="hidden" name="from" value="admin">
+          <input type="hidden" name="id" value="<%= r.id %>">
+          <button type="submit">キャンセル</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+
+<br>
+
+<a href="/">戻る</a>
+
+<%- include("partials/footer") %>
