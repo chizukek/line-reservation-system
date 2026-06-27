@@ -42,7 +42,7 @@ app.get("/", async (req, res) => {
             (r) => r.date === date && r.slot === slot,
           ).length;
 
-          const today = new Date().toISOString().split("T")[0];
+          const today = new Date().toLocaleDateString("sv-SE");
 
           if (date <= today) {
             return `<td><span class="full">×</span></td>`;
@@ -319,6 +319,7 @@ app.get("/admin", async (req, res) => {
 
   const searchPatientNumber = String(req.query.patientNumber || "").trim();
   const searchDate = String(req.query.date || "").trim();
+  const today = new Date().toLocaleDateString("sv-SE");
   const where = {};
 
   if (searchPatientNumber) {
@@ -334,9 +335,7 @@ app.get("/admin", async (req, res) => {
     include: {
       patient: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [{ date: "asc" }, { slot: "asc" }],
   });
 
   const tableRows = reservations
@@ -361,6 +360,11 @@ app.get("/admin", async (req, res) => {
 
   res.send(`
     <h1>予約一覧</h1>
+    <p>
+  <a href="/admin/add">
+    📞 電話予約を追加
+  </a>
+</p>
     <p>検索中の患者番号：${searchPatientNumber || "なし"}</p>
 <p>検索結果：${reservations.length}件</p>
     <form method="GET" action="/admin">
@@ -384,6 +388,18 @@ app.get("/admin", async (req, res) => {
   <button type="submit">検索</button>
 </form>
 
+<br>
+
+<a href="/admin?date=${today}">
+  今日の予約
+</a>
+
+&nbsp;&nbsp;
+
+<a href="/admin">
+  全件表示
+</a>
+
 <p>
 患者番号：${searchPatientNumber || "指定なし"}
 ／
@@ -404,6 +420,174 @@ app.get("/admin", async (req, res) => {
   ${tableRows}
 </table>
     <a href="/">戻る</a>
+  `);
+});
+
+app.get("/admin/add", (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  res.send(`
+    <h1>電話予約</h1>
+
+    <form action="/admin/add" method="POST">
+
+      <label>患者番号</label><br>
+      <input type="text" name="patientNumber" required>
+
+      <br><br>
+
+      <label>日付</label><br>
+      <input type="date" name="date" required>
+
+      <br><br>
+
+      <label>時間</label><br>
+
+      <select name="slot">
+        <option>09:00</option>
+        <option>09:30</option>
+        <option>10:00</option>
+        <option>10:30</option>
+      </select>
+
+      <br><br>
+
+      <button type="submit">
+        確認
+      </button>
+
+    </form>
+
+    <br>
+
+    <a href="/admin">
+      戻る
+    </a>
+  `);
+});
+
+app.post("/admin/add", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const { patientNumber, date, slot } = req.body;
+
+  const patient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+  });
+
+  if (!patient) {
+    return res.send(`
+      <h1>電話予約</h1>
+
+      <p style="color:red;">
+        患者番号が見つかりません。
+      </p>
+
+      <a href="/admin/add">戻る</a>
+    `);
+  }
+
+  res.send(`
+    <h1>電話予約確認</h1>
+
+    <p>患者番号：${patientNumber}</p>
+    <p>氏名：${patient.name}</p>
+    <p>予約日：${date}</p>
+    <p>予約時間：${slot}</p>
+
+    <form action="/admin/add/complete" method="POST">
+
+      <input type="hidden" name="patientNumber" value="${patientNumber}">
+      <input type="hidden" name="date" value="${date}">
+      <input type="hidden" name="slot" value="${slot}">
+
+      <button type="submit">
+        この内容で登録
+      </button>
+
+    </form>
+
+    <br>
+
+    <a href="/admin/add">
+      戻る
+    </a>
+  `);
+});
+
+app.post("/admin/add/complete", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const { patientNumber, date, slot } = req.body;
+
+  const patient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+  });
+
+  const existingReservation = await prisma.reservation.findFirst({
+    where: {
+      patientNumber,
+      date,
+    },
+  });
+
+  if (existingReservation) {
+    return res.send(`
+      <h1>予約不可</h1>
+      <p>同じ日にすでに予約があります。</p>
+      <p>既存予約：${existingReservation.date} ${existingReservation.slot}</p>
+      <a href="/admin/add">戻る</a>
+    `);
+  }
+
+  const count = await prisma.reservation.count({
+    where: {
+      date,
+      slot,
+    },
+  });
+
+  if (count >= 2) {
+    return res.send(`
+      <h1>予約不可</h1>
+      <p>${date} ${slot} は満員です。</p>
+      <a href="/admin/add">戻る</a>
+    `);
+  }
+
+  const reservationCode = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+
+  await prisma.reservation.create({
+    data: {
+      patientNumber,
+      date,
+      slot,
+      reservationCode,
+    },
+  });
+
+  res.send(`
+    <h1>電話予約完了</h1>
+    <p>患者番号：${patientNumber}</p>
+    <p>氏名：${patient.name}</p>
+    <p>予約日：${date}</p>
+    <p>予約時間：${slot}</p>
+    <p><strong>予約番号：${reservationCode}</strong></p>
+    <p>予約を登録しました。</p>
+    <a href="/admin">予約一覧へ戻る</a>
   `);
 });
 
@@ -441,7 +625,7 @@ app.get("/cancel-input", (req, res) => {
 
 app.post("/cancel-patient", async (req, res) => {
   const patientNumber = req.body.patientNumber;
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("sv-SE");
 
   const patient = await prisma.patient.findUnique({
     where: {
