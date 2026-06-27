@@ -378,6 +378,11 @@ app.get("/admin", async (req, res) => {
   <a href="/admin/add">
     📞 電話予約を追加
   </a>
+  <p>
+  <a href="/admin/patients">
+    👤 患者管理
+  </a>
+</p>
 </p>
     <p>検索中の患者番号：${searchPatientNumber || "なし"}</p>
 <p>検索結果：${reservations.length}件</p>
@@ -750,6 +755,289 @@ app.post("/admin/edit/:id", async (req, res) => {
 
     <a href="/admin">予約一覧へ戻る</a>
   `);
+});
+
+app.get("/admin/patients", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const patients = await prisma.patient.findMany({
+    orderBy: {
+      patientNumber: "asc",
+    },
+  });
+
+  const rows = patients
+    .map(
+      (p) => `
+      <tr>
+        <td>${p.patientNumber}</td>
+        <td>${p.name}</td>
+        <td>
+          <a href="/admin/patients/edit/${p.id}">
+            編集
+          </a>
+
+          &nbsp;
+
+          <a href="/admin/patients/delete/${p.id}">
+            削除
+          </a>
+        </td>
+      </tr>
+    `,
+    )
+    .join("");
+  res.send(`
+    <h1>患者一覧</h1>
+
+    <p>
+      <a href="/admin/patients/add">
+        ＋患者登録
+      </a>
+    </p>
+
+    <table border="1" cellpadding="8">
+      <tr>
+        <th>患者番号</th>
+        <th>氏名</th>
+        <th>操作</th>
+      </tr>
+
+      ${rows}
+    </table>
+
+    <br>
+
+    <a href="/admin">
+      戻る
+    </a>
+  `);
+});
+
+app.get("/admin/patients/add", (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  res.send(`
+    <h1>患者登録</h1>
+
+    <form action="/admin/patients/add" method="POST">
+      <label>患者番号</label><br>
+      <input type="text" name="patientNumber" required>
+
+      <br><br>
+
+      <label>氏名</label><br>
+      <input type="text" name="name" required>
+
+      <br><br>
+
+      <button type="submit">登録</button>
+    </form>
+
+    <br>
+    <a href="/admin/patients">戻る</a>
+  `);
+});
+
+app.post("/admin/patients/add", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const patientNumber = String(req.body.patientNumber).trim();
+  const name = String(req.body.name).trim();
+
+  const existingPatient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+  });
+
+  if (existingPatient) {
+    return res.send(`
+      <h1>患者登録</h1>
+      <p style="color:red;">この患者番号はすでに登録されています。</p>
+      <a href="/admin/patients/add">戻る</a>
+    `);
+  }
+
+  await prisma.patient.create({
+    data: {
+      patientNumber,
+      name,
+    },
+  });
+
+  res.redirect("/admin/patients");
+});
+
+app.get("/admin/patients/edit/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+
+  const patient = await prisma.patient.findUnique({
+    where: { id },
+  });
+
+  if (!patient) {
+    return res.send(`
+      <h1>患者が見つかりません</h1>
+      <a href="/admin/patients">戻る</a>
+    `);
+  }
+
+  res.send(`
+    <h1>患者編集</h1>
+
+    <form action="/admin/patients/edit/${patient.id}" method="POST">
+      <label>患者番号</label><br>
+      <input type="text" name="patientNumber" value="${patient.patientNumber}" required>
+
+      <br><br>
+
+      <label>氏名</label><br>
+      <input type="text" name="name" value="${patient.name}" required>
+
+      <br><br>
+
+      <button type="submit">保存</button>
+    </form>
+
+    <br>
+    <a href="/admin/patients">戻る</a>
+  `);
+});
+
+app.post("/admin/patients/edit/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+  const patientNumber = String(req.body.patientNumber).trim();
+  const name = String(req.body.name).trim();
+
+  const patient = await prisma.patient.findUnique({
+    where: { id },
+  });
+
+  if (!patient) {
+    return res.send(`
+      <h1>患者が見つかりません</h1>
+      <a href="/admin/patients">戻る</a>
+    `);
+  }
+
+  const duplicate = await prisma.patient.findFirst({
+    where: {
+      patientNumber,
+      id: {
+        not: id,
+      },
+    },
+  });
+
+  if (duplicate) {
+    return res.send(`
+      <h1>患者編集</h1>
+      <p style="color:red;">この患者番号はすでに使われています。</p>
+      <a href="/admin/patients/edit/${id}">戻る</a>
+    `);
+  }
+
+  await prisma.patient.update({
+    where: { id },
+    data: {
+      patientNumber,
+      name,
+    },
+  });
+
+  res.redirect("/admin/patients");
+});
+
+app.get("/admin/patients/delete/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+
+  const patient = await prisma.patient.findUnique({
+    where: { id },
+  });
+
+  if (!patient) {
+    return res.send(`
+      <h1>患者が見つかりません</h1>
+      <a href="/admin/patients">戻る</a>
+    `);
+  }
+
+  res.send(`
+    <h1>患者削除確認</h1>
+
+    <p>患者番号：${patient.patientNumber}</p>
+    <p>氏名：${patient.name}</p>
+
+    <p style="color:red;">
+      本当にこの患者を削除しますか？
+    </p>
+
+    <form action="/admin/patients/delete/${patient.id}" method="POST">
+      <button type="submit">削除する</button>
+    </form>
+
+    <br>
+    <a href="/admin/patients">戻る</a>
+  `);
+});
+
+app.post("/admin/patients/delete/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+
+  const patient = await prisma.patient.findUnique({
+    where: { id },
+  });
+
+  if (!patient) {
+    return res.send(`
+      <h1>患者が見つかりません</h1>
+      <a href="/admin/patients">戻る</a>
+    `);
+  }
+
+  const reservationCount = await prisma.reservation.count({
+    where: {
+      patientNumber: patient.patientNumber,
+    },
+  });
+
+  if (reservationCount > 0) {
+    return res.send(`
+      <h1>削除できません</h1>
+      <p>この患者には予約が存在するため削除できません。</p>
+      <p>予約件数：${reservationCount}件</p>
+      <a href="/admin/patients">戻る</a>
+    `);
+  }
+
+  await prisma.patient.delete({
+    where: { id },
+  });
+
+  res.redirect("/admin/patients");
 });
 
 app.post("/cancel", async (req, res) => {
