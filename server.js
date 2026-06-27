@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const express = require("express");
@@ -681,7 +682,7 @@ app.post("/cancel-patient", async (req, res) => {
     where: {
       patientNumber,
       date: {
-        gte: today,
+        gt: today,
       },
     },
     include: {
