@@ -3,9 +3,18 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const express = require("express");
 const session = require("express-session");
+const line = require("@line/bot-sdk");
 const config = require("./config");
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const PORT = process.env.PORT || 3000;
+const lineConfig = {
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+};
+
+const lineClient = new line.messagingApi.MessagingApiClient({
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+});
 
 const app = express();
 app.set("view engine", "ejs");
@@ -1006,6 +1015,59 @@ app.post("/cancel-confirm", async (req, res) => {
 
   return res.redirect("/");
 });
+
+app.post("/line/webhook", line.middleware(lineConfig), async (req, res) => {
+  try {
+    await Promise.all(req.body.events.map(handleLineEvent));
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+});
+
+async function handleLineEvent(event) {
+  if (event.type !== "message" || event.message.type !== "text") {
+    return;
+  }
+
+  const text = event.message.text.trim();
+  const appUrl = process.env.APP_URL;
+
+  if (text === "予約") {
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: `予約はこちら：\n${appUrl}/`,
+        },
+      ],
+    });
+  }
+
+  if (text === "キャンセル") {
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: `予約キャンセルはこちら：\n${appUrl}/cancel-input`,
+        },
+      ],
+    });
+  }
+
+  return lineClient.replyMessage({
+    replyToken: event.replyToken,
+    messages: [
+      {
+        type: "text",
+        text: "「予約」または「キャンセル」と送信してください。",
+      },
+    ],
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
