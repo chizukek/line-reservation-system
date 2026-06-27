@@ -3,18 +3,18 @@ const prisma = new PrismaClient();
 const express = require("express");
 const session = require("express-session");
 const config = require("./config");
-const ADMIN_PASSWORD = "1234";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: "admin-secret-key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   }),
 );
-const PORT = 3000;
 const validPatients = ["10001", "10002", "10003"];
 
 app.get("/", async (req, res) => {
