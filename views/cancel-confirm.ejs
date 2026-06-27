@@ -1,0 +1,30 @@
+<%- include("partials/header", { title: "予約キャンセル確認" }) %>
+
+<h1>予約キャンセル確認</h1>
+
+<p>氏名：<%= reservation.patient.name %></p>
+<p>予約日：<%= reservation.date %></p>
+<p>予約時間：<%= reservation.slot %></p>
+
+<p class="error">
+本当にキャンセルしますか？
+</p>
+
+<form action="/cancel-confirm" method="POST">
+
+  <input type="hidden" name="id" value="<%= reservation.id %>">
+  <input type="hidden" name="from" value="<%= from %>">
+
+  <button type="submit">
+    はい、キャンセルします
+  </button>
+
+</form>
+
+<br>
+
+<a href="<%= from === 'admin' ? '/admin' : '/' %>">
+戻る
+</a>
+
+<%- include("partials/footer") %>

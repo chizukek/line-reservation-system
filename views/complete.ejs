@@ -1,0 +1,18 @@
+<%- include("partials/header", { title: "予約完了" }) %>
+
+<h1>予約受付</h1>
+
+<p>患者番号：<%= patient.patientNumber %></p>
+<p>氏名：<%= patient.name %></p>
+<p>予約日：<%= date %></p>
+<p>予約時間：<%= slot %></p>
+
+<p><strong>予約番号：<%= reservationCode %></strong></p>
+
+<p class="success">
+  予約を保存しました。
+</p>
+
+<a href="/">トップへ戻る</a>
+
+<%- include("partials/footer") %>

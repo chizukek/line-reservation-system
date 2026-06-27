@@ -33,142 +33,42 @@ app.get("/", async (req, res) => {
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
 
-    dates.push(`${year}-${month}-${day}`);
+    const value = `${year}-${month}-${day}`;
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+    const label = `${d.getMonth() + 1}/${d.getDate()}(${weekdays[d.getDay()]})`;
+
+    dates.push({
+      value,
+      label,
+    });
   }
 
-  const slots = config.allSlots;
   const reservations = await prisma.reservation.findMany();
+  const today = new Date().toLocaleDateString("sv-SE");
 
-  const rows = slots
-    .map((slot) => {
-      const cells = dates
-        .map((date) => {
-          const count = reservations.filter(
-            (r) => r.date === date && r.slot === slot,
-          ).length;
-
-          const availableSlots = config.getSlotsForDate(date);
-
-          if (!availableSlots.includes(slot)) {
-            return `<td><span class="full">―</span></td>`;
-          }
-
-          const today = new Date().toLocaleDateString("sv-SE");
-
-          if (config.holidays.includes(date)) {
-            return `<td><span class="full">休</span></td>`;
-          }
-          if (date <= today) {
-            return `<td><span class="full">×</span></td>`;
-          }
-
-          if (count >= 2) {
-            return `<td><span class="full">×</span></td>`;
-          }
-
-          if (count === 1) {
-            return `<td><a class="few" href="/input?date=${date}&slot=${slot}">△</a></td>`;
-          }
-
-          return `<td><a class="open" href="/input?date=${date}&slot=${slot}">○</a></td>`;
-        })
-        .join("");
-
-      return `<tr><th>${slot}</th>${cells}</tr>`;
-    })
-    .join("");
-
-  res.send(`
-    <style>
-  body {
-    font-family: sans-serif;
-    padding: 20px;
-  }
-
-  table {
-    border-collapse: collapse;
-  }
-
-  th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-  }
-
-  th {
-    background: #f2f2f2;
-  }
-
-  a {
-    font-size: 20px;
-    text-decoration: none;
-  }
-
-  .open {
-    color: green;
-    font-weight: bold;
-  }
-
-  .few {
-    color: orange;
-    font-weight: bold;
-  }
-
-  .full {
-    color: red;
-    font-weight: bold;
-  }
-</style>
-    <h1>LINE予約システム</h1>
-    <table border="1" cellpadding="10">
-      <tr>
-        <th>時間</th>
-        ${dates
-          .map((date) => {
-            const d = new Date(date);
-            const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-            const label = `${d.getMonth() + 1}/${d.getDate()}(${weekdays[d.getDay()]})`;
-            return `<th>${label}</th>`;
-          })
-          .join("")}
-      </tr>
-      ${rows}
-    </table>
-    <br><br>
-
-    <a href="/?week=${Math.max(0, week - 1)}">
-    ← 前の週
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a href="/?week=${week + 1}">
-    次の週 →
-    </a>
-    <br>
-<a href="/cancel-input">予約をキャンセルする</a>
-  `);
+  res.render("index", {
+    title: "予約表",
+    week,
+    dates,
+    slots: config.allSlots,
+    reservations,
+    today,
+    holidays: config.holidays,
+    getSlotsForDate: config.getSlotsForDate,
+  });
 });
 
 app.get("/input", (req, res) => {
   const date = req.query.date;
   const slot = req.query.slot;
 
-  res.send(`
-    <h1>患者番号入力</h1>
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-
-    <form action="/confirm" method="POST">
-      <input type="hidden" name="date" value="${date}">
-      <input type="hidden" name="slot" value="${slot}">
-
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" required><br><br>
-
-      <button type="submit">予約する</button>
-    </form>
-  `);
+  res.render("input", {
+    title: "患者番号入力",
+    date,
+    slot,
+    patientNumber: "",
+    error: null,
+  });
 });
 
 app.post("/confirm", async (req, res) => {
@@ -183,47 +83,21 @@ app.post("/confirm", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-    <h1>患者番号入力</h1>
-
-    <p style="color:red;">
-      患者番号が間違っています。もう一度入力してください。
-    </p>
-
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-
-    <form action="/confirm" method="POST">
-      <input type="hidden" name="date" value="${date}">
-      <input type="hidden" name="slot" value="${slot}">
-
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" required><br><br>
-
-      <button type="submit">確認へ</button>
-    </form>
-  `);
+    return res.render("input", {
+      title: "患者番号入力",
+      date,
+      slot,
+      patientNumber,
+      error: "患者番号が間違っています。もう一度入力してください。",
+    });
   }
 
-  res.send(`
-    <h1>予約確認</h1>
-
-    <p>患者番号：${patientNumber}</p>
-    <p>氏名：${patient.name}</p>
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-
-    <form action="/reserve" method="POST">
-      <input type="hidden" name="patientNumber" value="${patientNumber}">
-      <input type="hidden" name="date" value="${date}">
-      <input type="hidden" name="slot" value="${slot}">
-
-      <button type="submit">この内容で予約する</button>
-    </form>
-
-    <br>
-    <a href="/">戻る</a>
-  `);
+  res.render("confirm", {
+    title: "予約確認",
+    patient,
+    date,
+    slot,
+  });
 });
 
 app.post("/reserve", async (req, res) => {
@@ -237,6 +111,10 @@ app.post("/reserve", async (req, res) => {
     },
   });
 
+  if (!patient) {
+    return res.redirect("/");
+  }
+
   const existingReservation = await prisma.reservation.findFirst({
     where: {
       patientNumber,
@@ -245,12 +123,13 @@ app.post("/reserve", async (req, res) => {
   });
 
   if (existingReservation) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>同じ日にすでに予約があります。</p>
-      <p>既存予約：${existingReservation.date} ${existingReservation.slot}</p>
-      <a href="/">戻る</a>
-    `);
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "同じ日にすでに予約があります。",
+      detail: `既存予約：${existingReservation.date} ${existingReservation.slot}`,
+      backUrl: "/",
+    });
   }
 
   const count = await prisma.reservation.count({
@@ -260,18 +139,20 @@ app.post("/reserve", async (req, res) => {
     },
   });
 
+  if (count >= 2) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: `${date} ${slot} は満員です。`,
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
   const reservationCode = Math.random()
     .toString(36)
     .substring(2, 8)
     .toUpperCase();
-
-  if (count >= 2) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>${date} ${slot} は満員です。</p>
-      <a href="/">戻る</a>
-    `);
-  }
 
   await prisma.reservation.create({
     data: {
@@ -282,16 +163,13 @@ app.post("/reserve", async (req, res) => {
     },
   });
 
-  res.send(`
-    <h1>予約受付</h1>
-    <p>患者番号：${patientNumber}</p>
-    <p>氏名：${patient.name}</p>
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-    <p><strong>予約番号：${reservationCode}</strong></p>
-    <p>予約を保存しました。</p>
-    <a href="/">戻る</a>
-  `);
+  res.render("complete", {
+    title: "予約完了",
+    patient,
+    date,
+    slot,
+    reservationCode,
+  });
 });
 
 app.get("/admin-login", (req, res) => {
@@ -436,14 +314,26 @@ app.post("/admin/add/complete", async (req, res) => {
     },
   });
 
+  if (!patient) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "患者番号が見つかりません。",
+      detail: "",
+      backUrl: "/admin/add",
+    });
+  }
+
   const availableSlots = config.getSlotsForDate(date);
 
   if (!availableSlots.includes(slot)) {
-    return res.send(`
-    <h1>予約不可</h1>
-    <p>${date} ${slot} は診療時間外です。</p>
-    <a href="/admin/add">戻る</a>
-  `);
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: `${date} ${slot} は診療時間外です。`,
+      detail: "",
+      backUrl: "/admin/add",
+    });
   }
 
   const existingReservation = await prisma.reservation.findFirst({
@@ -454,12 +344,13 @@ app.post("/admin/add/complete", async (req, res) => {
   });
 
   if (existingReservation) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>同じ日にすでに予約があります。</p>
-      <p>既存予約：${existingReservation.date} ${existingReservation.slot}</p>
-      <a href="/admin/add">戻る</a>
-    `);
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "同じ日にすでに予約があります。",
+      detail: `既存予約：${existingReservation.date} ${existingReservation.slot}`,
+      backUrl: "/admin/add",
+    });
   }
 
   const count = await prisma.reservation.count({
@@ -470,11 +361,13 @@ app.post("/admin/add/complete", async (req, res) => {
   });
 
   if (count >= 2) {
-    return res.send(`
-      <h1>予約不可</h1>
-      <p>${date} ${slot} は満員です。</p>
-      <a href="/admin/add">戻る</a>
-    `);
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: `${date} ${slot} は満員です。`,
+      detail: "",
+      backUrl: "/admin/add",
+    });
   }
 
   const reservationCode = Math.random()
@@ -491,16 +384,13 @@ app.post("/admin/add/complete", async (req, res) => {
     },
   });
 
-  res.send(`
-    <h1>電話予約完了</h1>
-    <p>患者番号：${patientNumber}</p>
-    <p>氏名：${patient.name}</p>
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-    <p><strong>予約番号：${reservationCode}</strong></p>
-    <p>予約を登録しました。</p>
-    <a href="/admin">予約一覧へ戻る</a>
-  `);
+  res.render("complete", {
+    title: "電話予約完了",
+    patient,
+    date,
+    slot,
+    reservationCode,
+  });
 });
 
 app.get("/admin/edit/:id", async (req, res) => {
@@ -823,48 +713,19 @@ app.post("/cancel", async (req, res) => {
     },
   });
 
-  res.send(`
-  <h1>キャンセル確認</h1>
-
-  <p>氏名：${reservation.patient.name}</p>
-  <p>予約日：${reservation.date}</p>
-  <p>予約時間：${reservation.slot}</p>
-
-  <p style="color:red;">
-    本当にキャンセルしますか？
-  </p>
-
-  <form action="/cancel-confirm" method="POST">
-    <input type="hidden" name="id" value="${reservation.id}">
-    <input type="hidden" name="from" value="${from}">
-
-    <button type="submit">
-      はい、キャンセルします
-    </button>
-  </form>
-
-  <br>
-
-  <a href="${from === "admin" ? "/admin" : "/"}">
-    戻る
-  </a>
-`);
+  res.render("cancel-confirm", {
+    title: "予約キャンセル確認",
+    reservation,
+    from,
+  });
 });
 
 app.get("/cancel-input", (req, res) => {
-  res.send(`
-    <h1>予約キャンセル</h1>
-
-    <form action="/cancel-patient" method="POST">
-      <label>患者番号</label><br>
-      <input type="text" name="patientNumber" required><br><br>
-
-      <button type="submit">予約を探す</button>
-    </form>
-
-    <br>
-    <a href="/">戻る</a>
-  `);
+  res.render("cancel-input", {
+    title: "予約キャンセル",
+    patientNumber: "",
+    error: null,
+  });
 });
 
 app.post("/cancel-patient", async (req, res) => {
@@ -878,11 +739,11 @@ app.post("/cancel-patient", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-    <h1>予約キャンセル</h1>
-    <p style="color:red;">患者番号が見つかりません。</p>
-    <a href="/cancel-input">戻る</a>
-  `);
+    return res.render("cancel-input", {
+      title: "予約キャンセル",
+      patientNumber,
+      error: "患者番号が見つかりません。",
+    });
   }
 
   const reservations = await prisma.reservation.findMany({
@@ -895,63 +756,22 @@ app.post("/cancel-patient", async (req, res) => {
     include: {
       patient: true,
     },
-    orderBy: [
-      {
-        date: "asc",
-      },
-      {
-        slot: "asc",
-      },
-    ],
+    orderBy: [{ date: "asc" }, { slot: "asc" }],
   });
+
   if (reservations.length === 0) {
-    return res.send(`
-          <h1>予約キャンセル</h1>
-          <p style="color:red;">予約が見つかりません。</p>
-          <a href="/cancel-input">戻る</a>
-        `);
+    return res.render("cancel-input", {
+      title: "予約キャンセル",
+      patientNumber,
+      error: "キャンセルできる予約が見つかりません。",
+    });
   }
 
-  const tableRows = reservations
-    .map(
-      (r) => `
-      <tr>
-        <td>${r.date}</td>
-        <td>${r.slot}</td>
-        <td>${r.patient.name}</td>
-        <td>${r.patientNumber}</td>
-        <td>${r.reservationCode}</td>
-        <td>
-<form action="/cancel" method="POST">
-          <input type="hidden" name="from" value="patient">
-            <input type="hidden" name="id" value="${r.id}">
-            <button type="submit">キャンセル</button>
-          </form>
-        </td>
-      </tr>
-    `,
-    )
-    .join("");
-
-  res.send(`
-        <h1>予約一覧</h1>
-        <p>患者番号：${patientNumber}</p>
-        <p>氏名：${patient.name}</p>
-        <table border="1" cellpadding="8">
-  <tr>
-    <th>日付</th>
-    <th>時間</th>
-    <th>氏名</th>
-    <th>患者番号</th>
-    <th>予約番号</th>
-    <th>操作</th>
-  </tr>
-
-  ${tableRows}
-</table>
-
-        <a href="/">トップへ戻る</a>
-    `);
+  res.render("cancel-list", {
+    title: "予約キャンセル",
+    patient,
+    reservations,
+  });
 });
 
 app.post("/cancel-confirm", async (req, res) => {

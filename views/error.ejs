@@ -1,0 +1,19 @@
+<%- include("partials/header", { title: title || "エラー" }) %>
+
+<h1><%= heading || "エラー" %></h1>
+
+<p class="error">
+  <%= message %>
+</p>
+
+<% if (detail) { %>
+  <p><%= detail %></p>
+<% } %>
+
+<br>
+
+<a href="<%= backUrl || '/' %>">
+  戻る
+</a>
+
+<%- include("partials/footer") %>

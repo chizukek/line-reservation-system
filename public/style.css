@@ -58,3 +58,65 @@ a:hover {
   color: red;
   font-weight: bold;
 }
+
+form {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+button {
+  min-width: 90px;
+}
+
+input,
+select,
+button {
+  font-size: 15px;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #eef7fb;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+.success {
+  color: green;
+  font-weight: bold;
+}
+
+nav {
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.open {
+  color: green;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.few {
+  color: orange;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.full {
+  color: red;
+  font-weight: bold;
+}

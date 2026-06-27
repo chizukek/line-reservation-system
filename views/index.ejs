@@ -1,0 +1,53 @@
+<%- include("partials/header", { title: "予約表" }) %>
+
+<h1>予約表</h1>
+
+<table>
+  <tr>
+    <th>時間</th>
+    <% dates.forEach(date => { %>
+      <th>
+        <%= date.label %>
+      </th>
+    <% }) %>
+  </tr>
+
+  <% slots.forEach(slot => { %>
+    <tr>
+      <th><%= slot %></th>
+
+      <% dates.forEach(date => { %>
+        <td>
+          <% const count = reservations.filter(r => r.date === date.value && r.slot === slot).length; %>
+          <% const availableSlots = getSlotsForDate(date.value); %>
+
+          <% if (!availableSlots.includes(slot)) { %>
+            <span class="full">―</span>
+          <% } else if (holidays.includes(date.value)) { %>
+            <span class="full">休</span>
+          <% } else if (date.value <= today) { %>
+            <span class="full">×</span>
+          <% } else if (count >= 2) { %>
+            <span class="full">×</span>
+          <% } else if (count === 1) { %>
+            <a class="few" href="/input?date=<%= date.value %>&slot=<%= slot %>">△</a>
+          <% } else { %>
+            <a class="open" href="/input?date=<%= date.value %>&slot=<%= slot %>">○</a>
+          <% } %>
+        </td>
+      <% }) %>
+    </tr>
+  <% }) %>
+</table>
+
+<br>
+
+<a href="/?week=<%= Math.max(0, week - 1) %>">← 前の週</a>
+&nbsp;&nbsp;
+<a href="/?week=<%= week + 1 %>">次の週 →</a>
+
+<br><br>
+
+<a href="/cancel-input">予約をキャンセルする</a>
+
+<%- include("partials/footer") %>

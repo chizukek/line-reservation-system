@@ -1,0 +1,38 @@
+<%- include("partials/header", { title: "患者番号入力" }) %>
+
+<h1>患者番号入力</h1>
+
+<% if (error) { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<p>予約日：<%= date %></p>
+<p>予約時間：<%= slot %></p>
+
+<form action="/confirm" method="POST">
+
+  <input type="hidden" name="date" value="<%= date %>">
+  <input type="hidden" name="slot" value="<%= slot %>">
+
+  <label>患者番号</label><br>
+
+  <input
+    type="text"
+    name="patientNumber"
+    value="<%= patientNumber || '' %>"
+    required
+  >
+
+  <br><br>
+
+  <button type="submit">
+    予約する
+  </button>
+
+</form>
+
+<br>
+
+<a href="/">戻る</a>
+
+<%- include("partials/footer") %>

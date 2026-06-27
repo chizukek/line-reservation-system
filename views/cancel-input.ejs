@@ -1,0 +1,27 @@
+<%- include("partials/header", { title: "予約キャンセル" }) %>
+
+<h1>予約キャンセル</h1>
+
+<% if (error) { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<form action="/cancel-patient" method="POST">
+  <label>患者番号</label><br>
+  <input
+    type="text"
+    name="patientNumber"
+    value="<%= patientNumber || '' %>"
+    required
+  >
+
+  <br><br>
+
+  <button type="submit">予約を探す</button>
+</form>
+
+<br>
+
+<a href="/">戻る</a>
+
+<%- include("partials/footer") %>

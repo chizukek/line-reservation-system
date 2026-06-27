@@ -1,0 +1,40 @@
+<%- include("partials/header", { title: "予約キャンセル" }) %>
+
+<h1>予約一覧</h1>
+
+<p>患者番号：<%= patient.patientNumber %></p>
+<p>氏名：<%= patient.name %></p>
+
+<table>
+  <tr>
+    <th>日付</th>
+    <th>時間</th>
+    <th>氏名</th>
+    <th>患者番号</th>
+    <th>予約番号</th>
+    <th>操作</th>
+  </tr>
+
+  <% reservations.forEach(r => { %>
+    <tr>
+      <td><%= r.date %></td>
+      <td><%= r.slot %></td>
+      <td><%= r.patient.name %></td>
+      <td><%= r.patientNumber %></td>
+      <td><%= r.reservationCode %></td>
+      <td>
+        <form action="/cancel" method="POST">
+          <input type="hidden" name="from" value="patient">
+          <input type="hidden" name="id" value="<%= r.id %>">
+          <button type="submit">キャンセル</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+
+<br>
+
+<a href="/">トップへ戻る</a>
+
+<%- include("partials/footer") %>
