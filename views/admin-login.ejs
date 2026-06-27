@@ -1,0 +1,20 @@
+<%- include("partials/header", { title: "管理者ログイン" }) %>
+
+<h1>管理者ログイン</h1>
+
+<% if (error) { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<form action="/admin-login" method="POST">
+  <input
+    type="password"
+    name="password"
+    placeholder="パスワード"
+    required
+  >
+
+  <button type="submit">ログイン</button>
+</form>
+
+<%- include("partials/footer") %>

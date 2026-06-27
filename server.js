@@ -19,7 +19,23 @@ app.use(
     saveUninitialized: false,
   }),
 );
-const validPatients = ["10001", "10002", "10003"];
+
+function isValidPatientNumber(patientNumber) {
+  return /^\d{5}$/.test(patientNumber);
+}
+
+function isValidDateText(date) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date);
+}
+
+function isValidSlot(slot) {
+  return config.allSlots.includes(slot);
+}
+
+function isFutureDate(date) {
+  const today = new Date().toLocaleDateString("sv-SE");
+  return date > today;
+}
 
 app.get("/", async (req, res) => {
   const week = Number(req.query.week || 0);
@@ -76,6 +92,26 @@ app.post("/confirm", async (req, res) => {
   const date = req.body.date;
   const slot = req.body.slot;
 
+  if (!isValidPatientNumber(patientNumber)) {
+    return res.render("input", {
+      title: "患者番号入力",
+      date,
+      slot,
+      patientNumber,
+      error: "患者番号は5桁の数字で入力してください。",
+    });
+  }
+
+  if (!isValidDateText(date) || !isValidSlot(slot) || !isFutureDate(date)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "不正な予約内容です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
   const patient = await prisma.patient.findUnique({
     where: {
       patientNumber,
@@ -105,6 +141,58 @@ app.post("/reserve", async (req, res) => {
   const date = req.body.date;
   const slot = req.body.slot;
 
+  if (!isValidPatientNumber(patientNumber)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "患者番号が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isValidDateText(date)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "日付が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isValidSlot(slot)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "時間帯が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isFutureDate(date)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "予約可能期間外です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  const availableSlots = config.getSlotsForDate(date);
+
+  if (!availableSlots.includes(slot)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "その時間は診療時間外です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
   const patient = await prisma.patient.findUnique({
     where: {
       patientNumber,
@@ -112,56 +200,91 @@ app.post("/reserve", async (req, res) => {
   });
 
   if (!patient) {
-    return res.redirect("/");
-  }
-
-  const existingReservation = await prisma.reservation.findFirst({
-    where: {
-      patientNumber,
-      date,
-    },
-  });
-
-  if (existingReservation) {
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
-      message: "同じ日にすでに予約があります。",
-      detail: `既存予約：${existingReservation.date} ${existingReservation.slot}`,
-      backUrl: "/",
-    });
-  }
-
-  const count = await prisma.reservation.count({
-    where: {
-      date,
-      slot,
-    },
-  });
-
-  if (count >= 2) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: `${date} ${slot} は満員です。`,
+      message: "患者番号が見つかりません。",
       detail: "",
       backUrl: "/",
     });
   }
 
-  const reservationCode = Math.random()
-    .toString(36)
-    .substring(2, 8)
-    .toUpperCase();
+  let reservationCode;
 
-  await prisma.reservation.create({
-    data: {
-      patientNumber,
-      date,
-      slot,
-      reservationCode,
-    },
-  });
+  try {
+    await prisma.$transaction(
+      async (tx) => {
+        const existingReservation = await tx.reservation.findFirst({
+          where: {
+            patientNumber,
+            date,
+          },
+        });
+
+        if (existingReservation) {
+          throw new Error(
+            `DUPLICATE:${existingReservation.date} ${existingReservation.slot}`,
+          );
+        }
+
+        const count = await tx.reservation.count({
+          where: {
+            date,
+            slot,
+          },
+        });
+
+        if (count >= 2) {
+          throw new Error("FULL");
+        }
+
+        reservationCode = Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase();
+
+        await tx.reservation.create({
+          data: {
+            patientNumber,
+            date,
+            slot,
+            reservationCode,
+          },
+        });
+      },
+      {
+        isolationLevel: "Serializable",
+      },
+    );
+  } catch (error) {
+    if (error.message.startsWith("DUPLICATE:")) {
+      return res.render("error", {
+        title: "予約不可",
+        heading: "予約不可",
+        message: "同じ日にすでに予約があります。",
+        detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
+        backUrl: "/",
+      });
+    }
+
+    if (error.message === "FULL") {
+      return res.render("error", {
+        title: "予約不可",
+        heading: "予約不可",
+        message: `${date} ${slot} は満員です。`,
+        detail: "",
+        backUrl: "/",
+      });
+    }
+
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "予約処理中にエラーが発生しました。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
 
   res.render("complete", {
     title: "予約完了",
@@ -173,31 +296,20 @@ app.post("/reserve", async (req, res) => {
 });
 
 app.get("/admin-login", (req, res) => {
-  res.send(`
-    <h1>管理者ログイン</h1>
-
-    <form action="/admin-login" method="POST">
-      <input
-        type="password"
-        name="password"
-        placeholder="パスワード"
-        required
-      >
-
-      <button type="submit">ログイン</button>
-    </form>
-  `);
+  res.render("admin-login", {
+    title: "管理者ログイン",
+    error: null,
+  });
 });
 
 app.post("/admin-login", (req, res) => {
   const password = req.body.password;
 
   if (password !== ADMIN_PASSWORD) {
-    return res.send(`
-      <h1>ログイン失敗</h1>
-      <p>パスワードが違います。</p>
-      <a href="/admin-login">戻る</a>
-    `);
+    return res.render("admin-login", {
+      title: "管理者ログイン",
+      error: "パスワードが違います。",
+    });
   }
 
   req.session.isAdmin = true;
@@ -259,6 +371,32 @@ app.post("/admin/add", async (req, res) => {
 
   const { patientNumber, date, slot } = req.body;
 
+  if (!isValidPatientNumber(patientNumber)) {
+    return res.render("admin-add", {
+      title: "電話予約",
+      slots: config.allSlots,
+      error: "患者番号は5桁の数字で入力してください。",
+    });
+  }
+
+  if (!isValidDateText(date) || !isValidSlot(slot) || !isFutureDate(date)) {
+    return res.render("admin-add", {
+      title: "電話予約",
+      slots: config.allSlots,
+      error: "予約内容が不正です。",
+    });
+  }
+
+  const availableSlots = config.getSlotsForDate(date);
+
+  if (!availableSlots.includes(slot)) {
+    return res.render("admin-add", {
+      title: "電話予約",
+      slots: config.allSlots,
+      error: "その時間は診療時間外です。",
+    });
+  }
+
   const patient = await prisma.patient.findUnique({
     where: {
       patientNumber,
@@ -273,32 +411,12 @@ app.post("/admin/add", async (req, res) => {
     });
   }
 
-  res.send(`
-    <h1>電話予約確認</h1>
-
-    <p>患者番号：${patientNumber}</p>
-    <p>氏名：${patient.name}</p>
-    <p>予約日：${date}</p>
-    <p>予約時間：${slot}</p>
-
-    <form action="/admin/add/complete" method="POST">
-
-      <input type="hidden" name="patientNumber" value="${patientNumber}">
-      <input type="hidden" name="date" value="${date}">
-      <input type="hidden" name="slot" value="${slot}">
-
-      <button type="submit">
-        この内容で登録
-      </button>
-
-    </form>
-
-    <br>
-
-    <a href="/admin/add">
-      戻る
-    </a>
-  `);
+  res.render("admin-add-confirm", {
+    title: "電話予約確認",
+    patient,
+    date,
+    slot,
+  });
 });
 
 app.post("/admin/add/complete", async (req, res) => {
@@ -307,6 +425,46 @@ app.post("/admin/add/complete", async (req, res) => {
   }
 
   const { patientNumber, date, slot } = req.body;
+
+  if (!isValidPatientNumber(patientNumber)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "患者番号が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isValidDateText(date)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "日付が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isValidSlot(slot)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "時間帯が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  if (!isFutureDate(date)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "予約可能期間外です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
 
   const patient = await prisma.patient.findUnique({
     where: {
@@ -320,7 +478,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "患者番号が見つかりません。",
       detail: "",
-      backUrl: "/admin/add",
+      backUrl: "/",
     });
   }
 
@@ -332,57 +490,86 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: `${date} ${slot} は診療時間外です。`,
       detail: "",
-      backUrl: "/admin/add",
+      backUrl: "/",
     });
   }
 
-  const existingReservation = await prisma.reservation.findFirst({
-    where: {
-      patientNumber,
-      date,
-    },
-  });
+  let reservationCode;
 
-  if (existingReservation) {
+  try {
+    await prisma.$transaction(
+      async (tx) => {
+        const existingReservation = await tx.reservation.findFirst({
+          where: {
+            patientNumber,
+            date,
+          },
+        });
+
+        if (existingReservation) {
+          throw new Error(
+            `DUPLICATE:${existingReservation.date} ${existingReservation.slot}`,
+          );
+        }
+
+        const count = await tx.reservation.count({
+          where: {
+            date,
+            slot,
+          },
+        });
+
+        if (count >= 2) {
+          throw new Error("FULL");
+        }
+
+        reservationCode = Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase();
+
+        await tx.reservation.create({
+          data: {
+            patientNumber,
+            date,
+            slot,
+            reservationCode,
+          },
+        });
+      },
+      {
+        isolationLevel: "Serializable",
+      },
+    );
+  } catch (error) {
+    if (error.message.startsWith("DUPLICATE:")) {
+      return res.render("error", {
+        title: "予約不可",
+        heading: "予約不可",
+        message: "同じ日にすでに予約があります。",
+        detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
+        backUrl: "/",
+      });
+    }
+
+    if (error.message === "FULL") {
+      return res.render("error", {
+        title: "予約不可",
+        heading: "予約不可",
+        message: `${date} ${slot} は満員です。`,
+        detail: "",
+        backUrl: "/",
+      });
+    }
+
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
-      message: "同じ日にすでに予約があります。",
-      detail: `既存予約：${existingReservation.date} ${existingReservation.slot}`,
-      backUrl: "/admin/add",
-    });
-  }
-
-  const count = await prisma.reservation.count({
-    where: {
-      date,
-      slot,
-    },
-  });
-
-  if (count >= 2) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: `${date} ${slot} は満員です。`,
+      message: "予約処理中にエラーが発生しました。",
       detail: "",
-      backUrl: "/admin/add",
+      backUrl: "/",
     });
   }
-
-  const reservationCode = Math.random()
-    .toString(36)
-    .substring(2, 8)
-    .toUpperCase();
-
-  await prisma.reservation.create({
-    data: {
-      patientNumber,
-      date,
-      slot,
-      reservationCode,
-    },
-  });
 
   res.render("complete", {
     title: "電話予約完了",
@@ -406,10 +593,13 @@ app.get("/admin/edit/:id", async (req, res) => {
   });
 
   if (!reservation) {
-    return res.send(`
-      <h1>予約が見つかりません</h1>
-      <a href="/admin">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "予約が見つかりません。",
+      detail: "",
+      backUrl: "/admin",
+    });
   }
 
   res.render("admin-edit", {
@@ -434,10 +624,13 @@ app.post("/admin/edit/:id", async (req, res) => {
   });
 
   if (!reservation) {
-    return res.send(`
-      <h1>予約が見つかりません</h1>
-      <a href="/admin">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "予約が見つかりません。",
+      detail: "",
+      backUrl: "/admin",
+    });
   }
 
   const renderEdit = (error) => {
@@ -543,7 +736,7 @@ app.post("/admin/patients/add", async (req, res) => {
   });
 
   if (existingPatient) {
-    res.render("patient-add", {
+    return res.render("patient-add", {
       title: "患者登録",
       error: "この患者番号はすでに登録されています。",
     });
@@ -571,10 +764,13 @@ app.get("/admin/patients/edit/:id", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-      <h1>患者が見つかりません</h1>
-      <a href="/admin/patients">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者が見つかりません。",
+      detail: "",
+      backUrl: "/admin/patients",
+    });
   }
 
   res.render("patient-edit", {
@@ -598,10 +794,13 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-      <h1>患者が見つかりません</h1>
-      <a href="/admin/patients">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者が見つかりません。",
+      detail: "",
+      backUrl: "/admin",
+    });
   }
 
   const duplicate = await prisma.patient.findFirst({
@@ -648,10 +847,13 @@ app.get("/admin/patients/delete/:id", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-      <h1>患者が見つかりません</h1>
-      <a href="/admin/patients">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者が見つかりません。",
+      detail: "",
+      backUrl: "/admin/patients",
+    });
   }
 
   res.render("patient-delete", {
@@ -672,10 +874,13 @@ app.post("/admin/patients/delete/:id", async (req, res) => {
   });
 
   if (!patient) {
-    return res.send(`
-      <h1>患者が見つかりません</h1>
-      <a href="/admin/patients">戻る</a>
-    `);
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者が見つかりません。",
+      detail: "",
+      backUrl: "/admin/patients",
+    });
   }
 
   const reservationCount = await prisma.reservation.count({
@@ -685,12 +890,13 @@ app.post("/admin/patients/delete/:id", async (req, res) => {
   });
 
   if (reservationCount > 0) {
-    return res.send(`
-      <h1>削除できません</h1>
-      <p>この患者には予約が存在するため削除できません。</p>
-      <p>予約件数：${reservationCount}件</p>
-      <a href="/admin/patients">戻る</a>
-    `);
+    return res.render("error", {
+      title: "削除できません",
+      heading: "削除できません",
+      message: "この患者には予約が存在するため削除できません。",
+      detail: `予約件数：${reservationCount}件`,
+      backUrl: "/admin/patients",
+    });
   }
 
   await prisma.patient.delete({
@@ -712,6 +918,16 @@ app.post("/cancel", async (req, res) => {
       patient: true,
     },
   });
+
+  if (!reservation) {
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "予約が見つかりません。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
 
   res.render("cancel-confirm", {
     title: "予約キャンセル確認",

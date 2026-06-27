@@ -1,0 +1,40 @@
+<%- include("partials/header", { title: "電話予約確認" }) %>
+
+<h1>電話予約確認</h1>
+
+<p>患者番号：<%= patient.patientNumber %></p>
+<p>氏名：<%= patient.name %></p>
+<p>予約日：<%= date %></p>
+<p>予約時間：<%= slot %></p>
+
+<form action="/admin/add/complete" method="POST">
+  <input
+    type="hidden"
+    name="patientNumber"
+    value="<%= patient.patientNumber %>"
+  >
+
+  <input
+    type="hidden"
+    name="date"
+    value="<%= date %>"
+  >
+
+  <input
+    type="hidden"
+    name="slot"
+    value="<%= slot %>"
+  >
+
+  <button type="submit">
+    この内容で登録
+  </button>
+</form>
+
+<br>
+
+<a href="/admin/add">
+  戻る
+</a>
+
+<%- include("partials/footer") %>
