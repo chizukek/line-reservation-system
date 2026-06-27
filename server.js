@@ -359,6 +359,8 @@ app.get("/admin", async (req, res) => {
         <td>${r.patientNumber}</td>
         <td>${r.reservationCode}</td>
         <td>
+          <a href="/admin/edit/${r.id}">変更</a>
+
           <form action="/cancel" method="POST">
             <input type="hidden" name="from" value="admin"> 
             <input type="hidden" name="id" value="${r.id}">
@@ -458,12 +460,10 @@ app.get("/admin/add", (req, res) => {
       <label>時間</label><br>
 
       <select name="slot">
-        <option>09:00</option>
-        <option>09:30</option>
-        <option>10:00</option>
-        <option>10:30</option>
+        ${config.allSlots
+          .map((slot) => `<option value="${slot}">${slot}</option>`)
+          .join("")}
       </select>
-
       <br><br>
 
       <button type="submit">
@@ -546,6 +546,16 @@ app.post("/admin/add/complete", async (req, res) => {
     },
   });
 
+  const availableSlots = config.getSlotsForDate(date);
+
+  if (!availableSlots.includes(slot)) {
+    return res.send(`
+    <h1>予約不可</h1>
+    <p>${date} ${slot} は診療時間外です。</p>
+    <a href="/admin/add">戻る</a>
+  `);
+  }
+
   const existingReservation = await prisma.reservation.findFirst({
     where: {
       patientNumber,
@@ -599,6 +609,145 @@ app.post("/admin/add/complete", async (req, res) => {
     <p>予約時間：${slot}</p>
     <p><strong>予約番号：${reservationCode}</strong></p>
     <p>予約を登録しました。</p>
+    <a href="/admin">予約一覧へ戻る</a>
+  `);
+});
+
+app.get("/admin/edit/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
+    include: { patient: true },
+  });
+
+  if (!reservation) {
+    return res.send(`
+      <h1>予約が見つかりません</h1>
+      <a href="/admin">戻る</a>
+    `);
+  }
+
+  res.send(`
+    <h1>予約変更</h1>
+
+    <p>患者番号：${reservation.patientNumber}</p>
+    <p>氏名：${reservation.patient.name}</p>
+    <p>現在の予約：${reservation.date} ${reservation.slot}</p>
+
+    <form action="/admin/edit/${reservation.id}" method="POST">
+      <label>変更後の日付</label><br>
+      <input type="date" name="date" value="${reservation.date}" required>
+
+      <br><br>
+
+      <label>変更後の時間</label><br>
+      <select name="slot">
+        ${config.allSlots
+          .map(
+            (slot) =>
+              `<option value="${slot}" ${
+                slot === reservation.slot ? "selected" : ""
+              }>${slot}</option>`,
+          )
+          .join("")}
+      </select>
+
+      <br><br>
+
+      <button type="submit">変更する</button>
+    </form>
+
+    <br>
+    <a href="/admin">戻る</a>
+  `);
+});
+
+app.post("/admin/edit/:id", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+  const { date, slot } = req.body;
+
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
+    include: { patient: true },
+  });
+
+  if (!reservation) {
+    return res.send(`
+      <h1>予約が見つかりません</h1>
+      <a href="/admin">戻る</a>
+    `);
+  }
+
+  const availableSlots = config.getSlotsForDate(date);
+
+  if (!availableSlots.includes(slot)) {
+    return res.send(`
+      <h1>予約不可</h1>
+      <p>${date} ${slot} は診療時間外です。</p>
+      <a href="/admin/edit/${id}">戻る</a>
+    `);
+  }
+
+  const sameDayReservation = await prisma.reservation.findFirst({
+    where: {
+      patientNumber: reservation.patientNumber,
+      date,
+      id: {
+        not: id,
+      },
+    },
+  });
+
+  if (sameDayReservation) {
+    return res.send(`
+      <h1>予約不可</h1>
+      <p>同じ日にすでに予約があります。</p>
+      <p>既存予約：${sameDayReservation.date} ${sameDayReservation.slot}</p>
+      <a href="/admin/edit/${id}">戻る</a>
+    `);
+  }
+
+  const count = await prisma.reservation.count({
+    where: {
+      date,
+      slot,
+      id: {
+        not: id,
+      },
+    },
+  });
+
+  if (count >= 2) {
+    return res.send(`
+      <h1>予約不可</h1>
+      <p>${date} ${slot} は満員です。</p>
+      <a href="/admin/edit/${id}">戻る</a>
+    `);
+  }
+
+  await prisma.reservation.update({
+    where: { id },
+    data: {
+      date,
+      slot,
+    },
+  });
+
+  res.send(`
+    <h1>予約変更完了</h1>
+    <p>患者番号：${reservation.patientNumber}</p>
+    <p>氏名：${reservation.patient.name}</p>
+    <p>変更後：${date} ${slot}</p>
+
     <a href="/admin">予約一覧へ戻る</a>
   `);
 });
