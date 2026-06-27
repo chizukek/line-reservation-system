@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const express = require("express");
 const session = require("express-session");
+const config = require("./config");
 const ADMIN_PASSWORD = "1234";
 
 const app = express();
@@ -30,8 +31,8 @@ app.get("/", async (req, res) => {
 
     dates.push(`${year}-${month}-${day}`);
   }
-  const slots = ["09:00", "09:30", "10:00", "10:30"];
 
+  const slots = config.allSlots;
   const reservations = await prisma.reservation.findMany();
 
   const rows = slots
@@ -42,8 +43,17 @@ app.get("/", async (req, res) => {
             (r) => r.date === date && r.slot === slot,
           ).length;
 
+          const availableSlots = config.getSlotsForDate(date);
+
+          if (!availableSlots.includes(slot)) {
+            return `<td><span class="full">―</span></td>`;
+          }
+
           const today = new Date().toLocaleDateString("sv-SE");
 
+          if (config.holidays.includes(date)) {
+            return `<td><span class="full">休</span></td>`;
+          }
           if (date <= today) {
             return `<td><span class="full">×</span></td>`;
           }
