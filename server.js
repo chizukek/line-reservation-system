@@ -349,6 +349,7 @@ app.get("/admin", async (req, res) => {
         <td>${r.reservationCode}</td>
         <td>
           <form action="/cancel" method="POST">
+            <input type="hidden" name="from" value="admin"> 
             <input type="hidden" name="id" value="${r.id}">
             <button type="submit">キャンセル</button>
           </form>
@@ -593,18 +594,43 @@ app.post("/admin/add/complete", async (req, res) => {
 
 app.post("/cancel", async (req, res) => {
   const id = Number(req.body.id);
+  const from = req.body.from;
 
-  await prisma.reservation.delete({
+  const reservation = await prisma.reservation.findUnique({
     where: {
       id,
+    },
+    include: {
+      patient: true,
     },
   });
 
   res.send(`
-      <h1>キャンセル完了</h1>
-      <p>予約を削除しました。</p>
-      <a href="/admin">予約一覧へ戻る</a>
-    `);
+  <h1>キャンセル確認</h1>
+
+  <p>氏名：${reservation.patient.name}</p>
+  <p>予約日：${reservation.date}</p>
+  <p>予約時間：${reservation.slot}</p>
+
+  <p style="color:red;">
+    本当にキャンセルしますか？
+  </p>
+
+  <form action="/cancel-confirm" method="POST">
+    <input type="hidden" name="id" value="${reservation.id}">
+    <input type="hidden" name="from" value="${from}">
+
+    <button type="submit">
+      はい、キャンセルします
+    </button>
+  </form>
+
+  <br>
+
+  <a href="${from === "admin" ? "/admin" : "/"}">
+    戻る
+  </a>
+`);
 });
 
 app.get("/cancel-input", (req, res) => {
@@ -678,7 +704,8 @@ app.post("/cancel-patient", async (req, res) => {
         <td>${r.patientNumber}</td>
         <td>${r.reservationCode}</td>
         <td>
-          <form action="/cancel" method="POST">
+<form action="/cancel" method="POST">
+          <input type="hidden" name="from" value="patient">
             <input type="hidden" name="id" value="${r.id}">
             <button type="submit">キャンセル</button>
           </form>
@@ -709,8 +736,9 @@ app.post("/cancel-patient", async (req, res) => {
     `);
 });
 
-app.post("/cancel-patient-confirm", async (req, res) => {
+app.post("/cancel-confirm", async (req, res) => {
   const id = Number(req.body.id);
+  const from = req.body.from;
 
   await prisma.reservation.delete({
     where: {
@@ -718,11 +746,11 @@ app.post("/cancel-patient-confirm", async (req, res) => {
     },
   });
 
-  res.send(`
-      <h1>キャンセル完了</h1>
-      <p>予約をキャンセルしました。</p>
-      <a href="/">トップへ戻る</a>
-    `);
+  if (from === "admin") {
+    return res.redirect("/admin");
+  }
+
+  return res.redirect("/");
 });
 
 app.listen(PORT, () => {
