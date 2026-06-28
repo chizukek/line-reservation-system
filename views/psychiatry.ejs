@@ -1,0 +1,39 @@
+<%- include("partials/header", { title: "心療内科再診予約" }) %>
+
+<div class="notice-box">
+
+  <h1>心療内科再診予約</h1>
+
+  <p>
+    このLINE予約は
+    <strong>心療内科の再診患者様専用</strong>
+    です。
+  </p>
+
+  <p>
+    初診の方、または他診療科をご希望の方は、
+    お電話またはホームページよりお問い合わせください。
+  </p>
+
+  <div class="notice-warning">
+    ※患者番号をお持ちの再診患者様のみ予約できます。
+  </div>
+
+  <form action="/" method="GET">
+
+    <label class="check-label">
+      <input type="checkbox" required>
+      心療内科の再診患者です
+    </label>
+
+    <br><br>
+
+    <button type="submit">
+      日時選択へ進む
+    </button>
+
+  </form>
+
+</div>
+
+<%- include("partials/footer") %>
