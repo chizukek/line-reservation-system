@@ -266,6 +266,13 @@ button:hover {
   font-weight: 800;
 }
 
+.week-btn.disabled {
+  color: #aaa;
+  border-color: #ddd;
+  background: #f5f5f5;
+  pointer-events: none;
+}
+
 .reservation-table-wrapper {
   width: 100%;
   overflow-x: hidden;

@@ -6,15 +6,24 @@
   日時を選択
 </div>
 
+<div class="reserve-note">
+  予約は30日先まで受け付けています。<br>予約には患者番号が必要です。
+</div>
+
+
 <div class="reserve-legend">
   <span><span class="mark-open">○</span> 受付可能</span>
-  <span><span class="mark-full">×</span> 満員</span>
-  <span><span class="mark-disabled">−</span> 受付不可</span>
+  <span><span class="mark-full">✕</span> 満員</span>
+  <span><span class="mark-disabled">ー</span> 受付不可</span>
 </div>
 
 <div class="week-nav">
   <a class="week-btn" href="/?week=<%= Math.max(0, week - 1) %>">‹ 前の7日間</a>
-  <a class="week-btn active" href="/?week=<%= week + 1 %>">次の7日間 ›</a>
+  <% if (canGoNextWeek) { %>
+    <a class="week-btn active" href="/?week=<%= week + 1 %>">次の7日間 ›</a>
+  <% } else { %>
+    <span class="week-btn disabled">次の7日間 ›</span>
+  <% } %>
 </div>
 
 <div class="reservation-table-wrapper">
@@ -81,7 +90,9 @@
             <% if (!availableSlots.includes(slot)) { %>
               <span class="mark-disabled">−</span>
             <% } else if (date.value <= today) { %>
-              <span class="mark-full">×</span>
+              <span class="mark-disabled">−</span>
+            <% } else if (date.value > maxReservableText) { %>
+              <span class="mark-disabled">−</span>
             <% } else if (count >= 2) { %>
               <span class="mark-full">×</span>
             <% } else { %>
@@ -93,10 +104,6 @@
     <% }) %>
 
   </table>
-</div>
-
-<div class="reserve-note">
-  予約には患者番号が必要です。予約の確定は次の画面で行います。
 </div>
 
 <a class="cancel-link" href="/cancel-input">

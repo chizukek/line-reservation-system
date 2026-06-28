@@ -41,9 +41,20 @@ function isValidSlot(slot) {
   return config.allSlots.includes(slot);
 }
 
-function isFutureDate(date) {
+function isWithinReservationPeriod(date) {
   const today = new Date().toLocaleDateString("sv-SE");
   return date > today;
+}
+
+function isWithinReservationPeriod(date) {
+  const today = new Date();
+
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 30);
+
+  const targetDate = new Date(date);
+
+  return targetDate > today && targetDate <= maxDate;
 }
 
 app.get("/psychiatry", (req, res) => {
@@ -76,7 +87,15 @@ app.get("/", async (req, res) => {
 
   const reservations = await prisma.reservation.findMany();
   const today = new Date().toLocaleDateString("sv-SE");
+  const maxReservableDate = new Date();
+  maxReservableDate.setDate(maxReservableDate.getDate() + 30);
+  const maxReservableText = maxReservableDate.toLocaleDateString("sv-SE");
 
+  const nextWeekStart = new Date();
+  nextWeekStart.setDate(nextWeekStart.getDate() + (week + 1) * 7);
+  const nextWeekStartText = nextWeekStart.toLocaleDateString("sv-SE");
+
+  const canGoNextWeek = nextWeekStartText <= maxReservableText;
   res.render("index", {
     title: "予約表",
     week,
@@ -84,6 +103,8 @@ app.get("/", async (req, res) => {
     slots: config.allSlots,
     reservations,
     today,
+    maxReservableText,
+    canGoNextWeek,
     holidays: config.holidays,
     getSlotsForDate: config.getSlotsForDate,
   });
@@ -117,11 +138,15 @@ app.post("/confirm", async (req, res) => {
     });
   }
 
-  if (!isValidDateText(date) || !isValidSlot(slot) || !isFutureDate(date)) {
+  if (
+    !isValidDateText(date) ||
+    !isValidSlot(slot) ||
+    !isWithinReservationPeriod(date)
+  ) {
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
-      message: "不正な予約内容です。",
+      message: "予約は30日先まで受け付けています。",
       detail: "",
       backUrl: "/",
     });
@@ -186,11 +211,11 @@ app.post("/reserve", async (req, res) => {
     });
   }
 
-  if (!isFutureDate(date)) {
+  if (!isWithinReservationPeriod(date)) {
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
-      message: "予約可能期間外です。",
+      message: "予約は30日先まで受け付けています。",
       detail: "",
       backUrl: "/",
     });
@@ -394,7 +419,11 @@ app.post("/admin/add", async (req, res) => {
     });
   }
 
-  if (!isValidDateText(date) || !isValidSlot(slot) || !isFutureDate(date)) {
+  if (
+    !isValidDateText(date) ||
+    !isValidSlot(slot) ||
+    !isWithinReservationPeriod(date)
+  ) {
     return res.render("admin-add", {
       title: "電話予約",
       slots: config.allSlots,
@@ -471,7 +500,7 @@ app.post("/admin/add/complete", async (req, res) => {
     });
   }
 
-  if (!isFutureDate(date)) {
+  if (!isWithinReservationPeriod(date)) {
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
