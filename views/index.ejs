@@ -2,75 +2,104 @@
 
 <h1>予約表</h1>
 
-<div class="reservation-header">
-  <div>
-    <strong>日時選択</strong>
-    <span class="required-badge">必須</span>
-  </div>
-  <p>時間は目安です。実際の受付時間より前後する場合があります。</p>
+<div class="reserve-title">
+  日時を選択
 </div>
 
-<div class="legend">
-  <span class="legend-open">○ 受付可能</span>
-  <span class="legend-few">△ 残り1枠</span>
-  <span class="legend-full">× 満枠</span>
-  <span class="legend-disabled">― 受付不可</span>
+<div class="reserve-legend">
+  <span><span class="mark-open">○</span> 受付可能</span>
+  <span><span class="mark-full">×</span> 満員</span>
+  <span><span class="mark-disabled">−</span> 受付不可</span>
+</div>
+
+<div class="week-nav">
+  <a class="week-btn" href="/?week=<%= Math.max(0, week - 1) %>">‹ 前の7日間</a>
+  <a class="week-btn active" href="/?week=<%= week + 1 %>">次の7日間 ›</a>
 </div>
 
 <div class="reservation-table-wrapper">
   <table class="reservation-table">
-  <tr>
-    <th>時間</th>
-    <% dates.forEach(date => { %>
-      <th>
-        <%= date.label %>
-      </th>
-    <% }) %>
-  </tr>
 
-  <% slots.forEach(slot => { %>
-    <tr>
-      <th><%= slot %></th>
+    <tr class="month-row">
+      <th></th>
+      <% 
+        let currentMonth = "";
+        let monthStart = 0;
+        const monthGroups = [];
 
-      <% dates.forEach(date => { %>
-        <td>
-          <% const count = reservations.filter(r => r.date === date.value && r.slot === slot).length; %>
-          <% const availableSlots = getSlotsForDate(date.value); %>
+        dates.forEach((date, index) => {
+          const monthText = date.value.slice(0, 7);
+          if (monthText !== currentMonth) {
+            if (currentMonth) {
+              monthGroups.push({
+                month: currentMonth,
+                colspan: index - monthStart
+              });
+            }
+            currentMonth = monthText;
+            monthStart = index;
+          }
+        });
 
-          <% if (!availableSlots.includes(slot)) { %>
-            <span class="full">―</span>
-          <% } else if (holidays.includes(date.value)) { %>
-            <span class="full">休</span>
-          <% } else if (date.value <= today) { %>
-            <span class="full">×</span>
-          <% } else if (count >= 2) { %>
-            <span class="full">×</span>
-          <% } else if (count === 1) { %>
-            <a class="few" href="/input?date=<%= date.value %>&slot=<%= slot %>">△</a>
-          <% } else { %>
-            <a class="open" href="/input?date=<%= date.value %>&slot=<%= slot %>">○</a>
-          <% } %>
-        </td>
+        monthGroups.push({
+          month: currentMonth,
+          colspan: dates.length - monthStart
+        });
+      %>
+
+      <% monthGroups.forEach(group => { %>
+        <th colspan="<%= group.colspan %>">
+          <%= group.month.replace("-", "年") %>月
+        </th>
       <% }) %>
     </tr>
-  <% }) %>
-</table>
-<div class="legend">
-  <span class="legend-open">○ 空きあり</span>
-  <span class="legend-few">△ 残り1枠</span>
-  <span class="legend-full">× 満員</span>
-  <span>― 受付不可</span>
+
+    <tr class="date-row">
+      <th>日時</th>
+      <% dates.forEach(date => { 
+        const d = new Date(date.value);
+        const day = d.getDate();
+        const weekday = ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
+        const dayClass = d.getDay() === 0 ? "sunday" : d.getDay() === 6 ? "saturday" : "";
+      %>
+        <th class="<%= dayClass %>">
+          <div><%= day %></div>
+          <div>(<%= weekday %>)</div>
+        </th>
+      <% }) %>
+    </tr>
+
+    <% slots.forEach(slot => { %>
+      <tr>
+        <th class="time-cell"><%= slot %></th>
+
+        <% dates.forEach(date => { %>
+          <td>
+            <% const count = reservations.filter(r => r.date === date.value && r.slot === slot).length; %>
+            <% const availableSlots = getSlotsForDate(date.value); %>
+
+            <% if (!availableSlots.includes(slot)) { %>
+              <span class="mark-disabled">−</span>
+            <% } else if (date.value <= today) { %>
+              <span class="mark-full">×</span>
+            <% } else if (count >= 2) { %>
+              <span class="mark-full">×</span>
+            <% } else { %>
+              <a class="mark-open" href="/input?date=<%= date.value %>&slot=<%= slot %>">○</a>
+            <% } %>
+          </td>
+        <% }) %>
+      </tr>
+    <% }) %>
+
+  </table>
 </div>
+
+<div class="reserve-note">
+  予約には患者番号が必要です。予約の確定は次の画面で行います。
 </div>
 
-<br>
-
-<a href="/?week=<%= Math.max(0, week - 1) %>">← 前の週</a>
-&nbsp;&nbsp;
-<a href="/?week=<%= week + 1 %>">次の週 →</a>
-
-<br><br>
-
-<a href="/cancel-input">予約をキャンセルする</a>
-
+<a class="cancel-link" href="/cancel-input">
+  予約確認・キャンセルはこちら
+</a>
 <%- include("partials/footer") %>
