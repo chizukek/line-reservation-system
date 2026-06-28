@@ -1039,8 +1039,25 @@ async function handleLineEvent(event) {
       replyToken: event.replyToken,
       messages: [
         {
-          type: "text",
-          text: `予約はこちら：\n${appUrl}/`,
+          type: "template",
+          altText: "予約メニュー",
+          template: {
+            type: "buttons",
+            title: "予約メニュー",
+            text: "ご希望の操作を選んでください。",
+            actions: [
+              {
+                type: "uri",
+                label: "予約する",
+                uri: `${appUrl}/`,
+              },
+              {
+                type: "uri",
+                label: "予約をキャンセルする",
+                uri: `${appUrl}/cancel-input`,
+              },
+            ],
+          },
         },
       ],
     });
@@ -1051,8 +1068,20 @@ async function handleLineEvent(event) {
       replyToken: event.replyToken,
       messages: [
         {
-          type: "text",
-          text: `予約キャンセルはこちら：\n${appUrl}/cancel-input`,
+          type: "template",
+          altText: "キャンセルメニュー",
+          template: {
+            type: "buttons",
+            title: "キャンセル",
+            text: "予約キャンセル画面を開きます。",
+            actions: [
+              {
+                type: "uri",
+                label: "キャンセル画面を開く",
+                uri: `${appUrl}/cancel-input`,
+              },
+            ],
+          },
         },
       ],
     });
@@ -1062,8 +1091,25 @@ async function handleLineEvent(event) {
     replyToken: event.replyToken,
     messages: [
       {
-        type: "text",
-        text: "「予約」または「キャンセル」と送信してください。",
+        type: "template",
+        altText: "メニュー",
+        template: {
+          type: "buttons",
+          title: "予約システム",
+          text: "ご希望の操作を選んでください。",
+          actions: [
+            {
+              type: "uri",
+              label: "予約する",
+              uri: `${appUrl}/`,
+            },
+            {
+              type: "uri",
+              label: "予約をキャンセルする",
+              uri: `${appUrl}/cancel-input`,
+            },
+          ],
+        },
       },
     ],
   });
