@@ -233,10 +233,18 @@ button:hover {
 
 .reserve-legend {
   display: flex;
-  gap: 20px;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
   margin: 14px 0 18px;
   font-size: 15px;
   font-weight: 600;
+}
+
+.reserve-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .week-nav {
@@ -314,21 +322,28 @@ button:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  font-size: 23px;
+  width: 28px;
+  height: 28px;
   line-height: 1;
-  font-weight: 800;
   text-decoration: none;
 }
 
 .mark-open {
-  color: #1f75bd;
+  color: #2b6cb0;
+  font-size: 23px;
+  font-weight: 700;
 }
 
-.mark-full,
+.mark-full {
+  color: #9aa3ad;
+  font-size: 20px;
+  font-weight: 400;
+}
+
 .mark-disabled {
-  color: #999;
+  color: #b7bec5;
+  font-size: 18px;
+  font-weight: 400;
 }
 
 .reserve-note {
@@ -382,15 +397,25 @@ button:hover {
     font-size: 14px;
   }
 
-  .mark-open,
+  .mark-open{
+    font-size:22px;
+  }
+
+  .mark-full{
+      font-size:19px;
+  }
+
+  .mark-disabled{
+      font-size:17px;
+  }
+
   .mark-full,
   .mark-disabled {
-    width: 24px;
-    height: 24px;
-    font-size: 22px;
+    font-weight: 300;
   }
 
   .week-btn {
     font-size: 15px;
   }
+
 }
