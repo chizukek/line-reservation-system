@@ -46,6 +46,12 @@ function isFutureDate(date) {
   return date > today;
 }
 
+app.get("/psychiatry", (req, res) => {
+  res.render("psychiatry", {
+    title: "心療内科再診予約",
+  });
+});
+
 app.get("/", async (req, res) => {
   const week = Number(req.query.week || 0);
   const dates = [];
