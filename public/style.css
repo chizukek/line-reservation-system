@@ -426,3 +426,75 @@ button:hover {
   }
 
 }
+
+.progress {
+  display: flex;
+  align-items: center;
+  margin: 18px 0 24px;
+}
+
+.progress-step {
+  text-align: center;
+  color: #9aa3ad;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.progress-step .circle {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: #dfe7eb;
+  color: #6b747a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.progress-step .label {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.progress-step.active {
+  color: #155f78;
+}
+
+.progress-step.active .circle {
+  background: #155f78;
+  color: white;
+}
+
+.progress .line {
+  flex: 1;
+  height: 3px;
+  background: #dfe7eb;
+  margin: 0 6px 22px;
+}
+
+.progress .line.active {
+  background: #155f78;
+}
+
+@media (max-width: 768px) {
+  .progress {
+    margin: 14px 0 20px;
+  }
+
+  .progress-step .circle {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+
+  .progress-step .label {
+    font-size: 12px;
+  }
+
+  .progress .line {
+    margin: 0 3px 22px;
+  }
+}
