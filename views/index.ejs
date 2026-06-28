@@ -2,7 +2,8 @@
 
 <h1>予約表</h1>
 
-<table>
+<div class="reservation-table-wrapper">
+  <table class="reservation-table">
   <tr>
     <th>時間</th>
     <% dates.forEach(date => { %>
@@ -39,6 +40,13 @@
     </tr>
   <% }) %>
 </table>
+<div class="legend">
+  <span class="legend-open">○ 空きあり</span>
+  <span class="legend-few">△ 残り1枠</span>
+  <span class="legend-full">× 満員</span>
+  <span>― 受付不可</span>
+</div>
+</div>
 
 <br>
 
