@@ -1,0 +1,46 @@
+<%- include("partials/header", { title: "マイページ" }) %>
+
+<div class="patient-page">
+  <div class="notice-box">
+    <h1>マイページ</h1>
+
+    <p>
+      <strong><%= patient.name %> 様</strong>
+    </p>
+
+    <% if (reservation) { %>
+      <div class="reservation-card">
+        <h2>現在の予約</h2>
+
+        <p>
+          <strong><%= reservation.date %></strong><br>
+          <strong><%= reservation.slot %></strong>
+        </p>
+
+        <div class="choice-buttons">
+          <a class="main-button" href="/change">
+            予約を変更する
+          </a>
+
+          <form method="POST" action="/cancel" style="margin: 0;">
+  <input type="hidden" name="id" value="<%= reservation.id %>">
+  <input type="hidden" name="from" value="mypage">
+  <button class="sub-button" type="submit">
+    予約をキャンセルする
+  </button>
+</form>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="reservation-card">
+        <h2>現在予約はありません</h2>
+
+        <a class="main-button" href="/">
+          新規予約する
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

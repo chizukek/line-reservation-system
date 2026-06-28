@@ -2,30 +2,33 @@
 
 <div class="patient-page">
   <div class="notice-box">
-    <h1>心療内科再診予約</h1>
+    <h1>〇〇クリニック予約システム</h1>
 
     <p>
-      このLINE予約は、<strong>心療内科の再診患者様専用</strong>です。
+      心療内科の再診患者様専用です。
     </p>
 
-    <p>
-      初診の方、他診療科のご予約・お問い合わせは、<br>
-      お電話またはホームページをご利用ください。
-    </p>
+    <% if (typeof error !== "undefined" && error) { %>
+      <div class="notice-warning">
+        <%= error %>
+      </div>
+    <% } %>
 
-    <div class="notice-warning">
-      ※予約には患者番号が必要です。
-    </div>
+    <form method="POST" action="/mypage" class="patient-form">
+      <label>
+        患者番号
+        <input type="text" name="patientNumber" required>
+      </label>
 
-    <div class="choice-buttons">
-      <a class="main-button" href="/">
-        予約する
-      </a>
+      <label>
+        生年月日
+        <input type="date" name="birthDate" required>
+      </label>
 
-      <a class="sub-button" href="/cancel-input">
-        予約確認・キャンセル
-      </a>
-    </div>
+      <button class="main-button" type="submit">
+        予約ページへ進む
+      </button>
+    </form>
   </div>
 </div>
 

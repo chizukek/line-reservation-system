@@ -63,7 +63,81 @@ app.get("/psychiatry", (req, res) => {
   });
 });
 
+app.post("/mypage", async (req, res) => {
+  const { patientNumber, birthDate } = req.body;
+
+  const patient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+    include: {
+      reservations: true,
+    },
+  });
+
+  if (!patient || !patient.birthDate) {
+    return res.render("index", {
+      title: "心療内科再診予約",
+      error: "患者番号または生年月日が違います。",
+    });
+  }
+
+  const inputDate = new Date(birthDate);
+  const patientDate = new Date(patient.birthDate);
+
+  const sameBirthday =
+    inputDate.getFullYear() === patientDate.getFullYear() &&
+    inputDate.getMonth() === patientDate.getMonth() &&
+    inputDate.getDate() === patientDate.getDate();
+
+  if (!sameBirthday) {
+    return res.render("index", {
+      title: "心療内科再診予約",
+      error: "患者番号または生年月日が違います。",
+    });
+  }
+
+  req.session.patientNumber = patient.patientNumber;
+
+  res.redirect("/mypage");
+});
+
+app.get("/mypage", async (req, res) => {
+  const patientNumber = req.session.patientNumber;
+
+  if (!patientNumber) {
+    return res.redirect("/psychiatry");
+  }
+
+  const today = new Date().toLocaleDateString("sv-SE");
+
+  const patient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+  });
+
+  const reservation = await prisma.reservation.findFirst({
+    where: {
+      patientNumber,
+      date: {
+        gt: today,
+      },
+    },
+    orderBy: [{ date: "asc" }, { slot: "asc" }],
+  });
+
+  res.render("mypage", {
+    title: "マイページ",
+    patient,
+    reservation,
+  });
+});
+
 app.get("/", async (req, res) => {
+  if (!req.session.patientNumber) {
+    return res.redirect("/psychiatry");
+  }
   const week = Number(req.query.week || 0);
   const dates = [];
 
@@ -123,6 +197,61 @@ app.get("/input", (req, res) => {
   });
 });
 
+app.get("/confirm", async (req, res) => {
+  const patientNumber = req.session.patientNumber;
+
+  if (!patientNumber) {
+    return res.redirect("/psychiatry");
+  }
+
+  const date = req.query.date;
+  const slot = req.query.slot;
+
+  if (
+    !isValidDateText(date) ||
+    !isValidSlot(slot) ||
+    !isWithinReservationPeriod(date)
+  ) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "予約内容が不正です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  const availableSlots = config.getSlotsForDate(date);
+
+  if (!availableSlots.includes(slot)) {
+    return res.render("error", {
+      title: "予約不可",
+      heading: "予約不可",
+      message: "その時間は診療時間外です。",
+      detail: "",
+      backUrl: "/",
+    });
+  }
+
+  const patient = await prisma.patient.findUnique({
+    where: {
+      patientNumber,
+    },
+  });
+
+  if (!patient) {
+    req.session.patientNumber = null;
+    return res.redirect("/psychiatry");
+  }
+
+  res.render("confirm", {
+    title: "予約確認",
+    patient,
+    date,
+    slot,
+  });
+});
+
 app.post("/confirm", async (req, res) => {
   const patientNumber = req.body.patientNumber;
   const date = req.body.date;
@@ -177,7 +306,10 @@ app.post("/confirm", async (req, res) => {
 });
 
 app.post("/reserve", async (req, res) => {
-  const patientNumber = req.body.patientNumber;
+  const patientNumber = req.session.patientNumber;
+  if (!patientNumber) {
+    return res.redirect("/psychiatry");
+  }
   const date = req.body.date;
   const slot = req.body.slot;
 
@@ -254,11 +386,16 @@ app.post("/reserve", async (req, res) => {
   try {
     await prisma.$transaction(
       async (tx) => {
+        const todayText = new Date().toLocaleDateString("sv-SE");
+
         const existingReservation = await tx.reservation.findFirst({
           where: {
             patientNumber,
-            date,
+            date: {
+              gte: todayText,
+            },
           },
+          orderBy: [{ date: "asc" }, { slot: "asc" }],
         });
 
         if (existingReservation) {
@@ -301,7 +438,7 @@ app.post("/reserve", async (req, res) => {
       return res.render("error", {
         title: "予約不可",
         heading: "予約不可",
-        message: "同じ日にすでに予約があります。",
+        message: "すでに予約があります。",
         detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
         backUrl: "/",
       });
@@ -543,11 +680,16 @@ app.post("/admin/add/complete", async (req, res) => {
   try {
     await prisma.$transaction(
       async (tx) => {
+        const todayText = new Date().toLocaleDateString("sv-SE");
+
         const existingReservation = await tx.reservation.findFirst({
           where: {
             patientNumber,
-            date,
+            date: {
+              gte: todayText,
+            },
           },
+          orderBy: [{ date: "asc" }, { slot: "asc" }],
         });
 
         if (existingReservation) {
@@ -590,7 +732,7 @@ app.post("/admin/add/complete", async (req, res) => {
       return res.render("error", {
         title: "予約不可",
         heading: "予約不可",
-        message: "同じ日にすでに予約があります。",
+        message: "すでに予約があります。",
         detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
         backUrl: "/",
       });
@@ -772,6 +914,7 @@ app.post("/admin/patients/add", async (req, res) => {
 
   const patientNumber = String(req.body.patientNumber).trim();
   const name = String(req.body.name).trim();
+  const birthDate = new Date(req.body.birthDate);
 
   const existingPatient = await prisma.patient.findUnique({
     where: {
@@ -790,6 +933,7 @@ app.post("/admin/patients/add", async (req, res) => {
     data: {
       patientNumber,
       name,
+      birthDate,
     },
   });
 
@@ -832,6 +976,7 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   const id = Number(req.params.id);
   const patientNumber = String(req.body.patientNumber).trim();
   const name = String(req.body.name).trim();
+  const birthDate = new Date(req.body.birthDate);
 
   const patient = await prisma.patient.findUnique({
     where: { id },
@@ -873,6 +1018,7 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
     data: {
       patientNumber,
       name,
+      birthDate,
     },
   });
 
@@ -1046,6 +1192,10 @@ app.post("/cancel-confirm", async (req, res) => {
 
   if (from === "admin") {
     return res.redirect("/admin");
+  }
+
+  if (from === "mypage") {
+    return res.redirect("/mypage");
   }
 
   return res.redirect("/");

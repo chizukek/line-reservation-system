@@ -1,13 +1,14 @@
 <%- include("partials/header", { title: "予約表" }) %>
 <%- include("partials/progress", { step: 1 }) %>
 
+
 <div class="reserve-title">
   日時を選択
 </div>
 
 <div class="reserve-note">
-  予約は30日先まで受け付けています。<br>予約には患者番号が必要です。
-</div>
+予約は30日先まで受け付けています。<br>
+ご希望の日時を選択してください。</div>
 
 
 <div class="reserve-legend">
@@ -95,7 +96,7 @@
             <% } else if (count >= 2) { %>
               <span class="mark-full">×</span>
             <% } else { %>
-              <a class="mark-open" href="/input?date=<%= date.value %>&slot=<%= slot %>">○</a>
+              <a class="mark-open" href="/confirm?date=<%= date.value %>&slot=<%= slot %>">○</a>
             <% } %>
           </td>
         <% }) %>
@@ -105,7 +106,4 @@
   </table>
 </div>
 
-<a class="cancel-link" href="/cancel-input">
-  予約確認・キャンセルはこちら
-</a>
 <%- include("partials/footer") %>

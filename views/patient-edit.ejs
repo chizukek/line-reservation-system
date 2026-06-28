@@ -30,6 +30,18 @@
 
   <br><br>
 
+  <div class="form-group">
+  <label>生年月日</label>
+  <input
+    type="date"
+    name="birthDate"
+    value="<%= patient.birthDate ? patient.birthDate.toISOString().slice(0,10) : '' %>"
+    required
+  >
+</div>
+
+<br><br>
+
   <button type="submit">
     保存
   </button>
