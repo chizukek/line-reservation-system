@@ -363,3 +363,71 @@ a[href="/cancel-input"] {
     font-size: 19px;
   }
 }
+
+.patient-page {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.choice-buttons {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.main-button,
+.sub-button {
+  display: block;
+  padding: 18px 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.main-button {
+  background: #155f78;
+  color: white;
+}
+
+.sub-button {
+  background: white;
+  color: #155f78;
+  border: 2px solid #155f78;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .patient-page {
+    font-size: 20px;
+  }
+
+  .notice-box {
+    padding: 22px;
+  }
+
+  .notice-warning {
+    font-size: 19px;
+  }
+
+  .main-button,
+  .sub-button {
+    font-size: 22px;
+    padding: 20px;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 20px;
+  }
+}
