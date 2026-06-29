@@ -1,40 +1,90 @@
 <%- include("partials/header", { title: "電話予約確認" }) %>
 
-<h1>電話予約確認</h1>
+<div class="admin-page">
+  <div class="admin-card">
 
-<p>患者番号：<%= patient.patientNumber %></p>
-<p>氏名：<%= patient.name %></p>
-<p>予約日：<%= date %></p>
-<p>予約時間：<%= slot %></p>
+    <h1>電話予約確認</h1>
 
-<form action="/admin/add/complete" method="POST">
-  <input
-    type="hidden"
-    name="patientNumber"
-    value="<%= patient.patientNumber %>"
-  >
+    <p class="clinic-lead">
+      以下の内容で電話予約を登録します。
+    </p>
 
-  <input
-    type="hidden"
-    name="date"
-    value="<%= date %>"
-  >
+    <section class="admin-section">
+      <h2>患者情報</h2>
 
-  <input
-    type="hidden"
-    name="slot"
-    value="<%= slot %>"
-  >
+      <div class="info-box">
 
-  <button type="submit">
-    この内容で登録
-  </button>
-</form>
+        <div class="info-row">
+          <span>患者番号</span>
+          <strong><%= patient.patientNumber %></strong>
+        </div>
 
-<br>
+        <div class="info-row">
+          <span>氏名</span>
+          <strong><%= patient.name %> 様</strong>
+        </div>
 
-<a href="/admin/add">
-  戻る
-</a>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h2>予約内容</h2>
+
+      <div class="reservation-box">
+
+        <div class="info-row">
+          <span>予約日</span>
+          <strong><%= date %></strong>
+        </div>
+
+        <div class="info-row">
+          <span>時間</span>
+          <strong><%= slot %></strong>
+        </div>
+
+        <div class="info-row">
+          <span>診療科</span>
+          <strong>心療内科</strong>
+        </div>
+
+      </div>
+    </section>
+
+    <form action="/admin/add/complete" method="POST">
+
+      <input
+        type="hidden"
+        name="patientNumber"
+        value="<%= patient.patientNumber %>"
+      >
+
+      <input
+        type="hidden"
+        name="date"
+        value="<%= date %>"
+      >
+
+      <input
+        type="hidden"
+        name="slot"
+        value="<%= slot %>"
+      >
+
+      <div class="clinic-actions">
+
+        <button class="clinic-main-button" type="submit">
+          電話予約を登録する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin/add">
+          戻る
+        </a>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

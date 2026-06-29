@@ -37,6 +37,9 @@
             name="patientNumber"
             placeholder="例：10001"
             value="<%= searchPatientNumber %>"
+            maxlength="5"
+inputmode="numeric"
+autocomplete="off"
           >
         </label>
 
@@ -67,42 +70,41 @@
         <div class="admin-table-wrapper">
           <table class="admin-table">
             <thead>
-              <tr>
-                <th>日付</th>
-                <th>時間</th>
-                <th>氏名</th>
-                <th>患者番号</th>
-                <th>予約番号</th>
-                <th>操作</th>
-              </tr>
-            </thead>
+  <tr>
+    <th>日時</th>
+    <th>氏名</th>
+    <th>患者番号</th>
+    <th>操作</th>
+  </tr>
+</thead>
 
-            <tbody>
-              <% reservations.forEach(r => { %>
-                <tr>
-                  <td><%= r.date %></td>
-                  <td><%= r.slot %></td>
-                  <td><%= r.patient.name %></td>
-                  <td><%= r.patientNumber %></td>
-                  <td><%= r.reservationCode %></td>
-                  <td>
-                    <div class="admin-action-buttons">
-                      <a class="admin-small-button" href="/admin/edit/<%= r.id %>">
-                        変更
-                      </a>
+<tbody>
+  <% reservations.forEach(r => { %>
+    <tr>
+      <td>
+        <strong><%= r.date %></strong><br>
+        <%= r.slot %>
+      </td>
+      <td><%= r.patient.name %></td>
+      <td><%= r.patientNumber %></td>
+      <td>
+        <div class="admin-action-buttons">
+          <a class="admin-small-button" href="/admin/edit/<%= r.id %>">
+            変更
+          </a>
 
-                      <form action="/cancel" method="POST">
-                        <input type="hidden" name="from" value="admin">
-                        <input type="hidden" name="id" value="<%= r.id %>">
-                        <button class="admin-danger-button" type="submit">
-                          キャンセル
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              <% }) %>
-            </tbody>
+          <form action="/cancel" method="POST">
+            <input type="hidden" name="from" value="admin">
+            <input type="hidden" name="id" value="<%= r.id %>">
+            <button class="admin-danger-button" type="submit">
+              キャンセル
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+  <% }) %>
+</tbody>
           </table>
         </div>
       <% } %>

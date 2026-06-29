@@ -1,78 +1,106 @@
-<%- include("partials/header", { title: "電話予約確認" }) %>
+<%- include("partials/header", { title: "電話予約登録" }) %>
 
 <div class="admin-page">
   <div class="admin-card">
 
-    <h1>電話予約確認</h1>
+    <h1>電話予約登録</h1>
 
-    <section class="admin-section">
-      <h2>患者情報</h2>
+    <p class="clinic-lead">
+      電話で受け付けた予約を登録します。
+    </p>
 
-      <div class="info-box">
-        <div class="info-row">
-          <span>患者番号</span>
-          <strong><%= patient.patientNumber %></strong>
-        </div>
-
-        <div class="info-row">
-          <span>氏名</span>
-          <strong><%= patient.name %> 様</strong>
-        </div>
+    <% if (error) { %>
+      <div class="clinic-error">
+        <%= error %>
       </div>
-    </section>
+    <% } %>
 
-    <section class="admin-section">
-      <h2>予約内容</h2>
+    <form action="/admin/add/confirm" method="POST" class="admin-form-card">
 
-      <div class="reservation-box">
-        <div class="info-row">
-          <span>予約日</span>
-          <strong><%= date %></strong>
-        </div>
+      <label>
+        <span>患者番号</span>
+        <input
+          type="text"
+          name="patientNumber"
+          inputmode="numeric"
+          maxlength="5"
+          autocomplete="off"
+          placeholder="例：10001"
+          required
+        >
+      </label>
 
-        <div class="info-row">
-          <span>時間</span>
-          <strong><%= slot %></strong>
-        </div>
+      <label>
+        <span>予約日</span>
+        <input
+          type="date"
+          id="date"
+          name="date"
+          required
+        >
+      </label>
 
-        <div class="info-row">
-          <span>診療科</span>
-          <strong>心療内科</strong>
-        </div>
+      <label>
+        <span>予約時間</span>
+        <select id="slot" name="slot" required>
+          <% slots.forEach(slot => { %>
+            <option value="<%= slot %>">
+              <%= slot %>
+            </option>
+          <% }) %>
+        </select>
+      </label>
+
+      <div class="clinic-actions">
+        <button class="clinic-main-button" type="submit">
+          内容を確認する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin">
+          戻る
+        </a>
       </div>
-    </section>
-
-    <form action="/admin/add/complete" method="POST" class="clinic-actions">
-
-      <input
-        type="hidden"
-        name="patientNumber"
-        value="<%= patient.patientNumber %>"
-      >
-
-      <input
-        type="hidden"
-        name="date"
-        value="<%= date %>"
-      >
-
-      <input
-        type="hidden"
-        name="slot"
-        value="<%= slot %>"
-      >
-
-      <button class="clinic-main-button" type="submit">
-        この内容で登録する
-      </button>
-
-      <a class="clinic-sub-button" href="/admin/add">
-        戻る
-      </a>
 
     </form>
 
   </div>
 </div>
+<script>
+const dateInput = document.getElementById("date");
+const slotSelect = document.getElementById("slot");
+
+async function loadSlots() {
+
+  const date = dateInput.value;
+
+  if (!date) return;
+
+  const res = await fetch("/api/slots?date=" + date);
+
+  const slots = await res.json();
+
+  slotSelect.innerHTML = "";
+
+  slots.forEach(slot => {
+
+    const option = document.createElement("option");
+
+    option.value = slot;
+
+    option.textContent = slot;
+
+    slotSelect.appendChild(option);
+
+  });
+
+}
+
+dateInput.addEventListener("change", loadSlots);
+
+if (dateInput.value) {
+  loadSlots();
+}
+
+</script>
 
 <%- include("partials/footer") %>

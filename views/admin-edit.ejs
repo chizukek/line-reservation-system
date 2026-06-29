@@ -43,18 +43,20 @@
       <form action="/admin/edit/<%= reservation.id %>" method="POST" class="admin-form-card">
         <label>
           <span>変更後の日付</span>
-          <input type="date" name="date" value="<%= reservation.date %>" required>
+          <input type="date" id="date" name="date" value="<%= reservation.date %>" required>
         </label>
 
         <label>
           <span>変更後の時間</span>
-          <select name="slot">
-            <% slots.forEach(slot => { %>
-              <option value="<%= slot %>" <%= slot === reservation.slot ? "selected" : "" %>>
-                <%= slot %>
-              </option>
-            <% }) %>
-          </select>
+          <select id="slot" name="slot" required>
+  <% slots.forEach(slot => { %>
+    <option
+      value="<%= slot %>"
+      <%= slot === reservation.slot ? "selected" : "" %>>
+      <%= slot %>
+    </option>
+  <% }) %>
+</select>
         </label>
 
         <div class="clinic-actions">
@@ -71,5 +73,46 @@
 
   </div>
 </div>
+
+<script>
+const dateInput = document.getElementById("date");
+const slotSelect = document.getElementById("slot");
+
+// 現在選択中の時間を保持
+let currentSlot = slotSelect.value;
+
+async function loadSlots() {
+  const date = dateInput.value;
+
+  if (!date) return;
+
+  const res = await fetch("/api/slots?date=" + date);
+  const slots = await res.json();
+
+  slotSelect.innerHTML = "";
+
+  slots.forEach(slot => {
+    const option = document.createElement("option");
+    option.value = slot;
+    option.textContent = slot;
+
+    // 元の時間があれば選択状態を維持
+    if (slot === currentSlot) {
+      option.selected = true;
+    }
+
+    slotSelect.appendChild(option);
+  });
+
+  // 新しい日付に現在の時間が無い場合は先頭を選択
+  currentSlot = slotSelect.value;
+}
+
+dateInput.addEventListener("change", loadSlots);
+
+if (dateInput.value) {
+  loadSlots();
+}
+</script>
 
 <%- include("partials/footer") %>

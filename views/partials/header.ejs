@@ -8,8 +8,41 @@
 </head>
 <body>
 
+<%
+  const isAdminPage =
+    typeof title !== "undefined" &&
+    (
+      title.includes("管理") ||
+      title.includes("予約一覧") ||
+      title.includes("電話予約") ||
+      title.includes("患者")
+    );
+%>
+
+<header class="<%= isAdminPage ? 'site-header admin-header-bar' : 'site-header' %>">
+  <div class="site-header-inner">
+    <div class="site-brand">
+      <div class="site-logo">🏥</div>
+      <div>
+        <div class="site-name">〇〇クリニック</div>
+        <div class="site-subtitle">
+          <%= isAdminPage ? "予約管理システム" : "心療内科再診予約" %>
+        </div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <% if (isAdminPage) { %>
+        <a href="/admin">予約一覧</a>
+        <a href="/admin/patients">患者管理</a>
+        <a href="/admin-logout">ログアウト</a>
+      <% } else { %>
+        <a href="/psychiatry">予約</a>
+        <a href="/mypage">マイページ</a>
+        <a href="/logout">ログアウト</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+
 <div class="container">
-
-<h1>🏥 LINE予約システム</h1>
-
-<hr>

@@ -1045,3 +1045,77 @@ h1,
     width: 100%;
   }
 }
+
+.site-header {
+  border-bottom: 1px solid #d8e5dc;
+  background: white;
+}
+
+.site-header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-logo {
+  font-size: 28px;
+}
+
+.site-name {
+  color: #008102;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.site-subtitle {
+  color: #4d5b55;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.site-nav {
+  display: flex;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.site-nav a {
+  color: #008102;
+  font-weight: 900;
+}
+
+.admin-header-bar .site-name {
+  color: #0046a8;
+}
+
+.admin-header-bar .site-nav a {
+  color: #0046a8;
+}
+
+@media (max-width: 768px) {
+  .site-header-inner {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px 12px;
+  }
+
+  .site-name {
+    font-size: 18px;
+  }
+}

@@ -2,33 +2,29 @@
 
 <div class="clinic-page">
   <div class="clinic-card mypage-card">
+
     <h1>マイページ</h1>
 
-    <section class="clinic-section">
-      <h2>患者情報</h2>
+    <p class="clinic-lead">
+      <strong><%= patient.name %></strong> 様
+      （患者番号：<%= patient.patientNumber %>）
+    </p>
 
-      <div class="info-box">
-        <div class="info-row">
-          <span>患者番号</span>
-          <strong><%= patient.patientNumber %></strong>
-        </div>
-        <div class="info-row">
-          <span>氏名</span>
-          <strong><%= patient.name %> 様</strong>
-        </div>
-      </div>
-    </section>
+    <% if (reservation) { %>
 
-    <section class="clinic-section">
-      <h2>ご予約状況</h2>
+      <section class="clinic-section">
+        <h2>現在のご予約</h2>
 
-      <% if (reservation) { %>
         <div class="reservation-box">
-          <h3>予約中の診察</h3>
 
           <div class="info-row">
-            <span>診療日時</span>
-            <strong><%= reservation.date %>　<%= reservation.slot %></strong>
+            <span>診療日</span>
+            <strong><%= reservation.date %></strong>
+          </div>
+
+          <div class="info-row">
+            <span>時間</span>
+            <strong><%= reservation.slot %></strong>
           </div>
 
           <div class="info-row">
@@ -36,32 +32,53 @@
             <strong>心療内科</strong>
           </div>
 
-          <div class="clinic-actions">
-            <a class="clinic-main-button" href="/change">
-              予約を変更する ＞
-            </a>
-
-            <form method="POST" action="/cancel">
-              <input type="hidden" name="id" value="<%= reservation.id %>">
-              <input type="hidden" name="from" value="mypage">
-              <button class="clinic-sub-button" type="submit">
-                予約をキャンセルする ＞
-              </button>
-            </form>
-          </div>
         </div>
-      <% } else { %>
+
+        <p class="clinic-note">
+  予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
+</p>
+
+        <div class="clinic-actions">
+  <a class="clinic-main-button" href="/change">
+    予約を変更する
+  </a>
+
+  <form method="POST" action="/cancel">
+    <input type="hidden" name="id" value="<%= reservation.id %>">
+    <input type="hidden" name="from" value="mypage">
+
+    <button class="clinic-sub-button" type="submit">
+      予約をキャンセルする
+    </button>
+  </form>
+</div>
+
+      </section>
+
+    <% } else { %>
+
+      <section class="clinic-section">
+
         <div class="reservation-box">
-          <p class="empty-message">現在予約はありません。</p>
+
+          <p class="empty-message">
+            現在予約はありません。
+          </p>
 
           <a class="clinic-main-button" href="/new">
-            新しい予約をとる ＞
+            新しい予約をとる
           </a>
-        </div>
-      <% } %>
-    </section>
 
-    <a class="clinic-logout" href="/logout">ログアウト</a>
+        </div>
+
+      </section>
+
+    <% } %>
+
+    <a class="clinic-logout" href="/logout">
+      ログアウト
+    </a>
+
   </div>
 </div>
 

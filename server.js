@@ -58,6 +58,12 @@ app.get("/psychiatry", (req, res) => {
   });
 });
 
+app.get("/verify", (req, res) => {
+  res.render("verify", {
+    title: "本人確認",
+  });
+});
+
 app.post("/mypage", async (req, res) => {
   const { patientNumber, birthYear, birthMonth, birthDay } = req.body;
 
@@ -73,8 +79,8 @@ app.post("/mypage", async (req, res) => {
   });
 
   if (!patient || !patient.birthDate) {
-    return res.render("psychiatry", {
-      title: "心療内科再診予約",
+    return res.render("verify", {
+      title: "本人確認",
       error: "患者番号または生年月日が違います。",
     });
   }
@@ -88,8 +94,8 @@ app.post("/mypage", async (req, res) => {
     inputDate.getDate() === patientDate.getDate();
 
   if (!sameBirthday) {
-    return res.render("psychiatry", {
-      title: "心療内科再診予約",
+    return res.render("verify", {
+      title: "本人確認",
       error: "患者番号または生年月日が違います。",
     });
   }
@@ -162,6 +168,18 @@ app.get("/new", (req, res) => {
 
   req.session.changeReservationId = null;
   res.redirect("/");
+});
+
+app.get("/api/slots", (req, res) => {
+  const date = req.query.date;
+
+  if (!date) {
+    return res.json([]);
+  }
+
+  const slots = config.getSlotsForDate(date);
+
+  res.json(slots);
 });
 
 app.get("/", async (req, res) => {
