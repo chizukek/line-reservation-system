@@ -12,6 +12,6 @@
 <p>時間：<%= reservation.slot %></p>
 <% } %>
 
-<a class="main-button" href="/mypage">
-  マイページへ戻る
+<a class="main-button" href="<%= typeof backUrl !== 'undefined' ? backUrl : '/mypage' %>">
+  <%= typeof backLabel !== 'undefined' ? backLabel : 'マイページへ戻る' %>
 </a>

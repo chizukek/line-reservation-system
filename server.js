@@ -97,6 +97,14 @@ app.post("/mypage", async (req, res) => {
   res.redirect("/mypage");
 });
 
+app.get("/logout", (req, res) => {
+  req.session.patientNumber = null;
+  req.session.changeReservationId = null;
+  req.session.completeMessage = null;
+
+  res.redirect("/psychiatry");
+});
+
 app.get("/complete", (req, res) => {
   const completeMessage = req.session.completeMessage;
 
@@ -465,6 +473,8 @@ app.post("/reserve", async (req, res) => {
       slot,
     },
     showProgress: !changeReservationId,
+    backUrl: "/mypage",
+    backLabel: "マイページへ戻る",
   };
 
   return res.redirect("/complete");
@@ -755,13 +765,20 @@ app.post("/admin/add/complete", async (req, res) => {
     });
   }
 
-  res.render("complete", {
+  req.session.completeMessage = {
     title: "電話予約完了",
-    patient,
-    date,
-    slot,
-    reservationCode,
-  });
+    heading: "電話予約が完了しました",
+    message: "予約を登録しました。",
+    reservation: {
+      date,
+      slot,
+    },
+    showProgress: false,
+    backUrl: "/admin",
+    backLabel: "予約一覧へ戻る",
+  };
+
+  return res.redirect("/complete");
 });
 
 app.get("/admin/edit/:id", async (req, res) => {
@@ -1144,6 +1161,8 @@ app.post("/cancel-confirm", async (req, res) => {
     message: "キャンセルが完了しました。",
     reservation: null,
     showProgress: false,
+    backUrl: "/mypage",
+    backLabel: "マイページへ戻る",
   };
 
   return res.redirect("/complete");
