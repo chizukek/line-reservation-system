@@ -76,7 +76,7 @@ app.post("/mypage", async (req, res) => {
   });
 
   if (!patient || !patient.birthDate) {
-    return res.render("index", {
+    return res.render("psychiatry", {
       title: "心療内科再診予約",
       error: "患者番号または生年月日が違います。",
     });
@@ -91,7 +91,7 @@ app.post("/mypage", async (req, res) => {
     inputDate.getDate() === patientDate.getDate();
 
   if (!sameBirthday) {
-    return res.render("index", {
+    return res.render("psychiatry", {
       title: "心療内科再診予約",
       error: "患者番号または生年月日が違います。",
     });
@@ -103,6 +103,17 @@ app.post("/mypage", async (req, res) => {
 });
 
 app.get("/mypage", async (req, res) => {
+  app.get("/complete", (req, res) => {
+    const completeMessage = req.session.completeMessage;
+
+    if (!completeMessage) {
+      return res.redirect("/mypage");
+    }
+
+    req.session.completeMessage = null;
+
+    res.render("complete", completeMessage);
+  });
   const patientNumber = req.session.patientNumber;
 
   if (!patientNumber) {
@@ -127,11 +138,24 @@ app.get("/mypage", async (req, res) => {
     orderBy: [{ date: "asc" }, { slot: "asc" }],
   });
 
+  if (!reservation) {
+    req.session.changeReservationId = null;
+  }
+
   res.render("mypage", {
     title: "マイページ",
     patient,
     reservation,
   });
+});
+
+app.get("/new", (req, res) => {
+  if (!req.session.patientNumber) {
+    return res.redirect("/psychiatry");
+  }
+
+  req.session.changeReservationId = null;
+  res.redirect("/");
 });
 
 app.get("/", async (req, res) => {
@@ -176,6 +200,7 @@ app.get("/", async (req, res) => {
     dates,
     slots: config.allSlots,
     reservations,
+    isChangeMode: Boolean(req.session.changeReservationId),
     today,
     maxReservableText,
     canGoNextWeek,
@@ -184,17 +209,32 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.get("/input", (req, res) => {
-  const date = req.query.date;
-  const slot = req.query.slot;
+app.get("/change", async (req, res) => {
+  const patientNumber = req.session.patientNumber;
 
-  res.render("input", {
-    title: "患者番号入力",
-    date,
-    slot,
-    patientNumber: "",
-    error: null,
+  if (!patientNumber) {
+    return res.redirect("/psychiatry");
+  }
+
+  const today = new Date().toLocaleDateString("sv-SE");
+
+  const reservation = await prisma.reservation.findFirst({
+    where: {
+      patientNumber,
+      date: {
+        gt: today,
+      },
+    },
+    orderBy: [{ date: "asc" }, { slot: "asc" }],
   });
+
+  if (!reservation) {
+    return res.redirect("/mypage");
+  }
+
+  req.session.changeReservationId = reservation.id;
+
+  res.redirect("/");
 });
 
 app.get("/confirm", async (req, res) => {
@@ -245,29 +285,27 @@ app.get("/confirm", async (req, res) => {
   }
 
   res.render("confirm", {
-    title: "予約確認",
+    title: req.session.changeReservationId ? "予約変更確認" : "予約確認",
     patient,
     date,
     slot,
+    isChangeMode: Boolean(req.session.changeReservationId),
   });
 });
 
-app.post("/confirm", async (req, res) => {
-  const patientNumber = req.body.patientNumber;
-  const date = req.body.date;
-  const slot = req.body.slot;
+app.post("/reserve", async (req, res) => {
+  const patientNumber = req.session.patientNumber;
 
-  if (!isValidPatientNumber(patientNumber)) {
-    return res.render("input", {
-      title: "患者番号入力",
-      date,
-      slot,
-      patientNumber,
-      error: "患者番号は5桁の数字で入力してください。",
-    });
+  if (!patientNumber) {
+    return res.redirect("/psychiatry");
   }
 
+  const date = req.body.date;
+  const slot = req.body.slot;
+  const changeReservationId = req.session.changeReservationId;
+
   if (
+    !isValidPatientNumber(patientNumber) ||
     !isValidDateText(date) ||
     !isValidSlot(slot) ||
     !isWithinReservationPeriod(date)
@@ -275,79 +313,7 @@ app.post("/confirm", async (req, res) => {
     return res.render("error", {
       title: "予約不可",
       heading: "予約不可",
-      message: "予約は30日先まで受け付けています。",
-      detail: "",
-      backUrl: "/",
-    });
-  }
-
-  const patient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
-  });
-
-  if (!patient) {
-    return res.render("input", {
-      title: "患者番号入力",
-      date,
-      slot,
-      patientNumber,
-      error: "患者番号が間違っています。もう一度入力してください。",
-    });
-  }
-
-  res.render("confirm", {
-    title: "予約確認",
-    patient,
-    date,
-    slot,
-  });
-});
-
-app.post("/reserve", async (req, res) => {
-  const patientNumber = req.session.patientNumber;
-  if (!patientNumber) {
-    return res.redirect("/psychiatry");
-  }
-  const date = req.body.date;
-  const slot = req.body.slot;
-
-  if (!isValidPatientNumber(patientNumber)) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: "患者番号が不正です。",
-      detail: "",
-      backUrl: "/",
-    });
-  }
-
-  if (!isValidDateText(date)) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: "日付が不正です。",
-      detail: "",
-      backUrl: "/",
-    });
-  }
-
-  if (!isValidSlot(slot)) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: "時間帯が不正です。",
-      detail: "",
-      backUrl: "/",
-    });
-  }
-
-  if (!isWithinReservationPeriod(date)) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: "予約は30日先まで受け付けています。",
+      message: "予約内容が不正です。",
       detail: "",
       backUrl: "/",
     });
@@ -366,19 +332,12 @@ app.post("/reserve", async (req, res) => {
   }
 
   const patient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
+    where: { patientNumber },
   });
 
   if (!patient) {
-    return res.render("error", {
-      title: "予約不可",
-      heading: "予約不可",
-      message: "患者番号が見つかりません。",
-      detail: "",
-      backUrl: "/",
-    });
+    req.session.patientNumber = null;
+    return res.redirect("/psychiatry");
   }
 
   let reservationCode;
@@ -386,6 +345,47 @@ app.post("/reserve", async (req, res) => {
   try {
     await prisma.$transaction(
       async (tx) => {
+        const count = await tx.reservation.count({
+          where: {
+            date,
+            slot,
+            ...(changeReservationId
+              ? {
+                  id: {
+                    not: changeReservationId,
+                  },
+                }
+              : {}),
+          },
+        });
+
+        if (count >= 2) {
+          throw new Error("FULL");
+        }
+
+        if (changeReservationId) {
+          const currentReservation = await tx.reservation.findUnique({
+            where: { id: changeReservationId },
+          });
+
+          if (
+            !currentReservation ||
+            currentReservation.patientNumber !== patientNumber
+          ) {
+            throw new Error("NOT_FOUND");
+          }
+
+          await tx.reservation.update({
+            where: { id: changeReservationId },
+            data: {
+              date,
+              slot,
+            },
+          });
+
+          return;
+        }
+
         const todayText = new Date().toLocaleDateString("sv-SE");
 
         const existingReservation = await tx.reservation.findFirst({
@@ -402,17 +402,6 @@ app.post("/reserve", async (req, res) => {
           throw new Error(
             `DUPLICATE:${existingReservation.date} ${existingReservation.slot}`,
           );
-        }
-
-        const count = await tx.reservation.count({
-          where: {
-            date,
-            slot,
-          },
-        });
-
-        if (count >= 2) {
-          throw new Error("FULL");
         }
 
         reservationCode = Math.random()
@@ -434,16 +423,6 @@ app.post("/reserve", async (req, res) => {
       },
     );
   } catch (error) {
-    if (error.message.startsWith("DUPLICATE:")) {
-      return res.render("error", {
-        title: "予約不可",
-        heading: "予約不可",
-        message: "すでに予約があります。",
-        detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
-        backUrl: "/",
-      });
-    }
-
     if (error.message === "FULL") {
       return res.render("error", {
         title: "予約不可",
@@ -451,6 +430,34 @@ app.post("/reserve", async (req, res) => {
         message: `${date} ${slot} は満員です。`,
         detail: "",
         backUrl: "/",
+      });
+    }
+
+    if (error.message === "NOT_FOUND") {
+      req.session.changeReservationId = null;
+
+      return res.render("complete", {
+        title: changeReservationId ? "予約変更完了" : "予約完了",
+        heading: changeReservationId
+          ? "予約を変更しました"
+          : "予約が完了しました",
+        message: changeReservationId
+          ? "予約内容を更新しました。"
+          : "ご予約ありがとうございました。",
+        reservation: {
+          date,
+          slot,
+        },
+      });
+    }
+
+    if (error.message.startsWith("DUPLICATE:")) {
+      return res.render("error", {
+        title: "予約不可",
+        heading: "予約不可",
+        message: "すでに予約があります。",
+        detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
+        backUrl: "/mypage",
       });
     }
 
@@ -463,13 +470,24 @@ app.post("/reserve", async (req, res) => {
     });
   }
 
-  res.render("complete", {
-    title: "予約完了",
-    patient,
-    date,
-    slot,
-    reservationCode,
-  });
+  req.session.changeReservationId = null;
+
+  req.session.changeReservationId = null;
+
+  req.session.completeMessage = {
+    title: changeReservationId ? "予約変更完了" : "予約完了",
+    heading: changeReservationId ? "予約を変更しました" : "予約が完了しました",
+    message: changeReservationId
+      ? "予約内容を更新しました。"
+      : "ご予約ありがとうございました。",
+    reservation: {
+      date,
+      slot,
+    },
+    showProgress: !changeReservationId,
+  };
+
+  return res.redirect("/complete");
 });
 
 app.get("/admin-login", (req, res) => {
@@ -1194,11 +1212,15 @@ app.post("/cancel-confirm", async (req, res) => {
     return res.redirect("/admin");
   }
 
-  if (from === "mypage") {
-    return res.redirect("/mypage");
-  }
+  req.session.completeMessage = {
+    title: "キャンセル完了",
+    heading: "予約をキャンセルしました",
+    message: "キャンセルが完了しました。",
+    reservation: null,
+    showProgress: false,
+  };
 
-  return res.redirect("/");
+  return res.redirect("/complete");
 });
 
 app.post("/line/webhook", line.middleware(lineConfig), async (req, res) => {

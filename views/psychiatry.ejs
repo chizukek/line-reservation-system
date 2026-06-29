@@ -1,10 +1,12 @@
 <%- include("partials/header", { title: "心療内科再診予約" }) %>
 
-<div class="patient-page">
-  <div class="notice-box">
-    <h1>〇〇クリニック予約システム</h1>
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-badge">再診予約</div>
 
-    <p>
+    <h1>〇〇クリニック<br>予約システム</h1>
+
+    <p class="login-lead">
       心療内科の再診患者様専用です。
     </p>
 
@@ -14,21 +16,35 @@
       </div>
     <% } %>
 
-    <form method="POST" action="/mypage" class="patient-form">
+    <form method="POST" action="/mypage" class="login-form">
       <label>
-        患者番号
-        <input type="text" name="patientNumber" required>
+        <span>患者番号</span>
+        <input
+          type="text"
+          name="patientNumber"
+          inputmode="numeric"
+          placeholder="例：10001"
+          required
+        >
       </label>
 
       <label>
-        生年月日
-        <input type="date" name="birthDate" required>
+        <span>生年月日</span>
+        <input
+          type="date"
+          name="birthDate"
+          required
+        >
       </label>
 
       <button class="main-button" type="submit">
         予約ページへ進む
       </button>
     </form>
+
+    <p class="login-note">
+      初診の方、他診療科のご予約・お問い合わせはお電話またはホームページをご利用ください。
+    </p>
   </div>
 </div>
 

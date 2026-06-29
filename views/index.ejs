@@ -1,11 +1,12 @@
 <%- include("partials/header", { title: "予約表" }) %>
-<%- include("partials/progress", { step: 1 }) %>
+<% if (typeof isChangeMode === "undefined" || !isChangeMode) { %>
+  <%- include("partials/progress", { step: 1 }) %>
+<% } %>
 
 
 <div class="reserve-title">
-  日時を選択
+  <%= typeof isChangeMode !== "undefined" && isChangeMode ? "変更後の日時を選択" : "日時を選択" %>  
 </div>
-
 <div class="reserve-note">
 予約は30日先まで受け付けています。<br>
 ご希望の日時を選択してください。</div>

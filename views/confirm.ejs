@@ -1,5 +1,5 @@
 <%- include("partials/header", { title: "予約確認" }) %>
-<%- include("partials/progress", { step: 3 }) %>
+<%- include("partials/progress", { step: 2 }) %>
 
 <h1>予約確認</h1>
 
@@ -13,7 +13,9 @@
   <input type="hidden" name="date" value="<%= date %>">
   <input type="hidden" name="slot" value="<%= slot %>">
 
-  <button type="submit">この内容で予約する</button>
+  <button type="submit">
+  <%= isChangeMode ? "この内容に変更する" : "この内容で予約する" %>
+</button>
 </form>
 
 <br>

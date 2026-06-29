@@ -1,19 +1,17 @@
 <%- include("partials/header", { title: "予約完了" }) %>
-<%- include("partials/progress", { step: 4 }) %>
+<% if (typeof showProgress !== "undefined" && showProgress) { %>
+  <%- include("partials/progress", { step: 3 }) %>
+<% } %>
 
-<h1>予約受付</h1>
+<h1><%= heading %></h1>
 
-<p>患者番号：<%= patient.patientNumber %></p>
-<p>氏名：<%= patient.name %></p>
-<p>予約日：<%= date %></p>
-<p>予約時間：<%= slot %></p>
+<p><%= message %></p>
 
-<p><strong>予約番号：<%= reservationCode %></strong></p>
+<% if (reservation) { %>
+<p>予約日：<%= reservation.date %></p>
+<p>時間：<%= reservation.slot %></p>
+<% } %>
 
-<p class="success">
-  予約を保存しました。
-</p>
-
-<a class="main-button" href="/mypage">マイページへ戻る</a>
-
-<%- include("partials/footer") %>
+<a class="main-button" href="/mypage">
+  マイページへ戻る
+</a>
