@@ -614,3 +614,192 @@ button:hover {
     font-size: 25px;
   }
 }
+
+.clinic-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+  background: #fff;
+}
+
+.clinic-card {
+  width: 100%;
+  max-width: 760px;
+  background: #eaf5ff;
+  border-radius: 6px;
+  padding: 42px 48px;
+  box-sizing: border-box;
+}
+
+.clinic-card h1 {
+  margin: 0 0 24px;
+  color: #222;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.clinic-lead {
+  margin-bottom: 28px;
+  color: #333;
+  font-weight: 700;
+}
+
+.clinic-form {
+  display: grid;
+  gap: 24px;
+}
+
+.clinic-form label {
+  display: grid;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.clinic-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 16px;
+  border: 1px solid #c9d3dc;
+  border-radius: 4px;
+  background: white;
+  font-size: 18px;
+}
+
+.clinic-main-button,
+.clinic-sub-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 17px 18px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.clinic-main-button {
+  background: #0046a8;
+  color: white;
+  border: 2px solid #0046a8;
+}
+
+.clinic-sub-button {
+  background: white;
+  color: #0046a8;
+  border: 2px solid #0046a8;
+}
+
+.clinic-note {
+  margin-top: 26px;
+  color: #4d5b66;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.clinic-error {
+  margin-bottom: 22px;
+  padding: 13px 16px;
+  background: #fff4e5;
+  border-left: 5px solid #e88900;
+  color: #8a4b00;
+  font-weight: 800;
+}
+
+.clinic-section {
+  margin-top: 30px;
+}
+
+.clinic-section h2 {
+  margin: 0 0 12px;
+  color: #0046a8;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.info-box,
+.reservation-box {
+  background: white;
+  border: 1px solid #cfd8df;
+  border-radius: 5px;
+  padding: 18px 22px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e2e6ea;
+  font-size: 17px;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row span {
+  font-weight: 900;
+  color: #222;
+}
+
+.info-row strong {
+  font-weight: 700;
+  color: #333;
+}
+
+.reservation-box h3 {
+  margin: 0 0 12px;
+  color: #0046a8;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.clinic-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.clinic-actions form {
+  margin: 0;
+}
+
+.empty-message {
+  margin: 0 0 18px;
+  font-weight: 800;
+  color: #333;
+}
+
+.clinic-logout {
+  display: block;
+  margin-top: 28px;
+  text-align: center;
+  color: #0046a8;
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .clinic-page {
+    padding: 16px 12px;
+  }
+
+  .clinic-card {
+    padding: 28px 20px;
+  }
+
+  .clinic-card h1 {
+    font-size: 25px;
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    font-size: 16px;
+  }
+}
