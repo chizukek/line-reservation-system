@@ -42,11 +42,6 @@ function isValidSlot(slot) {
 }
 
 function isWithinReservationPeriod(date) {
-  const today = new Date().toLocaleDateString("sv-SE");
-  return date > today;
-}
-
-function isWithinReservationPeriod(date) {
   const today = new Date();
 
   const maxDate = new Date();
@@ -102,18 +97,19 @@ app.post("/mypage", async (req, res) => {
   res.redirect("/mypage");
 });
 
+app.get("/complete", (req, res) => {
+  const completeMessage = req.session.completeMessage;
+
+  if (!completeMessage) {
+    return res.redirect("/mypage");
+  }
+
+  req.session.completeMessage = null;
+
+  res.render("complete", completeMessage);
+});
+
 app.get("/mypage", async (req, res) => {
-  app.get("/complete", (req, res) => {
-    const completeMessage = req.session.completeMessage;
-
-    if (!completeMessage) {
-      return res.redirect("/mypage");
-    }
-
-    req.session.completeMessage = null;
-
-    res.render("complete", completeMessage);
-  });
   const patientNumber = req.session.patientNumber;
 
   if (!patientNumber) {
@@ -435,22 +431,8 @@ app.post("/reserve", async (req, res) => {
 
     if (error.message === "NOT_FOUND") {
       req.session.changeReservationId = null;
-
-      return res.render("complete", {
-        title: changeReservationId ? "予約変更完了" : "予約完了",
-        heading: changeReservationId
-          ? "予約を変更しました"
-          : "予約が完了しました",
-        message: changeReservationId
-          ? "予約内容を更新しました。"
-          : "ご予約ありがとうございました。",
-        reservation: {
-          date,
-          slot,
-        },
-      });
+      return res.redirect("/mypage");
     }
-
     if (error.message.startsWith("DUPLICATE:")) {
       return res.render("error", {
         title: "予約不可",
@@ -469,8 +451,6 @@ app.post("/reserve", async (req, res) => {
       backUrl: "/",
     });
   }
-
-  req.session.changeReservationId = null;
 
   req.session.changeReservationId = null;
 
@@ -1144,60 +1124,6 @@ app.post("/cancel", async (req, res) => {
   });
 });
 
-app.get("/cancel-input", (req, res) => {
-  res.render("cancel-input", {
-    title: "予約キャンセル",
-    patientNumber: "",
-    error: null,
-  });
-});
-
-app.post("/cancel-patient", async (req, res) => {
-  const patientNumber = req.body.patientNumber;
-  const today = new Date().toLocaleDateString("sv-SE");
-
-  const patient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
-  });
-
-  if (!patient) {
-    return res.render("cancel-input", {
-      title: "予約キャンセル",
-      patientNumber,
-      error: "患者番号が見つかりません。",
-    });
-  }
-
-  const reservations = await prisma.reservation.findMany({
-    where: {
-      patientNumber,
-      date: {
-        gt: today,
-      },
-    },
-    include: {
-      patient: true,
-    },
-    orderBy: [{ date: "asc" }, { slot: "asc" }],
-  });
-
-  if (reservations.length === 0) {
-    return res.render("cancel-input", {
-      title: "予約キャンセル",
-      patientNumber,
-      error: "キャンセルできる予約が見つかりません。",
-    });
-  }
-
-  res.render("cancel-list", {
-    title: "予約キャンセル",
-    patient,
-    reservations,
-  });
-});
-
 app.post("/cancel-confirm", async (req, res) => {
   const id = Number(req.body.id);
   const from = req.body.from;
@@ -1256,12 +1182,12 @@ async function handleLineEvent(event) {
               {
                 type: "uri",
                 label: "予約する",
-                uri: `${appUrl}/`,
+                uri: `${appUrl}/psychiatry`,
               },
               {
                 type: "uri",
                 label: "予約をキャンセルする",
-                uri: `${appUrl}/cancel-input`,
+                uri: `${appUrl}/psychiatry`,
               },
             ],
           },
@@ -1285,7 +1211,7 @@ async function handleLineEvent(event) {
               {
                 type: "uri",
                 label: "キャンセル画面を開く",
-                uri: `${appUrl}/cancel-input`,
+                uri: `${appUrl}/psychiatry`,
               },
             ],
           },
@@ -1308,12 +1234,12 @@ async function handleLineEvent(event) {
             {
               type: "uri",
               label: "予約する",
-              uri: `${appUrl}/`,
+              uri: `${appUrl}/psychiatry`,
             },
             {
               type: "uri",
               label: "予約をキャンセルする",
-              uri: `${appUrl}/cancel-input`,
+              uri: `${appUrl}/psychiatry`,
             },
           ],
         },
