@@ -1,30 +1,56 @@
 <%- include("partials/header", { title: "予約キャンセル確認" }) %>
 
-<h1>予約キャンセル確認</h1>
+<div class="<%= from === 'admin' ? 'admin-page' : 'clinic-page' %>">
+  <div class="<%= from === 'admin' ? 'admin-card' : 'clinic-card' %>">
 
-<p>氏名：<%= reservation.patient.name %></p>
-<p>予約日：<%= reservation.date %></p>
-<p>予約時間：<%= reservation.slot %></p>
+    <h1>予約キャンセル確認</h1>
 
-<p class="error">
-本当にキャンセルしますか？
-</p>
+    <section class="clinic-section">
+      <h2>予約内容</h2>
 
-<form action="/cancel-confirm" method="POST">
+      <div class="reservation-box">
 
-  <input type="hidden" name="id" value="<%= reservation.id %>">
-  <input type="hidden" name="from" value="<%= from %>">
+        <div class="info-row">
+          <span>氏名</span>
+          <strong><%= reservation.patient.name %> 様</strong>
+        </div>
 
-  <button type="submit">
-    はい、キャンセルします
-  </button>
+        <div class="info-row">
+          <span>予約日</span>
+          <strong><%= reservation.date %></strong>
+        </div>
 
-</form>
+        <div class="info-row">
+          <span>時間</span>
+          <strong><%= reservation.slot %></strong>
+        </div>
 
-<br>
+      </div>
+    </section>
 
-<a href="<%= from === 'admin' ? '/admin' : '/mypage' %>">
-戻る
-</a>
+    <div class="clinic-error" style="margin-top:20px;">
+      この予約をキャンセルします。よろしいですか？
+    </div>
+
+    <form action="/cancel-confirm" method="POST" class="clinic-actions">
+
+      <input type="hidden" name="id" value="<%= reservation.id %>">
+      <input type="hidden" name="from" value="<%= from %>">
+
+      <button class="admin-danger-button" type="submit">
+        キャンセルする
+      </button>
+
+      <a
+        class="clinic-sub-button"
+        href="<%= from === 'admin' ? '/admin' : '/mypage' %>"
+      >
+        戻る
+      </a>
+
+    </form>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

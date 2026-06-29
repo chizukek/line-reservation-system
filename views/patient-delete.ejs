@@ -1,20 +1,56 @@
 <%- include("partials/header", { title: "患者削除確認" }) %>
 
-<h1>患者削除確認</h1>
+<div class="admin-page">
+  <div class="admin-card">
 
-<p>患者番号：<%= patient.patientNumber %></p>
-<p>氏名：<%= patient.name %></p>
+    <h1>患者削除確認</h1>
 
-<p class="error">
-  本当にこの患者を削除しますか？
-</p>
+    <section class="admin-section">
+      <h2>患者情報</h2>
 
-<form action="/admin/patients/delete/<%= patient.id %>" method="POST">
-  <button type="submit">削除する</button>
-</form>
+      <div class="reservation-box">
 
-<br>
+        <div class="info-row">
+          <span>患者番号</span>
+          <strong><%= patient.patientNumber %></strong>
+        </div>
 
-<a href="/admin/patients">戻る</a>
+        <div class="info-row">
+          <span>氏名</span>
+          <strong><%= patient.name %> 様</strong>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="clinic-error">
+      この患者情報を削除します。<br>
+      この操作は取り消せません。
+    </div>
+
+    <form
+      action="/admin/patients/delete/<%= patient.id %>"
+      method="POST"
+      class="clinic-actions"
+    >
+
+      <button
+        type="submit"
+        class="admin-danger-button"
+      >
+        削除する
+      </button>
+
+      <a
+        href="/admin/patients"
+        class="clinic-sub-button"
+      >
+        戻る
+      </a>
+
+    </form>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

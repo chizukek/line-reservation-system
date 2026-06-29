@@ -1,40 +1,66 @@
 <%- include("partials/header", { title: "患者登録" }) %>
 
-<h1>患者登録</h1>
+<div class="admin-page">
+  <div class="admin-card">
 
-<% if (error) { %>
-  <p class="error">
-    <%= error %>
-  </p>
-<% } %>
+    <h1>患者登録</h1>
 
-<form action="/admin/patients/add" method="POST">
-  <label>患者番号</label><br>
-  <input type="text" name="patientNumber" required>
+    <p class="clinic-lead">
+      新しい患者を登録します。
+    </p>
 
-  <br><br>
+    <% if (error) { %>
+      <div class="clinic-error">
+        <%= error %>
+      </div>
+    <% } %>
 
-  <label>氏名</label><br>
-  <input type="text" name="name" required>
+    <form action="/admin/patients/add" method="POST" class="admin-form-card">
 
-  <br><br>
+      <label>
+        <span>患者番号</span>
+        <input
+          type="text"
+          name="patientNumber"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="例：10001"
+          required
+        >
+      </label>
 
-  <div class="form-group">
-  <label>生年月日</label>
-  <input
-    type="date"
-    name="birthDate"
-    required
-  >
+      <label>
+        <span>氏名</span>
+        <input
+          type="text"
+          name="name"
+          placeholder="例：山田 太郎"
+          required
+        >
+      </label>
+
+      <label>
+        <span>生年月日</span>
+        <input
+          type="date"
+          name="birthDate"
+          required
+        >
+      </label>
+
+      <div class="clinic-actions">
+        <button class="clinic-main-button" type="submit">
+          患者を登録する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin/patients">
+          戻る
+        </a>
+      </div>
+
+    </form>
+
+  </div>
 </div>
-
-<br><br>
-
-  <button type="submit">登録</button>
-</form>
-
-<br>
-
-<a href="/admin/patients">戻る</a>
 
 <%- include("partials/footer") %>

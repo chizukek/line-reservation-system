@@ -1,20 +1,41 @@
 <%- include("partials/header", { title: "管理者ログイン" }) %>
 
-<h1>管理者ログイン</h1>
+<div class="admin-page">
+  <div class="admin-card admin-login-card">
 
-<% if (error) { %>
-  <p class="error"><%= error %></p>
-<% } %>
+    <h1>予約管理システム</h1>
 
-<form action="/admin-login" method="POST">
-  <input
-    type="password"
-    name="password"
-    placeholder="パスワード"
-    required
-  >
+    <p class="clinic-lead">
+      管理者専用ページです。<br>
+      パスワードを入力してください。
+    </p>
 
-  <button type="submit">ログイン</button>
-</form>
+    <% if (error) { %>
+      <div class="clinic-error">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/admin-login" method="POST" class="admin-form-card">
+
+      <label>
+        <span>パスワード</span>
+
+        <input
+          type="password"
+          name="password"
+          placeholder="パスワード"
+          required
+        >
+      </label>
+
+      <button class="clinic-main-button" type="submit">
+        ログイン
+      </button>
+
+    </form>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

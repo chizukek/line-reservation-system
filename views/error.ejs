@@ -1,19 +1,29 @@
 <%- include("partials/header", { title: title || "エラー" }) %>
 
-<h1><%= heading || "エラー" %></h1>
+<div class="clinic-page">
+  <div class="clinic-card error-box">
 
-<p class="error">
-  <%= message %>
-</p>
+    <h1><%= heading || "エラー" %></h1>
 
-<% if (detail) { %>
-  <p><%= detail %></p>
-<% } %>
+    <div class="clinic-error">
+      <%= message %>
+    </div>
 
-<br>
+    <% if (detail) { %>
+      <div class="reservation-box">
+        <p style="margin: 0; font-weight: 700;">
+          <%= detail %>
+        </p>
+      </div>
+    <% } %>
 
-<a href="<%= backUrl || '/' %>">
-  戻る
-</a>
+    <div class="clinic-actions">
+      <a class="clinic-sub-button" href="<%= backUrl || '/' %>">
+        戻る
+      </a>
+    </div>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

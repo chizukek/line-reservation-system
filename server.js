@@ -59,7 +59,9 @@ app.get("/psychiatry", (req, res) => {
 });
 
 app.post("/mypage", async (req, res) => {
-  const { patientNumber, birthDate } = req.body;
+  const { patientNumber, birthYear, birthMonth, birthDay } = req.body;
+
+  const birthDate = `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`;
 
   const patient = await prisma.patient.findUnique({
     where: {
@@ -501,6 +503,11 @@ app.post("/admin-login", (req, res) => {
   res.redirect("/admin");
 });
 
+app.get("/admin-logout", (req, res) => {
+  req.session.isAdmin = false;
+  res.redirect("/admin-login");
+});
+
 app.get("/admin", async (req, res) => {
   if (!req.session.isAdmin) {
     return res.redirect("/admin-login");
@@ -929,7 +936,10 @@ app.post("/admin/patients/add", async (req, res) => {
 
   const patientNumber = String(req.body.patientNumber).trim();
   const name = String(req.body.name).trim();
-  const birthDate = new Date(req.body.birthDate);
+  const year = req.body.birthYear;
+  const month = String(req.body.birthMonth).padStart(2, "0");
+  const day = String(req.body.birthDay).padStart(2, "0");
+  const birthDate = new Date(`${year}-${month}-${day}`);
 
   const existingPatient = await prisma.patient.findUnique({
     where: {
@@ -991,7 +1001,10 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   const id = Number(req.params.id);
   const patientNumber = String(req.body.patientNumber).trim();
   const name = String(req.body.name).trim();
-  const birthDate = new Date(req.body.birthDate);
+  const year = req.body.birthYear;
+  const month = String(req.body.birthMonth).padStart(2, "0");
+  const day = String(req.body.birthDay).padStart(2, "0");
+  const birthDate = new Date(`${year}-${month}-${day}`);
 
   const patient = await prisma.patient.findUnique({
     where: { id },

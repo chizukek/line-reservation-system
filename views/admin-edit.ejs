@@ -1,39 +1,75 @@
 <%- include("partials/header", { title: "予約変更" }) %>
 
-<h1>予約変更</h1>
+<div class="admin-page">
+  <div class="admin-card">
 
-<% if (error) { %>
-  <p class="error">
-    <%= error %>
-  </p>
-<% } %>
+    <h1>予約変更</h1>
 
-<p>患者番号：<%= reservation.patientNumber %></p>
-<p>氏名：<%= reservation.patient.name %></p>
-<p>現在の予約：<%= reservation.date %> <%= reservation.slot %></p>
+    <% if (error) { %>
+      <div class="clinic-error">
+        <%= error %>
+      </div>
+    <% } %>
 
-<form action="/admin/edit/<%= reservation.id %>" method="POST">
-  <label>変更後の日付</label><br>
-  <input type="date" name="date" value="<%= reservation.date %>" required>
+    <section class="admin-section">
+      <h2>現在の予約</h2>
 
-  <br><br>
+      <div class="reservation-box">
+        <div class="info-row">
+          <span>患者番号</span>
+          <strong><%= reservation.patientNumber %></strong>
+        </div>
 
-  <label>変更後の時間</label><br>
-  <select name="slot">
-    <% slots.forEach(slot => { %>
-      <option value="<%= slot %>" <%= slot === reservation.slot ? "selected" : "" %>>
-        <%= slot %>
-      </option>
-    <% }) %>
-  </select>
+        <div class="info-row">
+          <span>氏名</span>
+          <strong><%= reservation.patient.name %> 様</strong>
+        </div>
 
-  <br><br>
+        <div class="info-row">
+          <span>予約日</span>
+          <strong><%= reservation.date %></strong>
+        </div>
 
-  <button type="submit">変更する</button>
-</form>
+        <div class="info-row">
+          <span>時間</span>
+          <strong><%= reservation.slot %></strong>
+        </div>
+      </div>
+    </section>
 
-<br>
+    <section class="admin-section">
+      <h2>変更後の内容</h2>
 
-<a href="/admin">戻る</a>
+      <form action="/admin/edit/<%= reservation.id %>" method="POST" class="admin-form-card">
+        <label>
+          <span>変更後の日付</span>
+          <input type="date" name="date" value="<%= reservation.date %>" required>
+        </label>
+
+        <label>
+          <span>変更後の時間</span>
+          <select name="slot">
+            <% slots.forEach(slot => { %>
+              <option value="<%= slot %>" <%= slot === reservation.slot ? "selected" : "" %>>
+                <%= slot %>
+              </option>
+            <% }) %>
+          </select>
+        </label>
+
+        <div class="clinic-actions">
+          <button class="clinic-main-button" type="submit">
+            変更する
+          </button>
+
+          <a class="clinic-sub-button" href="/admin">
+            戻る
+          </a>
+        </div>
+      </form>
+    </section>
+
+  </div>
+</div>
 
 <%- include("partials/footer") %>

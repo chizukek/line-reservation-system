@@ -1,74 +1,113 @@
 <%- include("partials/header", { title: "予約一覧" }) %>
 
-<h1>予約一覧</h1>
+<div class="admin-page">
+  <div class="admin-card">
+    <div class="admin-header">
+      <div>
+        <h1>予約管理</h1>
+        <p>予約一覧・電話予約・患者管理</p>
+      </div>
+    </div>
 
-<p>
-  <a href="/admin/add">📞 電話予約を追加</a>
-</p>
+    <div class="admin-menu">
+      <a class="admin-menu-item" href="/admin/add">
+        <span>電話予約を追加</span>
+        <strong>＞</strong>
+      </a>
 
-<p>
-  <a href="/admin/patients">👤 患者管理</a>
-</p>
+      <a class="admin-menu-item" href="/admin/patients">
+        <span>患者管理</span>
+        <strong>＞</strong>
+      </a>
+    </div>
 
-<p>検索中の患者番号：<%= searchPatientNumber || "なし" %></p>
-<p>検索結果：<%= reservations.length %>件</p>
+    <section class="admin-section">
+      <h2>予約検索</h2>
 
-<form method="GET" action="/admin">
-  <label>日付</label><br>
-  <input type="date" name="date" value="<%= searchDate %>">
+      <form method="GET" action="/admin" class="admin-search-form">
+        <label>
+          <span>日付</span>
+          <input type="date" name="date" value="<%= searchDate %>">
+        </label>
 
-  <br><br>
+        <label>
+          <span>患者番号</span>
+          <input
+            type="text"
+            name="patientNumber"
+            placeholder="例：10001"
+            value="<%= searchPatientNumber %>"
+          >
+        </label>
 
-  <input
-    type="text"
-    name="patientNumber"
-    placeholder="患者番号"
-    value="<%= searchPatientNumber %>"
-  >
+        <button type="submit" class="clinic-main-button">
+          検索する
+        </button>
+      </form>
 
-  <button type="submit">検索</button>
-</form>
+      <div class="admin-filter-links">
+        <a href="/admin?date=<%= today %>">今日の予約</a>
+        <a href="/admin">全件表示</a>
+      </div>
 
-<br>
+      <p class="admin-result-text">
+        検索中の患者番号：<strong><%= searchPatientNumber || "なし" %></strong><br>
+        検索結果：<strong><%= reservations.length %>件</strong>
+      </p>
+    </section>
 
-<a href="/admin?date=<%= today %>">今日の予約</a>
-&nbsp;&nbsp;
-<a href="/admin">全件表示</a>
+    <section class="admin-section">
+      <h2>予約一覧</h2>
 
-<br><br>
+      <% if (reservations.length === 0) { %>
+        <div class="admin-empty">
+          該当する予約はありません。
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>時間</th>
+                <th>氏名</th>
+                <th>患者番号</th>
+                <th>予約番号</th>
+                <th>操作</th>
+              </tr>
+            </thead>
 
-<table border="1" cellpadding="8">
-  <tr>
-    <th>日付</th>
-    <th>時間</th>
-    <th>氏名</th>
-    <th>患者番号</th>
-    <th>予約番号</th>
-    <th>操作</th>
-  </tr>
+            <tbody>
+              <% reservations.forEach(r => { %>
+                <tr>
+                  <td><%= r.date %></td>
+                  <td><%= r.slot %></td>
+                  <td><%= r.patient.name %></td>
+                  <td><%= r.patientNumber %></td>
+                  <td><%= r.reservationCode %></td>
+                  <td>
+                    <div class="admin-action-buttons">
+                      <a class="admin-small-button" href="/admin/edit/<%= r.id %>">
+                        変更
+                      </a>
 
-  <% reservations.forEach(r => { %>
-    <tr>
-      <td><%= r.date %></td>
-      <td><%= r.slot %></td>
-      <td><%= r.patient.name %></td>
-      <td><%= r.patientNumber %></td>
-      <td><%= r.reservationCode %></td>
-      <td>
-        <a href="/admin/edit/<%= r.id %>">変更</a>
-
-        <form action="/cancel" method="POST" style="display:inline;">
-          <input type="hidden" name="from" value="admin">
-          <input type="hidden" name="id" value="<%= r.id %>">
-          <button type="submit">キャンセル</button>
-        </form>
-      </td>
-    </tr>
-  <% }) %>
-</table>
-
-<br>
-
-<a href="/">戻る</a>
+                      <form action="/cancel" method="POST">
+                        <input type="hidden" name="from" value="admin">
+                        <input type="hidden" name="id" value="<%= r.id %>">
+                        <button class="admin-danger-button" type="submit">
+                          キャンセル
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+  </div>
+</div>
 
 <%- include("partials/footer") %>

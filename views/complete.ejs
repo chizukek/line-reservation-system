@@ -1,17 +1,63 @@
-<%- include("partials/header", { title: "予約完了" }) %>
+<%- include("partials/header", { title: title }) %>
+
 <% if (typeof showProgress !== "undefined" && showProgress) { %>
   <%- include("partials/progress", { step: 3 }) %>
 <% } %>
 
-<h1><%= heading %></h1>
+<div class="clinic-page">
+  <div class="clinic-card complete-box">
 
-<p><%= message %></p>
+    <h1><%= heading %></h1>
+    <section class="clinic-section">
+      <h2>患者情報</h2>
 
-<% if (reservation) { %>
-<p>予約日：<%= reservation.date %></p>
-<p>時間：<%= reservation.slot %></p>
-<% } %>
+      <div class="info-box">
+        <div class="info-row">
+          <span>患者番号</span>
+          <strong><%= patient.patientNumber %></strong>
+        </div>
 
-<a class="main-button" href="<%= typeof backUrl !== 'undefined' ? backUrl : '/mypage' %>">
-  <%= typeof backLabel !== 'undefined' ? backLabel : 'マイページへ戻る' %>
-</a>
+        <div class="info-row">
+          <span>氏名</span>
+          <strong><%= patient.name %> 様</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="clinic-section">
+      <h2><%= isChangeMode ? "変更後の予約内容" : "予約内容" %></h2>
+
+      <div class="reservation-box">
+        <div class="info-row">
+          <span>予約日</span>
+          <strong><%= date %></strong>
+        </div>
+
+        <div class="info-row">
+          <span>時間</span>
+          <strong><%= slot %></strong>
+        </div>
+
+        <div class="info-row">
+          <span>診療科</span>
+          <strong>心療内科</strong>
+        </div>
+      </div>
+    </section>
+
+    <form action="/reserve" method="POST" class="clinic-actions">
+      <input type="hidden" name="date" value="<%= date %>">
+      <input type="hidden" name="slot" value="<%= slot %>">
+
+      <button type="submit" class="clinic-main-button">
+        <%= isChangeMode ? "この内容に変更する" : "この内容で予約する" %>
+      </button>
+
+      <a class="clinic-sub-button" href="/">
+        戻る
+      </a>
+    </form>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

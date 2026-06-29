@@ -1,5 +1,9 @@
 <%- include("partials/header", { title: "心療内科再診予約" }) %>
 
+<%
+const currentYear = new Date().getFullYear();
+%>
+
 <div class="clinic-page">
   <div class="clinic-card login-card">
     <h1>〇〇クリニック<br>予約システム</h1>
@@ -13,12 +17,37 @@
     <form method="POST" action="/mypage" class="clinic-form">
       <label>
         <span>患者番号</span>
-        <input type="text" name="patientNumber" inputmode="numeric" required>
+        <input
+          type="text"
+          name="patientNumber"
+          inputmode="numeric"
+          placeholder="例：10001"
+          required
+        >
       </label>
 
       <label>
         <span>生年月日</span>
-        <input type="date" name="birthDate" required>
+
+        <div class="birth-select">
+          <select name="birthYear" required>
+            <% for (let y = currentYear; y >= 1900; y--) { %>
+              <option value="<%= y %>"><%= y %>年</option>
+            <% } %>
+          </select>
+
+          <select name="birthMonth" required>
+            <% for (let m = 1; m <= 12; m++) { %>
+              <option value="<%= m %>"><%= m %>月</option>
+            <% } %>
+          </select>
+
+          <select name="birthDay" required>
+            <% for (let d = 1; d <= 31; d++) { %>
+              <option value="<%= d %>"><%= d %>日</option>
+            <% } %>
+          </select>
+        </div>
       </label>
 
       <button type="submit" class="clinic-main-button">
@@ -27,7 +56,7 @@
     </form>
 
     <p class="clinic-note">
-      初診の方、他診療科のご予約・お問い合わせはお電話またはホームページをご利用ください。
+      初診の方、他診療科のお問い合わせはお電話またはホームページをご利用ください。
     </p>
   </div>
 </div>
