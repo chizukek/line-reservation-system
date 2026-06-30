@@ -1142,6 +1142,41 @@ app.post("/admin/patients/delete/:id", async (req, res) => {
   res.redirect("/admin/patients");
 });
 
+app.get("/admin/cancel-confirm/:id", requireAdminLogin, async (req, res) => {
+  const reservation = await prisma.reservation.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+    include: {
+      patient: true,
+    },
+  });
+
+  if (!reservation) {
+    return res.redirect("/admin");
+  }
+
+  res.render("admin-cancel-confirm", {
+    title: "予約キャンセル確認",
+    reservation,
+  });
+});
+
+app.post("/admin/cancel/:id", requireAdminLogin, async (req, res) => {
+  await prisma.reservation.delete({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
+
+  res.render("admin-complete", {
+    title: "キャンセル完了",
+    message: "予約をキャンセルしました。",
+    buttonText: "予約一覧へ戻る",
+    buttonLink: "/admin",
+  });
+});
+
 app.post("/cancel", async (req, res) => {
   const id = Number(req.body.id);
   const from = req.body.from;

@@ -93,13 +93,9 @@ autocomplete="off"
             変更
           </a>
 
-          <form action="/cancel" method="POST">
-            <input type="hidden" name="from" value="admin">
-            <input type="hidden" name="id" value="<%= r.id %>">
-            <button class="admin-danger-button" type="submit">
-              キャンセル
-            </button>
-          </form>
+          <a class="admin-danger-button" href="/admin/cancel-confirm/<%= r.id %>">
+  キャンセル
+</a>
         </div>
       </td>
     </tr>

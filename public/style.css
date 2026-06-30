@@ -489,9 +489,9 @@ button {
 
 .mark-open::before {
   content: "";
-  width: 18px;
-  height: 18px;
-  border: 4px solid var(--green);
+  width: 15px;
+  height: 15px;
+  border: 3px solid var(--green);
   border-radius: 50%;
   display: block;
 }
@@ -959,10 +959,6 @@ button {
   .time-cell {
     width: 48px;
     font-size: 13px;
-  }
-
-  .mark-open {
-    font-size: 22px;;
   }
 
   .mark-full {

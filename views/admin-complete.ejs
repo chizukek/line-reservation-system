@@ -1,0 +1,17 @@
+<%- include("partials/header", { title }) %>
+
+<div class="admin-page">
+  <div class="admin-card complete-card">
+    <h1><%= title %></h1>
+
+    <p class="clinic-lead">
+      <%= message %>
+    </p>
+
+    <a class="clinic-main-button" href="<%= buttonLink %>">
+      <%= buttonText %>
+    </a>
+  </div>
+</div>
+
+<%- include("partials/footer") %>
