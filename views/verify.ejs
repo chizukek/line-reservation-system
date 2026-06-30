@@ -36,11 +36,11 @@ const currentYear = new Date().getFullYear();
         <span>生年月日</span>
 
         <div class="birth-select">
-          <select name="birthYear" required>
-            <% for (let y = currentYear; y >= 1900; y--) { %>
-              <option value="<%= y %>"><%= y %>年</option>
-            <% } %>
-          </select>
+          <select id="birthYear" name="birthYear" required>
+  <% for (let y = currentYear; y >= 1900; y--) { %>
+    <option value="<%= y %>"><%= y %>年</option>
+  <% } %>
+</select>
 
           <select name="birthMonth" required>
             <% for (let m = 1; m <= 12; m++) { %>
@@ -68,5 +68,11 @@ const currentYear = new Date().getFullYear();
 
   </div>
 </div>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("birthYear").value = "1990";
+});
+</script>
 
 <%- include("partials/footer") %>
