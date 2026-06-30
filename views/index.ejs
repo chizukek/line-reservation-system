@@ -95,23 +95,35 @@
             <th class="time-cell"><%= slot %></th>
 
             <% dates.forEach(date => { %>
-              <td>
-                <% const count = reservations.filter(r => r.date === date.value && r.slot === slot).length; %>
-                <% const availableSlots = getSlotsForDate(date.value); %>
+  <% 
+    const count = reservations.filter(r => r.date === date.value && r.slot === slot).length;
+    const availableSlots = getSlotsForDate(date.value);
 
-                <% if (!availableSlots.includes(slot)) { %>
-                  <span class="mark-disabled">−</span>
-                <% } else if (date.value <= today) { %>
-                  <span class="mark-disabled">−</span>
-                <% } else if (date.value > maxReservableText) { %>
-                  <span class="mark-disabled">−</span>
-                <% } else if (count >= 2) { %>
-                  <span class="mark-full">×</span>
-                <% } else { %>
-                  <a class="mark-open" href="/confirm?date=<%= date.value %>&slot=<%= slot %>">○</a>
-                <% } %>
-              </td>
-            <% }) %>
+    let cellClass = "";
+    let cellContent = "";
+
+    if (!availableSlots.includes(slot)) {
+      cellClass = "unavailable-cell";
+      cellContent = '<span class="mark-disabled">−</span>';
+    } else if (date.value <= today) {
+      cellClass = "unavailable-cell";
+      cellContent = '<span class="mark-disabled">−</span>';
+    } else if (date.value > maxReservableText) {
+      cellClass = "unavailable-cell";
+      cellContent = '<span class="mark-disabled">−</span>';
+    } else if (count >= 2) {
+      cellClass = "full-cell";
+      cellContent = '<span class="mark-full">×</span>';
+    } else {
+      cellClass = "open-cell";
+      cellContent = `<a class="mark-open" href="/confirm?date=${date.value}&slot=${slot}"></a>`;
+    }
+  %>
+
+  <td class="<%= cellClass %>">
+    <%- cellContent %>
+  </td>
+<% }) %>
           </tr>
         <% }) %>
 

@@ -471,18 +471,35 @@ button {
   text-decoration: none;
 }
 
+.open-cell {
+  background: white;
+}
+
+.unavailable-cell,
+.full-cell {
+  background: #f2f2f2;
+}
+
 .mark-open {
-  font-size: 26px;
-  color: var(--green);
-  font-weight: 900;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  font-size: 0;
+}
+
+.mark-open::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 4px solid var(--green);
+  border-radius: 50%;
+  display: block;
 }
 
 .mark-open:hover {
   background: var(--green-pale);
   border-radius: 50%;
   text-decoration: none;
-  transform: scale(1.12);
-  transition: 0.15s;
 }
 
 .mark-full {
@@ -1002,3 +1019,4 @@ button {
     padding: 11px 10px;
   }
 }
+
