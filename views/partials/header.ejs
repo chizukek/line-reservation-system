@@ -9,27 +9,37 @@
 <body>
 
 <%
-  const isAdminPage =
-    typeof title !== "undefined" &&
-    (
-      title.includes("管理") ||
-      title.includes("予約一覧") ||
-      title.includes("電話予約") ||
-      title.includes("患者")
-    );
+const isAdminPage =
+  typeof title !== "undefined" &&
+  (
+    title.includes("管理") ||
+    title.includes("予約一覧") ||
+    title.includes("電話予約") ||
+    title.includes("患者")
+  );
 %>
 
 <header class="<%= isAdminPage ? 'site-header admin-header-bar' : 'site-header' %>">
+
   <div class="site-header-inner">
-    <div class="site-brand">
-      <div class="site-logo">🏥</div>
-      <div>
-        <div class="site-name">〇〇クリニック</div>
+
+    <a class="site-brand" href="<%= isAdminPage ? '/admin' : '/psychiatry' %>">
+
+      <div class="site-logo">
+        <img src="/images/icon.png" alt="〇〇クリニック">
+      </div>
+
+      <div class="site-brand-text">
+        <div class="site-name">
+          今村医院
+        </div>
+
         <div class="site-subtitle">
           <%= isAdminPage ? "予約管理システム" : "心療内科再診予約" %>
         </div>
       </div>
-    </div>
+
+    </a>
 
     <nav class="site-nav">
       <% if (isAdminPage) { %>
@@ -42,7 +52,9 @@
         <a href="/logout">ログアウト</a>
       <% } %>
     </nav>
+
   </div>
+
 </header>
 
 <div class="container">
