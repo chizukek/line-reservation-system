@@ -473,7 +473,6 @@ button {
 
 .mark-open {
   color: var(--green);
-  font-size: 30px;
   font-weight: 900;
 }
 
@@ -854,7 +853,7 @@ button {
   .container {
     width: 100%;
     max-width: none;
-    padding: 6px;
+    padding: 0;
   }
 
   h1 {
@@ -887,7 +886,7 @@ button {
 
   .clinic-page,
   .admin-page {
-    padding: 8px 4px;
+    padding: 0;
   }
 
   .clinic-card,
@@ -945,7 +944,7 @@ button {
   }
 
   .mark-open {
-    font-size: 28px;
+    
   }
 
   .mark-full {
