@@ -1,0 +1,21 @@
+<%- include("partials/header", { title: "ログアウト確認" }) %>
+
+<div class="clinic-page">
+  <div class="clinic-card">
+    <h1>ログアウトしますか？</h1>
+
+    <form action="/logout" method="POST">
+      <div class="clinic-actions">
+        <button type="submit" class="clinic-main-button">
+          ログアウトする
+        </button>
+
+        <a href="/mypage" class="clinic-sub-button">
+          戻る
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

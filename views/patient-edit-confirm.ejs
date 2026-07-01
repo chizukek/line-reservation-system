@@ -1,0 +1,41 @@
+<%- include("partials/header", { title: "患者編集確認" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <h1>この内容で変更しますか？</h1>
+
+    <div class="confirm-box">
+      <h2>変更前</h2>
+      <p><strong>患者番号：</strong><%= patient.patientNumber %></p>
+      <p><strong>氏名：</strong><%= patient.name %></p>
+      <p><strong>生年月日：</strong><%= formatJapaneseDate(patient.birthDate) %></p>
+    </div>
+
+    <div class="confirm-box">
+      <h2>変更後</h2>
+      <p><strong>患者番号：</strong><%= newPatient.patientNumber %></p>
+      <p><strong>氏名：</strong><%= newPatient.name %></p>
+      <p><strong>生年月日：</strong><%= formatJapaneseDate(newPatient.birthDateText) %></p>
+    </div>
+
+    <form method="POST" action="/admin/patients/edit/<%= newPatient.id %>/complete">
+      <input type="hidden" name="patientNumber" value="<%= newPatient.patientNumber %>">
+      <input type="hidden" name="name" value="<%= newPatient.name %>">
+      <input type="hidden" name="birthDate" value="<%= newPatient.birthDateText %>">
+
+      <div class="clinic-actions">
+        <button type="submit" class="clinic-main-button">
+          変更する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin/patients/edit/<%= newPatient.id %>">
+          戻る
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

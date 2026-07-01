@@ -1,14 +1,44 @@
-app.post("/admin/cancel/:id", requireAdminLogin, async (req, res) => {
-  await prisma.reservation.delete({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
+<%- include("partials/header", { title: "予約キャンセル確認" }) %>
 
-  res.render("admin-complete", {
-    title: "キャンセル完了",
-    message: "予約をキャンセルしました。",
-    buttonText: "予約一覧へ戻る",
-    buttonLink: "/admin",
-  });
-});
+<div class="admin-page">
+  <div class="admin-card">
+
+    <h1>予約キャンセル確認</h1>
+
+    <p class="clinic-lead">
+      以下の予約をキャンセルします。よろしいですか？
+    </p>
+
+    <div class="confirm-box">
+      <p>
+        <strong>日時：</strong>
+        <%= reservation.date %> <%= reservation.slot %>
+      </p>
+
+      <p>
+        <strong>患者番号：</strong>
+        <%= reservation.patientNumber %>
+      </p>
+
+      <p>
+        <strong>氏名：</strong>
+        <%= reservation.patient ? reservation.patient.name : "不明" %>
+      </p>
+    </div>
+
+    <form method="POST" action="/admin/cancel/<%= reservation.id %>" class="admin-form-card">
+      <div class="clinic-actions">
+        <button type="submit" class="admin-danger-button">
+          キャンセルする
+        </button>
+
+        <a class="clinic-sub-button" href="/admin">
+          戻る
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

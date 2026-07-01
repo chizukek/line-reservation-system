@@ -42,12 +42,11 @@ const isAdminPage =
     </a>
 
     <nav class="site-nav">
-      <% if (isAdminPage) { %>
+      <% if (isAdminPage && isAdminLoggedIn) { %>
         <a href="/admin">予約一覧</a>
         <a href="/admin/patients">患者管理</a>
         <a href="/admin-logout">ログアウト</a>
-      <% } else { %>
-        <a href="/psychiatry">予約</a>
+      <% } else if (!isAdminPage && isPatientLoggedIn) { %>
         <a href="/mypage">マイページ</a>
         <a href="/logout">ログアウト</a>
       <% } %>

@@ -28,6 +28,19 @@ app.use(
     saveUninitialized: false,
   }),
 );
+app.use((req, res, next) => {
+  res.locals.isPatientLoggedIn = Boolean(req.session.patientNumber);
+  res.locals.isAdminLoggedIn = Boolean(req.session.isAdmin);
+  next();
+});
+
+function formatJapaneseDate(dateText) {
+  const date = new Date(dateText);
+
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日(${weekdays[date.getDay()]})`;
+}
 
 function isValidPatientNumber(patientNumber) {
   return /^\d{5}$/.test(patientNumber);
@@ -74,13 +87,26 @@ async function createAuditLog(action, target = null, detail = null) {
   }
 }
 
+app.use((req, res, next) => {
+  res.locals.formatJapaneseDate = formatJapaneseDate;
+  next();
+});
+
 app.get("/psychiatry", (req, res) => {
+  if (req.session.patientNumber) {
+    return res.redirect("/mypage");
+  }
+
   res.render("psychiatry", {
     title: "心療内科再診予約",
   });
 });
 
 app.get("/verify", (req, res) => {
+  if (req.session.patientNumber) {
+    return res.redirect("/mypage");
+  }
+
   res.render("verify", {
     title: "本人確認",
   });
@@ -128,6 +154,16 @@ app.post("/mypage", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
+  if (!req.session.patientNumber) {
+    return res.redirect("/psychiatry");
+  }
+
+  res.render("logout-confirm", {
+    title: "ログアウト確認",
+  });
+});
+
+app.post("/logout", (req, res) => {
   req.session.patientNumber = null;
   req.session.changeReservationId = null;
   req.session.completeMessage = null;
@@ -957,6 +993,40 @@ app.post("/admin/edit/:id", async (req, res) => {
     return renderEdit(`${date} ${slot} は満員です。`);
   }
 
+  return res.render("admin-edit-confirm", {
+    title: "予約変更確認",
+    reservation,
+    newReservation: {
+      id,
+      date,
+      slot,
+    },
+  });
+});
+
+app.post("/admin/edit/:id/complete", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+  const { date, slot } = req.body;
+
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
+    include: { patient: true },
+  });
+
+  if (!reservation) {
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "予約が見つかりません。",
+      detail: "",
+      backUrl: "/admin",
+    });
+  }
+
   await prisma.reservation.update({
     where: { id },
     data: {
@@ -1012,12 +1082,29 @@ app.post("/admin/patients/add", async (req, res) => {
     return res.redirect("/admin-login");
   }
 
-  const patientNumber = String(req.body.patientNumber).trim();
-  const name = String(req.body.name).trim();
-  const year = req.body.birthYear;
-  const month = String(req.body.birthMonth).padStart(2, "0");
-  const day = String(req.body.birthDay).padStart(2, "0");
-  const birthDate = new Date(`${year}-${month}-${day}`);
+  const patientNumber = String(req.body.patientNumber || "").trim();
+  const name = String(req.body.name || "").trim();
+
+  const year = String(req.body.birthYear || "");
+  const month = String(req.body.birthMonth || "").padStart(2, "0");
+  const day = String(req.body.birthDay || "").padStart(2, "0");
+
+  const birthDateText = `${year}-${month}-${day}`;
+  const birthDate = new Date(birthDateText);
+
+  if (
+    !isValidPatientNumber(patientNumber) ||
+    !name ||
+    !year ||
+    !month ||
+    !day ||
+    Number.isNaN(birthDate.getTime())
+  ) {
+    return res.render("patient-add", {
+      title: "患者登録",
+      error: "患者番号・氏名・生年月日を正しく入力してください。",
+    });
+  }
 
   const existingPatient = await prisma.patient.findUnique({
     where: {
@@ -1090,12 +1177,114 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   }
 
   const id = Number(req.params.id);
-  const patientNumber = String(req.body.patientNumber).trim();
-  const name = String(req.body.name).trim();
-  const year = req.body.birthYear;
-  const month = String(req.body.birthMonth).padStart(2, "0");
-  const day = String(req.body.birthDay).padStart(2, "0");
-  const birthDate = new Date(`${year}-${month}-${day}`);
+  const patientNumber = String(req.body.patientNumber || "").trim();
+  const name = String(req.body.name || "").trim();
+
+  const year = String(req.body.birthYear || "");
+  const month = String(req.body.birthMonth || "").padStart(2, "0");
+  const day = String(req.body.birthDay || "").padStart(2, "0");
+  const birthDateText = `${year}-${month}-${day}`;
+  const birthDate = new Date(birthDateText);
+
+  const patient = await prisma.patient.findUnique({
+    where: { id },
+  });
+
+  if (!patient) {
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者が見つかりません。",
+      detail: "",
+      backUrl: "/admin/patients",
+    });
+  }
+
+  if (
+    !isValidPatientNumber(patientNumber) ||
+    !name ||
+    !year ||
+    !month ||
+    !day ||
+    Number.isNaN(birthDate.getTime())
+  ) {
+    return res.render("patient-edit", {
+      title: "患者編集",
+      patient: {
+        ...patient,
+        patientNumber,
+        name,
+      },
+      birthYear: Number(year) || new Date(patient.birthDate).getFullYear(),
+      birthMonth: Number(month) || new Date(patient.birthDate).getMonth() + 1,
+      birthDay: Number(day) || new Date(patient.birthDate).getDate(),
+      currentYear: new Date().getFullYear(),
+      error: "患者番号・氏名・生年月日を正しく入力してください。",
+    });
+  }
+
+  const duplicate = await prisma.patient.findFirst({
+    where: {
+      patientNumber,
+      id: {
+        not: id,
+      },
+    },
+  });
+
+  if (duplicate) {
+    return res.render("patient-edit", {
+      title: "患者編集",
+      patient: {
+        ...patient,
+        patientNumber,
+        name,
+      },
+      birthYear: Number(year),
+      birthMonth: Number(month),
+      birthDay: Number(day),
+      currentYear: new Date().getFullYear(),
+      error: "この患者番号はすでに使われています。",
+    });
+  }
+
+  return res.render("patient-edit-confirm", {
+    title: "患者編集確認",
+    patient,
+    newPatient: {
+      id,
+      patientNumber,
+      name,
+      birthDateText,
+    },
+  });
+});
+
+app.post("/admin/patients/edit/:id/complete", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const id = Number(req.params.id);
+  const patientNumber = String(req.body.patientNumber || "").trim();
+  const name = String(req.body.name || "").trim();
+  const birthDateText = String(req.body.birthDate || "");
+  const birthDate = new Date(birthDateText);
+
+  if (
+    !isValidPatientNumber(patientNumber) ||
+    !name ||
+    !isValidDateText(birthDateText) ||
+    Number.isNaN(birthDate.getTime())
+  ) {
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "患者情報が不正です。",
+      detail: "",
+      backUrl: `/admin/patients/edit/${id}`,
+    });
+  }
 
   const patient = await prisma.patient.findUnique({
     where: { id },
@@ -1121,15 +1310,12 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
   });
 
   if (duplicate) {
-    return res.render("patient-edit", {
-      title: "患者編集",
-      patient: {
-        id,
-        patientNumber,
-        name,
-        birthDate,
-      },
-      error: "この患者番号はすでに使われています。",
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "この患者番号はすでに使われています。",
+      detail: "",
+      backUrl: `/admin/patients/edit/${id}`,
     });
   }
 
@@ -1142,7 +1328,11 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
     },
   });
 
-  await createAuditLog("患者編集", `患者ID:${id}`, `患者番号:${patientNumber}`);
+  await createAuditLog(
+    "患者編集",
+    `患者ID:${id}`,
+    `患者番号:${patient.patientNumber} → ${patientNumber}`,
+  );
 
   return res.render("admin-complete", {
     title: "患者編集完了",

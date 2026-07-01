@@ -1,0 +1,40 @@
+<%- include("partials/header", { title: "予約変更確認" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <h1>この内容で予約を変更しますか？</h1>
+
+    <div class="confirm-box">
+      <h2>変更前</h2>
+      <p><strong>日時：</strong><%= formatJapaneseDate(reservation.date) %> <%= reservation.slot %></p>
+      <p><strong>患者番号：</strong><%= reservation.patientNumber %></p>
+      <p><strong>氏名：</strong><%= reservation.patient.name %></p>
+    </div>
+
+    <div class="confirm-box">
+      <h2>変更後</h2>
+      <p><strong>日時：</strong><%= formatJapaneseDate(newReservation.date) %> <%= newReservation.slot %></p>
+      <p><strong>患者番号：</strong><%= reservation.patientNumber %></p>
+      <p><strong>氏名：</strong><%= reservation.patient.name %></p>
+    </div>
+
+    <form method="POST" action="/admin/edit/<%= newReservation.id %>/complete">
+      <input type="hidden" name="date" value="<%= newReservation.date %>">
+      <input type="hidden" name="slot" value="<%= newReservation.slot %>">
+
+      <div class="clinic-actions">
+        <button type="submit" class="clinic-main-button">
+          変更する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin/edit/<%= newReservation.id %>">
+          戻る
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

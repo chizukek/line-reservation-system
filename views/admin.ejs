@@ -86,8 +86,8 @@ autocomplete="off"
   <% reservations.forEach(r => { %>
     <tr>
       <td>
-        <strong><%= r.date %></strong><br>
-        <%= r.slot %>
+        <strong><%= formatJapaneseDate(r.date) %></strong><br>
+<%= r.slot %>
       </td>
       <td><%= r.patient.name %></td>
       <td><%= r.patientNumber %></td>

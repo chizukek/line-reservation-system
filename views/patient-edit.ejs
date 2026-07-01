@@ -39,22 +39,28 @@
 
         <div class="birth-select">
           <select name="birthYear" required>
-            <% for (let y = currentYear; y >= 1900; y--) { %>
-              <option value="<%= y %>" <%= y === birthYear ? "selected" : "" %>>
-            <% } %>
-          </select>
+  <% for (let y = currentYear; y >= 1900; y--) { %>
+    <option value="<%= y %>" <%= y === birthYear ? "selected" : "" %>>
+      <%= y %>年
+    </option>
+  <% } %>
+</select>
 
-          <select name="birthMonth" required>
-            <% for (let m = 1; m <= 12; m++) { %>
-              <option value="<%= y %>" <%= y === birthYear ? "selected" : "" %>>
-            <% } %>
-          </select>
+<select name="birthMonth" required>
+  <% for (let m = 1; m <= 12; m++) { %>
+    <option value="<%= m %>" <%= m === birthMonth ? "selected" : "" %>>
+      <%= m %>月
+    </option>
+  <% } %>
+</select>
 
-          <select name="birthDay" required>
-            <% for (let d = 1; d <= 31; d++) { %>
-              <option value="<%= d %>" <%= d === birthDay ? "selected" : "" %>>
-            <% } %>
-          </select>
+<select name="birthDay" required>
+  <% for (let d = 1; d <= 31; d++) { %>
+    <option value="<%= d %>" <%= d === birthDay ? "selected" : "" %>>
+      <%= d %>日
+    </option>
+  <% } %>
+</select>
         </div>
       </label>
 
