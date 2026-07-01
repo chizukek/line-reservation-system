@@ -29,3 +29,11 @@ model Patient {
 
   reservations Reservation[]
 }
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  target    String?
+  detail    String?
+  createdAt DateTime @default(now())
+}

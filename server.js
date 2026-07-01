@@ -52,6 +52,28 @@ function isWithinReservationPeriod(date) {
   return targetDate > today && targetDate <= maxDate;
 }
 
+function requireAdminLogin(req, res, next) {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  next();
+}
+
+async function createAuditLog(action, target = null, detail = null) {
+  try {
+    await prisma.auditLog.create({
+      data: {
+        action,
+        target,
+        detail,
+      },
+    });
+  } catch (error) {
+    console.error("AuditLog error:", error);
+  }
+}
+
 app.get("/psychiatry", (req, res) => {
   res.render("psychiatry", {
     title: "心療内科再診予約",
@@ -480,6 +502,12 @@ app.post("/reserve", async (req, res) => {
     });
   }
 
+  await createAuditLog(
+    changeReservationId ? "患者予約変更" : "患者予約",
+    `患者番号:${patientNumber}`,
+    `${date} ${slot}`,
+  );
+
   req.session.changeReservationId = null;
 
   req.session.completeMessage = {
@@ -507,7 +535,7 @@ app.get("/admin-login", (req, res) => {
   });
 });
 
-app.post("/admin-login", (req, res) => {
+app.post("/admin-login", async (req, res) => {
   const password = req.body.password;
 
   if (password !== ADMIN_PASSWORD) {
@@ -518,10 +546,15 @@ app.post("/admin-login", (req, res) => {
   }
 
   req.session.isAdmin = true;
+
+  await createAuditLog("管理者ログイン", null, req.ip);
+
   res.redirect("/admin");
 });
 
-app.get("/admin-logout", (req, res) => {
+app.get("/admin-logout", async (req, res) => {
+  await createAuditLog("管理者ログアウト", null, req.ip);
+
   req.session.isAdmin = false;
   res.redirect("/admin-login");
 });
@@ -559,6 +592,24 @@ app.get("/admin", async (req, res) => {
     searchPatientNumber,
     searchDate,
     today,
+  });
+});
+
+app.get("/admin/logs", async (req, res) => {
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin-login");
+  }
+
+  const logs = await prisma.auditLog.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 100,
+  });
+
+  res.render("admin-logs", {
+    title: "操作ログ",
+    logs,
   });
 });
 
@@ -656,7 +707,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "日付が不正です。",
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
@@ -666,7 +717,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "時間帯が不正です。",
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
@@ -676,7 +727,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "予約可能期間外です。",
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
@@ -692,7 +743,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "患者番号が見つかりません。",
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
@@ -704,7 +755,7 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: `${date} ${slot} は診療時間外です。`,
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
@@ -767,7 +818,7 @@ app.post("/admin/add/complete", async (req, res) => {
         heading: "予約不可",
         message: "すでに予約があります。",
         detail: `既存予約：${error.message.replace("DUPLICATE:", "")}`,
-        backUrl: "/",
+        backUrl: "/admin/add",
       });
     }
 
@@ -777,7 +828,7 @@ app.post("/admin/add/complete", async (req, res) => {
         heading: "予約不可",
         message: `${date} ${slot} は満員です。`,
         detail: "",
-        backUrl: "/",
+        backUrl: "/admin/add",
       });
     }
 
@@ -786,24 +837,22 @@ app.post("/admin/add/complete", async (req, res) => {
       heading: "予約不可",
       message: "予約処理中にエラーが発生しました。",
       detail: "",
-      backUrl: "/",
+      backUrl: "/admin/add",
     });
   }
 
-  req.session.completeMessage = {
-    title: "電話予約完了",
-    heading: "電話予約が完了しました",
-    message: "予約を登録しました。",
-    reservation: {
-      date,
-      slot,
-    },
-    showProgress: false,
-    backUrl: "/admin",
-    backLabel: "予約一覧へ戻る",
-  };
+  await createAuditLog(
+    "電話予約追加",
+    `患者番号:${patientNumber}`,
+    `${date} ${slot}`,
+  );
 
-  return res.redirect("/complete");
+  return res.render("admin-complete", {
+    title: "電話予約完了",
+    message: "電話予約を登録しました。",
+    buttonText: "予約一覧へ戻る",
+    buttonLink: "/admin",
+  });
 });
 
 app.get("/admin/edit/:id", async (req, res) => {
@@ -916,7 +965,18 @@ app.post("/admin/edit/:id", async (req, res) => {
     },
   });
 
-  res.redirect("/admin");
+  await createAuditLog(
+    "予約変更",
+    `予約ID:${id}`,
+    `${reservation.date} ${reservation.slot} → ${date} ${slot}`,
+  );
+
+  return res.render("admin-complete", {
+    title: "予約変更完了",
+    message: "予約を変更しました。",
+    buttonText: "予約一覧へ戻る",
+    buttonLink: "/admin",
+  });
 });
 
 app.get("/admin/patients", async (req, res) => {
@@ -980,7 +1040,14 @@ app.post("/admin/patients/add", async (req, res) => {
     },
   });
 
-  res.redirect("/admin/patients");
+  await createAuditLog("患者登録", `患者番号:${patientNumber}`, name);
+
+  return res.render("admin-complete", {
+    title: "患者登録完了",
+    message: "患者情報を登録しました。",
+    buttonText: "患者一覧へ戻る",
+    buttonLink: "/admin/patients",
+  });
 });
 
 app.get("/admin/patients/edit/:id", async (req, res) => {
@@ -1004,9 +1071,15 @@ app.get("/admin/patients/edit/:id", async (req, res) => {
     });
   }
 
+  const birth = patient.birthDate ? new Date(patient.birthDate) : new Date();
+
   res.render("patient-edit", {
     title: "患者編集",
     patient,
+    birthYear: birth.getFullYear(),
+    birthMonth: birth.getMonth() + 1,
+    birthDay: birth.getDate(),
+    currentYear: new Date().getFullYear(),
     error: null,
   });
 });
@@ -1034,7 +1107,7 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
       heading: "エラー",
       message: "患者が見つかりません。",
       detail: "",
-      backUrl: "/admin",
+      backUrl: "/admin/patients",
     });
   }
 
@@ -1054,6 +1127,7 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
         id,
         patientNumber,
         name,
+        birthDate,
       },
       error: "この患者番号はすでに使われています。",
     });
@@ -1068,7 +1142,14 @@ app.post("/admin/patients/edit/:id", async (req, res) => {
     },
   });
 
-  res.redirect("/admin/patients");
+  await createAuditLog("患者編集", `患者ID:${id}`, `患者番号:${patientNumber}`);
+
+  return res.render("admin-complete", {
+    title: "患者編集完了",
+    message: "患者情報を更新しました。",
+    buttonText: "患者一覧へ戻る",
+    buttonLink: "/admin/patients",
+  });
 });
 
 app.get("/admin/patients/delete/:id", async (req, res) => {
@@ -1139,7 +1220,18 @@ app.post("/admin/patients/delete/:id", async (req, res) => {
     where: { id },
   });
 
-  res.redirect("/admin/patients");
+  await createAuditLog(
+    "患者削除",
+    `患者ID:${id}`,
+    `患者番号:${patient.patientNumber}`,
+  );
+
+  return res.render("admin-complete", {
+    title: "患者削除完了",
+    message: "患者情報を削除しました。",
+    buttonText: "患者一覧へ戻る",
+    buttonLink: "/admin/patients",
+  });
 });
 
 app.get("/admin/cancel-confirm/:id", requireAdminLogin, async (req, res) => {
@@ -1163,13 +1255,34 @@ app.get("/admin/cancel-confirm/:id", requireAdminLogin, async (req, res) => {
 });
 
 app.post("/admin/cancel/:id", requireAdminLogin, async (req, res) => {
-  await prisma.reservation.delete({
-    where: {
-      id: Number(req.params.id),
-    },
+  const id = Number(req.params.id);
+
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
+    include: { patient: true },
   });
 
-  res.render("admin-complete", {
+  if (!reservation) {
+    return res.render("error", {
+      title: "エラー",
+      heading: "エラー",
+      message: "予約が見つかりません。",
+      detail: "",
+      backUrl: "/admin",
+    });
+  }
+
+  await prisma.reservation.delete({
+    where: { id },
+  });
+
+  await createAuditLog(
+    "予約キャンセル",
+    `予約ID:${id}`,
+    `患者番号:${reservation.patientNumber} / ${reservation.date} ${reservation.slot}`,
+  );
+
+  return res.render("admin-complete", {
     title: "キャンセル完了",
     message: "予約をキャンセルしました。",
     buttonText: "予約一覧へ戻る",
@@ -1211,11 +1324,21 @@ app.post("/cancel-confirm", async (req, res) => {
   const id = Number(req.body.id);
   const from = req.body.from;
 
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
+  });
+
   await prisma.reservation.delete({
     where: {
       id,
     },
   });
+
+  await createAuditLog(
+    "患者予約キャンセル",
+    `予約ID:${id}`,
+    `患者番号:${reservation.patientNumber}`,
+  );
 
   if (from === "admin") {
     return res.redirect("/admin");

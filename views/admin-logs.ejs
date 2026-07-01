@@ -1,0 +1,42 @@
+<%- include("partials/header", { title: "操作ログ" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+    <h1>操作ログ</h1>
+
+    <% if (logs.length === 0) { %>
+      <div class="admin-empty">
+        操作ログはありません。
+      </div>
+    <% } else { %>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日時</th>
+              <th>操作</th>
+              <th>対象</th>
+              <th>詳細</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% logs.forEach(log => { %>
+              <tr>
+                <td><%= log.createdAt.toLocaleString("ja-JP") %></td>
+                <td><%= log.action %></td>
+                <td><%= log.target || "" %></td>
+                <td><%= log.detail || "" %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+
+    <a class="clinic-sub-button" href="/admin">
+      管理画面へ戻る
+    </a>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

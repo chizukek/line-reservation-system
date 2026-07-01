@@ -1,57 +1,76 @@
 <%- include("partials/header", { title: "患者編集" }) %>
 
-<h1>患者編集</h1>
+<div class="admin-page">
+  <div class="admin-card">
 
-<% if (error) { %>
-  <p class="error">
-    <%= error %>
-  </p>
-<% } %>
+    <h1>患者編集</h1>
 
-<form action="/admin/patients/edit/<%= patient.id %>" method="POST">
+    <% if (error) { %>
+      <div class="clinic-error">
+        <%= error %>
+      </div>
+    <% } %>
 
-  <label>患者番号</label><br>
-  <input
-    type="text"
-    name="patientNumber"
-    value="<%= patient.patientNumber %>"
-    required
-  >
+    <form action="/admin/patients/edit/<%= patient.id %>" method="POST" class="admin-form-card">
 
-  <br><br>
+      <label>
+        <span>患者番号</span>
+        <input
+          type="text"
+          name="patientNumber"
+          value="<%= patient.patientNumber %>"
+          inputmode="numeric"
+          required
+        >
+      </label>
 
-  <label>氏名</label><br>
-  <input
-    type="text"
-    name="name"
-    value="<%= patient.name %>"
-    required
-  >
+      <label>
+        <span>氏名</span>
+        <input
+          type="text"
+          name="name"
+          value="<%= patient.name %>"
+          required
+        >
+      </label>
 
-  <br><br>
+      <label>
+        <span>生年月日</span>
 
-  <div class="form-group">
-  <label>生年月日</label>
-  <input
-    type="date"
-    name="birthDate"
-    value="<%= patient.birthDate ? patient.birthDate.toISOString().slice(0,10) : '' %>"
-    required
-  >
+        <div class="birth-select">
+          <select name="birthYear" required>
+            <% for (let y = currentYear; y >= 1900; y--) { %>
+              <option value="<%= y %>" <%= y === birthYear ? "selected" : "" %>>
+            <% } %>
+          </select>
+
+          <select name="birthMonth" required>
+            <% for (let m = 1; m <= 12; m++) { %>
+              <option value="<%= y %>" <%= y === birthYear ? "selected" : "" %>>
+            <% } %>
+          </select>
+
+          <select name="birthDay" required>
+            <% for (let d = 1; d <= 31; d++) { %>
+              <option value="<%= d %>" <%= d === birthDay ? "selected" : "" %>>
+            <% } %>
+          </select>
+        </div>
+      </label>
+
+      <div class="clinic-actions">
+        <button class="clinic-main-button" type="submit">
+          保存する
+        </button>
+
+        <a class="clinic-sub-button" href="/admin/patients">
+          戻る
+        </a>
+      </div>
+
+    </form>
+
+  </div>
 </div>
-
-<br><br>
-
-  <button type="submit">
-    保存
-  </button>
-
-</form>
-
-<br>
-
-<a href="/admin/patients">
-戻る
-</a>
 
 <%- include("partials/footer") %>
