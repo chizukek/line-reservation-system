@@ -17,7 +17,7 @@
 
         <div class="info-row">
           <span>予約日</span>
-          <strong><%= reservation.date %></strong>
+          <strong><%= formatJapaneseDate(reservation.date) %></strong>
         </div>
 
         <div class="info-row">
@@ -37,7 +37,7 @@
       <input type="hidden" name="id" value="<%= reservation.id %>">
       <input type="hidden" name="from" value="<%= from %>">
 
-      <button class="admin-danger-button" type="submit">
+      <button class="clinic-danger-button" type="submit">
         キャンセルする
       </button>
 

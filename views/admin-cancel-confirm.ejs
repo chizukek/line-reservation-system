@@ -12,7 +12,7 @@
     <div class="confirm-box">
       <p>
         <strong>日時：</strong>
-        <%= reservation.date %> <%= reservation.slot %>
+        <%= formatJapaneseDate(reservation.date) %> <%= reservation.slot %>
       </p>
 
       <p>
@@ -28,7 +28,7 @@
 
     <form method="POST" action="/admin/cancel/<%= reservation.id %>" class="admin-form-card">
       <div class="clinic-actions">
-        <button type="submit" class="admin-danger-button">
+        <button type="submit" class="clinic-logout">
           キャンセルする
         </button>
 
