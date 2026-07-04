@@ -6,57 +6,82 @@
 
 <div class="clinic-page">
   <div class="clinic-card confirm-box">
+
     <h1><%= isChangeMode ? "予約変更確認" : "予約確認" %></h1>
 
-    <section class="clinic-section">
-      <h2>患者情報</h2>
+    <p class="confirm-warning">
+      以下の内容でよろしければ、予約を確定してください。
+    </p>
 
-      <div class="info-box">
-        <div class="info-row">
-          <span>患者番号</span>
-          <strong><%= patient.patientNumber %></strong>
+    <section class="confirm-section">
+      <h2>ご予約内容</h2>
+
+      <div class="confirm-table">
+
+        <div class="confirm-row">
+          <div class="confirm-label">予約日</div>
+          <div class="confirm-value"><%= date %></div>
         </div>
 
-        <div class="info-row">
-          <span>氏名</span>
-          <strong><%= patient.name %> 様</strong>
+        <div class="confirm-row">
+          <div class="confirm-label">時間</div>
+          <div class="confirm-value"><%= slot %></div>
         </div>
+
+        <div class="confirm-row">
+          <div class="confirm-label">診療科</div>
+          <div class="confirm-value">心療内科</div>
+        </div>
+
+        <div class="confirm-row">
+          <div class="confirm-label">患者番号</div>
+          <div class="confirm-value"><%= patient.patientNumber %></div>
+        </div>
+
+        <div class="confirm-row">
+          <div class="confirm-label">氏名</div>
+          <div class="confirm-value"><%= patient.name %> 様</div>
+        </div>
+
       </div>
     </section>
 
-    <section class="clinic-section">
-      <h2><%= isChangeMode ? "変更後の予約内容" : "予約内容" %></h2>
-
-      <div class="reservation-box">
-        <div class="info-row">
-          <span>予約日</span>
-          <strong><%= date %></strong>
-        </div>
-
-        <div class="info-row">
-          <span>時間</span>
-          <strong><%= slot %></strong>
-        </div>
-
-        <div class="info-row">
-          <span>診療科</span>
-          <strong>心療内科</strong>
-        </div>
+    <section class="confirm-section">
+      <h2>キャンセルについて</h2>
+      <div class="confirm-note-box">
+        予約のキャンセル・変更はマイページから行えます。<br>
+        期限を過ぎた変更・キャンセルは、お電話にて医院までご連絡ください。
       </div>
     </section>
+
+    <section class="confirm-section">
+      <h2>診療に関する確認事項</h2>
+      <div class="confirm-note-box">
+        予約時間に遅れる場合や、体調に変化がある場合は医院までご連絡ください。<br>
+        発熱・咳などの症状がある場合は、来院前にお電話ください。
+      </div>
+    </section>
+
+    <div class="terms-area">
+      <a href="/terms" target="_blank">利用規約</a>
+      <span>｜</span>
+      <a href="/privacy" target="_blank">プライバシーポリシー</a>
+    </div>
 
     <form action="/reserve" method="POST" class="clinic-actions">
       <input type="hidden" name="date" value="<%= date %>">
       <input type="hidden" name="slot" value="<%= slot %>">
 
-      <button type="submit" class="clinic-main-button">
-        <%= isChangeMode ? "この内容に変更する" : "この内容で予約する" %>
+      <button type="submit" class="clinic-main-button confirm-submit-button">
+        <span>上記に同意の上</span>
+        <strong><%= isChangeMode ? "予約を変更する" : "予約を確定する" %></strong>
       </button>
 
-      <a class="clinic-sub-button" href="/">
-        戻る
+      <a class="clinic-sub-button" href="<%= isChangeMode ? '/change' : '/new' %>">
+        入力内容を変更する
       </a>
     </form>
+
   </div>
 </div>
 

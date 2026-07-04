@@ -1164,3 +1164,103 @@ button {
   }
 }
 
+.confirm-warning {
+  margin: 0 0 var(--space-lg);
+  color: var(--danger);
+  font-weight: var(--fw-bold);
+}
+
+.confirm-section {
+  margin-top: var(--space-30);
+}
+
+.confirm-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.confirm-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.confirm-row:last-child {
+  border-bottom: none;
+}
+
+.confirm-label {
+  padding: 12px 14px;
+  background: #f3eddf;
+  font-weight: var(--fw-bold);
+  color: #555;
+}
+
+.confirm-value {
+  padding: 12px 14px;
+  background: #fff;
+  font-weight: var(--fw-medium);
+  color: var(--text);
+}
+
+.confirm-note-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  line-height: 1.8;
+  color: #555;
+}
+
+.terms-area {
+  margin: 26px 0 10px;
+  text-align: center;
+  font-size: var(--fs-note);
+}
+
+.terms-area a {
+  text-decoration: underline;
+}
+
+.confirm-submit-button span {
+  display: block;
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+  margin-bottom: 4px;
+}
+
+.confirm-submit-button strong {
+  display: block;
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+}
+
+@media (max-width: 768px) {
+  .confirm-row {
+    grid-template-columns: 120px 1fr;
+  }
+
+  .confirm-label,
+  .confirm-value {
+    padding: 11px 10px;
+    font-size: 14px;
+  }
+}
+
+.complete-message {
+  margin: 0 0 var(--space-30);
+  padding: 16px 18px;
+  background: var(--green-pale);
+  border: 1px solid var(--green);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--green);
+  line-height: 1.8;
+}
+
+.complete-message strong {
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+}

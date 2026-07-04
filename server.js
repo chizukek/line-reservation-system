@@ -555,6 +555,11 @@ app.post("/reserve", async (req, res) => {
     reservation: {
       date,
       slot,
+      reservationCode,
+      patient: {
+        patientNumber: patient.patientNumber,
+        name: patient.name,
+      },
     },
     showProgress: !changeReservationId,
     backUrl: "/mypage",
@@ -1516,7 +1521,14 @@ app.post("/cancel-confirm", async (req, res) => {
 
   const reservation = await prisma.reservation.findUnique({
     where: { id },
+    include: {
+      patient: true,
+    },
   });
+
+  if (!reservation) {
+    return res.redirect("/mypage");
+  }
 
   await prisma.reservation.delete({
     where: {
@@ -1534,17 +1546,30 @@ app.post("/cancel-confirm", async (req, res) => {
     return res.redirect("/admin");
   }
 
-  req.session.completeMessage = {
-    title: "キャンセル完了",
-    heading: "予約をキャンセルしました",
-    message: "キャンセルが完了しました。",
-    reservation: null,
-    showProgress: false,
-    backUrl: "/mypage",
-    backLabel: "マイページへ戻る",
+  req.session.cancelComplete = {
+    reservation: {
+      date: reservation.date,
+      slot: reservation.slot,
+      patient: {
+        patientNumber: reservation.patient.patientNumber,
+        name: reservation.patient.name,
+      },
+    },
   };
 
-  return res.redirect("/complete");
+  return res.redirect("/cancel-complete");
+});
+
+app.get("/cancel-complete", (req, res) => {
+  const data = req.session.cancelComplete;
+
+  if (!data) {
+    return res.redirect("/mypage");
+  }
+
+  req.session.cancelComplete = null;
+
+  res.render("cancel-complete", data);
 });
 
 app.post("/line/webhook", line.middleware(lineConfig), async (req, res) => {

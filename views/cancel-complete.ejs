@@ -1,0 +1,56 @@
+<%- include("partials/header", { title: "予約キャンセル完了" }) %>
+
+<div class="clinic-page">
+  <div class="clinic-card complete-box">
+
+    <h1>予約をキャンセルしました</h1>
+
+    <div class="complete-message">
+      ご予約のキャンセルが完了しました。
+    </div>
+
+    <section class="clinic-section">
+      <h2>キャンセル内容</h2>
+
+      <div class="confirm-table">
+
+        <div class="confirm-row">
+          <div class="confirm-label">予約日</div>
+          <div class="confirm-value">
+            <%= formatJapaneseDate(reservation.date) %>
+          </div>
+        </div>
+
+        <div class="confirm-row">
+          <div class="confirm-label">時間</div>
+          <div class="confirm-value">
+            <%= reservation.slot %>
+          </div>
+        </div>
+
+        <div class="confirm-row">
+          <div class="confirm-label">診療科</div>
+          <div class="confirm-value">
+            心療内科
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="clinic-actions">
+
+      <a class="clinic-main-button" href="/mypage">
+        マイページへ戻る
+      </a>
+
+      <a class="clinic-sub-button" href="/new">
+        日時を変えて再予約する
+      </a>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
