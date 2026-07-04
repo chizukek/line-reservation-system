@@ -10,16 +10,16 @@
       （患者番号：<%= patient.patientNumber %>）
     </p>
 
-    <% if (reservation) { %>
+    <section class="clinic-section">
+      <h2>現在の予約状況</h2>
 
-      <section class="clinic-section">
-        <h2>現在のご予約</h2>
+      <div class="reservation-box">
 
-        <div class="reservation-box">
+        <% if (reservation) { %>
 
           <div class="info-row">
             <span>診療日</span>
-            <strong><%= reservation.date %></strong>
+            <strong><%= formatJapaneseDate(reservation.date) %></strong>
           </div>
 
           <div class="info-row">
@@ -32,48 +32,44 @@
             <strong>心療内科</strong>
           </div>
 
-        </div>
+          <p class="clinic-note">
+            予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
+          </p>
 
-        <p class="clinic-note">
-  予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
-</p>
+          <div class="clinic-actions">
+            <a class="clinic-main-button" href="/change">
+              予約を変更する
+            </a>
 
-        <div class="clinic-actions">
-  <a class="clinic-main-button" href="/change">
-    予約を変更する
-  </a>
+            <form method="POST" action="/cancel">
+              <input type="hidden" name="id" value="<%= reservation.id %>">
+              <input type="hidden" name="from" value="mypage">
 
-  <form method="POST" action="/cancel">
-    <input type="hidden" name="id" value="<%= reservation.id %>">
-    <input type="hidden" name="from" value="mypage">
+              <button class="clinic-sub-button" type="submit">
+                予約をキャンセルする
+              </button>
+            </form>
+          </div>
 
-    <button class="clinic-sub-button" type="submit">
-      予約をキャンセルする
-    </button>
-  </form>
-</div>
-
-      </section>
-
-    <% } else { %>
-
-      <section class="clinic-section">
-
-        <div class="reservation-box">
+        <% } else { %>
 
           <p class="empty-message">
             現在予約はありません。
           </p>
 
+        <% } %>
+
+      </div>
+
+      <% if (!reservation) { %>
+        <div class="clinic-actions">
           <a class="clinic-main-button" href="/new">
             新しい予約をとる
           </a>
-
         </div>
+      <% } %>
 
-      </section>
-
-    <% } %>
+    </section>
 
     <a class="clinic-logout" href="/logout">
       ログアウト
