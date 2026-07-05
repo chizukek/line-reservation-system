@@ -1588,8 +1588,9 @@ async function handleLineEvent(event) {
   }
 
   const appUrl = process.env.APP_URL;
-  const clinicPhone = process.env.CLINIC_PHONE || "06XXXXXXXX";
-
+  const homeUrl = process.env.HOME_URL;
+  const accessUrl = process.env.ACCESS_URL;
+  const clinicPhone = process.env.CLINIC_PHONE;
   return lineClient.replyMessage({
     replyToken: event.replyToken,
     messages: [
@@ -1598,18 +1599,18 @@ async function handleLineEvent(event) {
         altText: "ご案内",
         template: {
           type: "buttons",
-          title: "○○クリニック",
+          title: "今村医院公式",
           text: "このアカウントでは個別返信は行っておりません。ご希望の内容をお選びください。",
           actions: [
             {
               type: "uri",
               label: "ホームページを見る",
-              uri: process.env.HOME_URL || appUrl,
+              uri: homeUrl,
             },
             {
               type: "uri",
               label: "アクセス",
-              uri: process.env.ACCESS_URL || appUrl,
+              uri: accessUrl,
             },
             {
               type: "uri",
