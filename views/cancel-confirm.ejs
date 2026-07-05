@@ -6,7 +6,7 @@
     <h1>予約キャンセル確認</h1>
 
     <section class="clinic-section">
-      <h2>予約内容</h2>
+      <h2>キャンセルする予約</h2>
 
       <div class="reservation-box">
 
@@ -25,6 +25,11 @@
           <strong><%= reservation.slot %></strong>
         </div>
 
+        <div class="info-row">
+          <span>診療科</span>
+          <strong>心療内科</strong>
+        </div>
+
       </div>
     </section>
 
@@ -33,7 +38,6 @@
     </div>
 
     <form action="/cancel-confirm" method="POST" class="clinic-actions">
-
       <input type="hidden" name="id" value="<%= reservation.id %>">
       <input type="hidden" name="from" value="<%= from %>">
 
@@ -47,7 +51,6 @@
       >
         戻る
       </a>
-
     </form>
 
   </div>

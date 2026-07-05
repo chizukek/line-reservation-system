@@ -1587,82 +1587,39 @@ async function handleLineEvent(event) {
     return;
   }
 
-  const text = event.message.text.trim();
   const appUrl = process.env.APP_URL;
-
-  if (text === "予約") {
-    return lineClient.replyMessage({
-      replyToken: event.replyToken,
-      messages: [
-        {
-          type: "template",
-          altText: "予約メニュー",
-          template: {
-            type: "buttons",
-            title: "予約メニュー",
-            text: "ご希望の操作を選んでください。",
-            actions: [
-              {
-                type: "uri",
-                label: "予約する",
-                uri: `${appUrl}/psychiatry`,
-              },
-              {
-                type: "uri",
-                label: "予約をキャンセルする",
-                uri: `${appUrl}/psychiatry`,
-              },
-            ],
-          },
-        },
-      ],
-    });
-  }
-
-  if (text === "キャンセル") {
-    return lineClient.replyMessage({
-      replyToken: event.replyToken,
-      messages: [
-        {
-          type: "template",
-          altText: "キャンセルメニュー",
-          template: {
-            type: "buttons",
-            title: "キャンセル",
-            text: "予約キャンセル画面を開きます。",
-            actions: [
-              {
-                type: "uri",
-                label: "キャンセル画面を開く",
-                uri: `${appUrl}/psychiatry`,
-              },
-            ],
-          },
-        },
-      ],
-    });
-  }
+  const clinicPhone = process.env.CLINIC_PHONE || "06XXXXXXXX";
 
   return lineClient.replyMessage({
     replyToken: event.replyToken,
     messages: [
       {
         type: "template",
-        altText: "メニュー",
+        altText: "ご案内",
         template: {
           type: "buttons",
-          title: "予約システム",
-          text: "ご希望の操作を選んでください。",
+          title: "○○クリニック",
+          text: "このアカウントでは個別返信は行っておりません。ご希望の内容をお選びください。",
           actions: [
             {
               type: "uri",
-              label: "予約する",
+              label: "ホームページを見る",
+              uri: process.env.HOME_URL || appUrl,
+            },
+            {
+              type: "uri",
+              label: "アクセス",
+              uri: process.env.ACCESS_URL || appUrl,
+            },
+            {
+              type: "uri",
+              label: "心療内科再診予約",
               uri: `${appUrl}/psychiatry`,
             },
             {
               type: "uri",
-              label: "予約をキャンセルする",
-              uri: `${appUrl}/psychiatry`,
+              label: "電話をかける",
+              uri: `tel:${clinicPhone}`,
             },
           ],
         },
