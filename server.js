@@ -1,12 +1,17 @@
 require("dotenv").config();
+
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 const express = require("express");
 const session = require("express-session");
 const line = require("@line/bot-sdk");
 const config = require("./config");
+
+const prisma = new PrismaClient();
+const app = express();
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const PORT = process.env.PORT || 3000;
+
 const lineConfig = {
   channelSecret: process.env.LINE_CHANNEL_SECRET,
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
@@ -16,20 +21,93 @@ const lineClient = new line.messagingApi.MessagingApiClient({
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
 });
 
-const app = express();
+/* =========================
+   必須環境変数
+========================= */
+
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRETが設定されていません。");
+}
+
+if (!ADMIN_PASSWORD) {
+  throw new Error("ADMIN_PASSWORDが設定されていません。");
+}
+
+/* =========================
+   Express基本設定
+========================= */
+
 app.set("view engine", "ejs");
 app.set("views", "views");
+
+app.disable("x-powered-by");
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static("public"));
+
+/* =========================
+   セッション
+========================= */
+
 app.use(
   session({
+    name: "clinic.sid",
+
     secret: process.env.SESSION_SECRET,
+
     resave: false,
     saveUninitialized: false,
+    rolling: true,
+
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 60 * 1000,
+    },
   }),
 );
+
+/* =========================
+   キャッシュ禁止
+========================= */
+
+app.use((req, res, next) => {
+  const sensitivePaths = [
+    "/admin-login",
+    "/mypage",
+    "/verify",
+    "/confirm",
+    "/cancel-confirm",
+    "/complete",
+  ];
+
+  const isSensitivePage =
+    req.path.startsWith("/admin") || sensitivePaths.includes(req.path);
+
+  if (isSensitivePage) {
+    res.set({
+      "Cache-Control": "no-store",
+      Pragma: "no-cache",
+      Expires: "0",
+    });
+  }
+
+  return next();
+});
+
+/* =========================
+   EJS共通変数
+========================= */
+
 app.use(async (req, res, next) => {
   res.locals.isPatientLoggedIn = Boolean(req.session.patientNumber);
+
   res.locals.isAdminLoggedIn = Boolean(req.session.isAdmin);
 
   res.locals.isAdminPage =
@@ -54,63 +132,98 @@ app.use(async (req, res, next) => {
 
     res.locals.doctors = doctors;
 
-    const doctorId = req.session.doctorId;
+    const doctorId = Number(req.session.doctorId);
 
-    if (Number.isInteger(doctorId)) {
-      const doctor = doctors.find((doctorItem) => doctorItem.id === doctorId);
-
-      res.locals.doctor = doctor || null;
+    if (Number.isInteger(doctorId) && doctorId > 0) {
+      res.locals.doctor =
+        doctors.find((doctorItem) => doctorItem.id === doctorId) || null;
     }
 
-    next();
+    return next();
   } catch (error) {
     console.error("管理ヘッダー情報取得エラー:", error);
-    next(error);
+
+    return next(error);
   }
 });
 
+/* =========================
+   共通関数
+========================= */
+
 function formatJapaneseDate(dateText) {
-  const date = new Date(dateText);
+  const date = new Date(`${dateText}T00:00:00+09:00`);
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
-  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日(${weekdays[date.getDay()]})`;
+  return (
+    `${date.getFullYear()}年` +
+    `${date.getMonth() + 1}月` +
+    `${date.getDate()}日` +
+    `(${weekdays[date.getDay()]})`
+  );
 }
 
 function isValidPatientNumber(patientNumber) {
-  return /^\d{5}$/.test(patientNumber);
+  return /^\d{5}$/.test(String(patientNumber || ""));
 }
 
 function isValidDateText(date) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(date);
-}
-
-function isValidSlot(slot, doctorId) {
-  return config.getDisplaySlots(doctorId).includes(slot);
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(date || ""));
 }
 
 function isValidDoctorId(doctorId) {
   return Number.isInteger(doctorId) && doctorId > 0;
 }
 
-function isWithinReservationPeriod(date) {
-  const today = new Date();
+function isValidSlot(slot, doctorId) {
+  if (!isValidDoctorId(doctorId)) {
+    return false;
+  }
 
-  const maxDate = new Date();
+  if (typeof slot !== "string") {
+    return false;
+  }
+
+  return config.getDisplaySlots(doctorId).includes(slot);
+}
+
+function isWithinReservationPeriod(dateText) {
+  if (!isValidDateText(dateText)) {
+    return false;
+  }
+
+  const todayText = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Tokyo",
+  });
+
+  const today = new Date(`${todayText}T00:00:00+09:00`);
+
+  const maxDate = new Date(today);
   maxDate.setDate(maxDate.getDate() + 30);
 
-  const targetDate = new Date(date);
+  const targetDate = new Date(`${dateText}T00:00:00+09:00`);
 
   return targetDate > today && targetDate <= maxDate;
 }
 
+/* =========================
+   管理者認証
+========================= */
+
 function requireAdminLogin(req, res, next) {
   if (!req.session.isAdmin) {
-    return res.redirect("/admin-login");
+    return res.redirect("/admin-login?reason=timeout");
   }
 
-  next();
+  req.session.cookie.maxAge = 15 * 60 * 1000;
+
+  return next();
 }
+
+/* =========================
+   操作ログ
+========================= */
 
 async function createAuditLog(action, target = null, detail = null) {
   try {
@@ -122,18 +235,18 @@ async function createAuditLog(action, target = null, detail = null) {
       },
     });
   } catch (error) {
-    console.error("AuditLog error:", error);
+    console.error("操作ログ保存エラー:", error);
   }
 }
 
+/* =========================
+   EJSヘルパー
+========================= */
+
 app.use((req, res, next) => {
   res.locals.formatJapaneseDate = formatJapaneseDate;
-  next();
-});
 
-app.use("/admin", (req, res, next) => {
-  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
-  next();
+  return next();
 });
 
 app.get("/psychiatry", (req, res) => {
