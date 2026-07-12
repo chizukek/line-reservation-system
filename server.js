@@ -823,35 +823,86 @@ app.post("/reserve", async (req, res) => {
 });
 
 app.get("/admin-login", (req, res) => {
-  res.render("admin-login", {
+  if (req.session.isAdmin) {
+    return res.redirect("/admin");
+  }
+
+  return res.render("admin-login", {
     title: "管理者ログイン",
     error: null,
   });
 });
 
-app.post("/admin-login", async (req, res) => {
-  const password = req.body.password;
+app.post("/admin-login", (req, res) => {
+  const password =
+    typeof req.body.password === "string" ? req.body.password : "";
 
   if (password !== ADMIN_PASSWORD) {
-    return res.render("admin-login", {
+    return res.status(401).render("admin-login", {
       title: "管理者ログイン",
       error: "パスワードが違います。",
     });
   }
 
-  req.session.isAdmin = true;
-  req.session.doctorId = null;
+  req.session.regenerate((regenerateError) => {
+    if (regenerateError) {
+      console.error(
+        "管理者ログイン時のセッション再生成エラー:",
+        regenerateError,
+      );
 
-  await createAuditLog("管理者ログイン", null, req.ip);
+      return res.status(500).send("ログイン処理中にエラーが発生しました。");
+    }
 
-  res.redirect("/admin/doctors");
+    req.session.isAdmin = true;
+    req.session.doctorId = null;
+    req.session.cookie.maxAge = 15 * 60 * 1000;
+
+    req.session.save(async (saveError) => {
+      if (saveError) {
+        console.error("管理者ログイン時のセッション保存エラー:", saveError);
+
+        return res.status(500).send("ログイン処理中にエラーが発生しました。");
+      }
+
+      await createAuditLog("管理者ログイン", null, req.ip);
+
+      return res.redirect("/admin/doctors");
+    });
+  });
 });
 
 app.get("/admin-logout", async (req, res) => {
-  await createAuditLog("管理者ログアウト", null, req.ip);
+  try {
+    await createAuditLog(
+      "管理者ログアウト",
+      null,
+      req.ip,
+    );
 
-  req.session.isAdmin = false;
-  res.redirect("/admin-login");
+    req.session.destroy((error) => {
+      if (error) {
+        console.error(
+          "管理者ログアウトエラー:",
+          error,
+        );
+
+        return res.status(500).send(
+          "ログアウト処理中にエラーが発生しました。",
+        );
+      }
+
+      res.clearCookie("clinic.sid");
+
+      return res.redirect("/admin-login");
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).send(
+      "ログアウト処理中にエラーが発生しました。",
+    );
+  }
 });
 
 app.get("/admin/doctors", requireAdminLogin, async (req, res) => {
