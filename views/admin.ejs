@@ -2,113 +2,207 @@
 
 <div class="admin-page">
   <div class="admin-card">
+
     <div class="admin-header">
       <div>
         <h1>予約管理</h1>
-        <p>予約一覧・電話予約・患者管理</p>
+        <p>
+          担当医：<strong><%= doctor.displayName || doctor.name %></strong>
+        </p>
       </div>
     </div>
 
-    <div class="admin-menu">
-      <a class="admin-menu-item" href="/admin/add">
-        <span>電話予約を追加</span>
-        <strong>＞</strong>
-      </a>
+    <div class="admin-layout">
 
-      <a class="admin-menu-item" href="/admin/patients">
-        <span>患者管理</span>
-        <strong>＞</strong>
-      </a>
-      <a class="admin-menu-item" href="/admin/logs">
-  <span>操作ログ</span>
-  <strong>＞</strong>
-</a>
+      <main class="admin-main">
+  <section class="admin-section">
+    <h2>一週間の予約空き状況</h2>
+
+    <div class="reserve-legend">
+      <span><span class="mark-open">○</span> 受付可能</span>
+      <span><span class="mark-partial">△</span> 残りわずか</span>
+      <span><span class="mark-full">満</span> 満員</span>
+      <span><span class="mark-disabled">−</span> 受付不可</span>
     </div>
 
-    <section class="admin-section">
-      <h2>予約検索</h2>
+    <div class="week-nav">
+      <a
+        class="week-btn"
+        href="/admin/reservations?doctorId=<%= doctorId %>&week=<%= Math.max(0, week - 1) %>"
+      >
+        ‹ 前の7日間
+      </a>
 
-      <form method="GET" action="/admin" class="admin-search-form">
-        <label>
-          <span>日付</span>
-          <input type="date" name="date" value="<%= searchDate %>">
-        </label>
-
-        <label>
-          <span>患者番号</span>
-          <input
-            type="text"
-            name="patientNumber"
-            placeholder="例：10001"
-            value="<%= searchPatientNumber %>"
-            maxlength="5"
-inputmode="numeric"
-autocomplete="off"
-          >
-        </label>
-
-        <button type="submit" class="clinic-main-button">
-          検索する
-        </button>
-      </form>
-
-      <div class="admin-filter-links">
-        <a href="/admin?date=<%= today %>">今日の予約</a>
-        <a href="/admin">全件表示</a>
-      </div>
-
-      <p class="admin-result-text">
-        検索中の患者番号：<strong><%= searchPatientNumber || "なし" %></strong><br>
-        検索結果：<strong><%= reservations.length %>件</strong>
-      </p>
-    </section>
-
-    <section class="admin-section">
-      <h2>予約一覧</h2>
-
-      <% if (reservations.length === 0) { %>
-        <div class="admin-empty">
-          該当する予約はありません。
-        </div>
+      <% if (canGoNextWeek) { %>
+        <a
+          class="week-btn active"
+          href="/admin/reservations?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
+        >
+          次の7日間 ›
+        </a>
       <% } else { %>
-        <div class="admin-table-wrapper">
-          <table class="admin-table">
-            <thead>
-  <tr>
-    <th>日時</th>
-    <th>氏名</th>
-    <th>患者番号</th>
-    <th>操作</th>
-  </tr>
-</thead>
-
-<tbody>
-  <% reservations.forEach(r => { %>
-    <tr>
-      <td>
-        <strong><%= formatJapaneseDate(r.date) %></strong><br>
-<%= r.slot %>
-      </td>
-      <td><%= r.patient.name %></td>
-      <td><%= r.patientNumber %></td>
-      <td>
-        <div class="admin-action-buttons">
-          <a class="admin-small-button" href="/admin/edit/<%= r.id %>">
-            変更
-          </a>
-
-          <a class="admin-danger-button" href="/admin/cancel-confirm/<%= r.id %>">
-  キャンセル
-</a>
-        </div>
-      </td>
-    </tr>
-  <% }) %>
-</tbody>
-          </table>
-        </div>
+        <span class="week-btn disabled">
+          次の7日間 ›
+        </span>
       <% } %>
-    </section>
+    </div>
+
+    <div class="reservation-table-wrapper">
+      <table class="reservation-table">
+
+        <tr class="month-row">
+          <th></th>
+
+          <%
+            let currentMonth = "";
+            let monthStart = 0;
+            const monthGroups = [];
+
+            dates.forEach((date, index) => {
+              const monthText = date.value.slice(0, 7);
+
+              if (monthText !== currentMonth) {
+                if (currentMonth) {
+                  monthGroups.push({
+                    month: currentMonth,
+                    colspan: index - monthStart
+                  });
+                }
+
+                currentMonth = monthText;
+                monthStart = index;
+              }
+            });
+
+            monthGroups.push({
+              month: currentMonth,
+              colspan: dates.length - monthStart
+            });
+          %>
+
+          <% monthGroups.forEach(group => { %>
+            <th colspan="<%= group.colspan %>">
+              <%= group.month.replace("-", "年") %>月
+            </th>
+          <% }) %>
+        </tr>
+
+        <tr class="date-row">
+          <th>日時</th>
+
+          <% dates.forEach(date => {
+            const d = new Date(date.value);
+            const day = d.getDate();
+            const weekday = ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
+            const dayClass = d.getDay() === 0 ? "sunday" : d.getDay() === 6 ? "saturday" : "";
+          %>
+            <th class="<%= dayClass %>">
+              <div><%= day %></div>
+              <div>(<%= weekday %>)</div>
+            </th>
+          <% }) %>
+        </tr>
+
+        <% slots.forEach(slot => { %>
+          <tr>
+            <th class="time-cell">
+              <%= getSlotLabel(slot, doctorId) %>
+            </th>
+
+            <% dates.forEach(date => { %>
+              <%
+  const count = reservations.filter(
+    r => r.date === date.value && r.slot === slot
+  ).length;
+
+  const availableSlots = getSlotsForDate(date.value, doctorId);
+  const capacity = getCapacityForSlot(date.value, slot, doctorId);
+
+  let cellClass = "";
+  let mark = "";
+  let href = "";
+
+  if (!availableSlots.includes(slot)) {
+    cellClass = "unavailable-cell";
+    mark = "−";
+  } else if (date.value <= today) {
+    cellClass = "unavailable-cell";
+    mark = "−";
+  } else if (date.value > maxReservableText) {
+    cellClass = "unavailable-cell";
+    mark = "−";
+  } else {
+    href =
+      `/admin/slot?doctorId=${doctorId}` +
+      `&date=${date.value}` +
+      `&slot=${encodeURIComponent(slot)}`;
+
+    if (count >= capacity) {
+      cellClass = "full-cell";
+      mark = "満";
+    } else if (count > 0) {
+      cellClass = "open-cell";
+      mark = "△";
+    } else {
+      cellClass = "open-cell";
+      mark = "○";
+    }
+  }
+%>
+
+              <td class="<%= cellClass %>">
+  <% if (href) { %>
+    <a class="slot-link" href="<%= href %>">
+      <% if (mark === "○") { %>
+        <span class="mark-open">○</span>
+      <% } else if (mark === "△") { %>
+        <span class="mark-partial">△</span>
+      <% } else if (mark === "満") { %>
+        <span class="mark-full">満</span>
+      <% } %>
+    </a>
+  <% } else { %>
+    <span class="mark-disabled">−</span>
+  <% } %>
+</td>
+            <% }) %>
+          </tr>
+        <% }) %>
+
+      </table>
+    </div>
+  </section>
+</main>
+
+      <aside class="admin-side">
+  <div class="admin-side-card">
+    <h2>操作メニュー</h2>
+
+    <a
+  class="admin-side-link"
+  href="/admin/reservations?doctorId=<%= doctorId %>"
+>
+  予約スケジュール
+</a>
+
+<a
+  class="admin-side-link"
+  href="/admin/search"
+>
+  検索
+</a>
+
+<a
+  class="admin-side-link"
+  href="/admin/logs"
+>
+  操作ログ
+</a>
+  </div>
+</aside>
+
+    </div>
+
   </div>
 </div>
 

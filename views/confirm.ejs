@@ -34,6 +34,11 @@
         </div>
 
         <div class="confirm-row">
+          <div class="confirm-label">担当医</div>
+          <div class="confirm-value"><%= doctor.displayName || doctor.name %></div>
+        </div>
+
+        <div class="confirm-row">
           <div class="confirm-label">患者番号</div>
           <div class="confirm-value"><%= patient.patientNumber %></div>
         </div>
@@ -69,15 +74,15 @@
     </div>
 
     <form action="/reserve" method="POST" class="clinic-actions">
-      <input type="hidden" name="date" value="<%= date %>">
-      <input type="hidden" name="slot" value="<%= slot %>">
-
-      <button type="submit" class="clinic-main-button confirm-submit-button">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="slot" value="<%= slot %>">
+        <input type="hidden" name="doctorId" value="<%= doctor.id %>">
+        <button type="submit" class="clinic-main-button confirm-submit-button">
         <span>上記に同意の上</span>
         <strong><%= isChangeMode ? "予約を変更する" : "予約を確定する" %></strong>
       </button>
 
-      <a class="clinic-sub-button" href="<%= isChangeMode ? '/change' : '/new' %>">
+      <a class="clinic-sub-button" href="<%= isChangeMode ? '/change' : '/reserve?doctorId=' + doctor.id %>">
         入力内容を変更する
       </a>
     </form>

@@ -1,0 +1,197 @@
+
+<%- include("partials/header", {
+  title: isChangeMode ? "予約日時を変更" : "予約日時を選択"
+}) %>
+
+<div class="clinic-page">
+  <div class="clinic-card">
+
+    <div class="clinic-header">
+      <div>
+        <h1>
+          <%= isChangeMode ? "変更する予約日時を選択" : "予約日時を選択" %>
+        </h1>
+
+        <p>
+          担当医：
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </p>
+      </div>
+    </div>
+
+    <section class="clinic-section">
+
+      <div class="reservation-calendar-header">
+        <div>
+          <strong>
+            <%= dates[0].label %> 〜 <%= dates[dates.length - 1].label %>
+          </strong>
+        </div>
+
+        <div class="reservation-calendar-navigation">
+
+          <% if (week > 0) { %>
+            <a
+              class="clinic-sub-button"
+              href="/reserve?doctorId=<%= doctorId %>&week=<%= week - 1 %>"
+            >
+              前の週
+            </a>
+          <% } %>
+
+          <% if (canGoNextWeek) { %>
+            <a
+              class="clinic-sub-button"
+              href="/reserve?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
+            >
+              次の週
+            </a>
+          <% } %>
+
+        </div>
+      </div>
+
+      <div class="reservation-status-guide">
+        <span>○ 予約できます</span>
+        <span>△ 残りわずか</span>
+        <span>満 予約できません</span>
+        <span>− 診療時間外</span>
+      </div>
+
+      <div class="reservation-calendar-wrapper">
+        <table class="reservation-calendar">
+
+          <thead>
+            <tr>
+              <th class="reservation-time-heading">時間</th>
+
+              <% dates.forEach((dateItem) => { %>
+                <th
+                  class="
+                    <%= dateItem.weekday === 0 ? 'is-sunday' : '' %>
+                    <%= dateItem.weekday === 6 ? 'is-saturday' : '' %>
+                  "
+                >
+                  <%= dateItem.label %>
+                </th>
+              <% }) %>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% slots.forEach((slot) => { %>
+              <tr>
+
+                <th class="reservation-time-cell">
+                  <%= getSlotLabel(slot, doctorId) %>
+                </th>
+
+                <% dates.forEach((dateItem) => { %>
+
+                  <%
+                    const date = dateItem.value;
+
+                    const availableSlots =
+                      getSlotsForDate(date, doctorId);
+
+                    const isAvailableTime =
+                      availableSlots.includes(slot);
+
+                    const isWithinPeriod =
+                      date > today &&
+                      date <= maxReservableText;
+
+                    const reservationCount =
+                      reservations.filter((reservation) => {
+                        return (
+                          reservation.date === date &&
+                          reservation.slot === slot
+                        );
+                      }).length;
+
+                    const capacity =
+                      getCapacityForSlot(date, slot, doctorId);
+
+                    const isFull =
+                      reservationCount >= capacity;
+
+                    const remaining =
+                      capacity - reservationCount;
+
+                    let status = "closed";
+                    let statusLabel = "−";
+
+                    if (isAvailableTime && isWithinPeriod) {
+                      if (isFull) {
+                        status = "full";
+                        statusLabel = "満";
+                      } else if (remaining === 1) {
+                        status = "few";
+                        statusLabel = "△";
+                      } else {
+                        status = "open";
+                        statusLabel = "○";
+                      }
+                    }
+                  %>
+
+                  <td
+                    class="
+                      reservation-slot-cell
+                      reservation-slot-<%= status %>
+                      <%= dateItem.weekday === 0 ? 'is-sunday' : '' %>
+                      <%= dateItem.weekday === 6 ? 'is-saturday' : '' %>
+                    "
+                  >
+
+                    <% if (status === "open" || status === "few") { %>
+
+                      <a
+                        class="reservation-slot-link"
+                        href="/confirm?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+                        aria-label="<%= dateItem.label %> <%= getSlotLabel(slot, doctorId) %>を選択"
+                      >
+                        <span class="reservation-slot-symbol">
+                          <%= statusLabel %>
+                        </span>
+
+                        <% if (status === "few") { %>
+                          <small>残りわずか</small>
+                        <% } %>
+                      </a>
+
+                    <% } else { %>
+
+                      <span class="reservation-slot-disabled">
+                        <%= statusLabel %>
+                      </span>
+
+                    <% } %>
+
+                  </td>
+
+                <% }) %>
+
+              </tr>
+            <% }) %>
+          </tbody>
+
+        </table>
+      </div>
+
+    </section>
+
+    <div class="clinic-actions">
+      <a
+        class="clinic-sub-button"
+        href="/select-doctor"
+      >
+        担当医選択へ戻る
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
+

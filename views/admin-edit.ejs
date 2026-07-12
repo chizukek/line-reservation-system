@@ -16,6 +16,11 @@
 
       <div class="reservation-box">
         <div class="info-row">
+          <span>担当医</span>
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </div>
+
+        <div class="info-row">
           <span>患者番号</span>
           <strong><%= reservation.patientNumber %></strong>
         </div>
@@ -27,7 +32,7 @@
 
         <div class="info-row">
           <span>予約日</span>
-          <strong><%= reservation.date %></strong>
+          <strong><%= formatJapaneseDate(reservation.date) %></strong>
         </div>
 
         <div class="info-row">
@@ -41,30 +46,39 @@
       <h2>変更後の内容</h2>
 
       <form action="/admin/edit/<%= reservation.id %>" method="POST" class="admin-form-card">
+        <input type="hidden" name="doctorId" value="<%= doctorId %>">
+
         <label>
           <span>変更後の日付</span>
-          <input type="date" id="date" name="date" value="<%= reservation.date %>" required>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value="<%= reservation.date %>"
+            required
+          >
         </label>
 
         <label>
           <span>変更後の時間</span>
           <select id="slot" name="slot" required>
-  <% slots.forEach(slot => { %>
-    <option
-      value="<%= slot %>"
-      <%= slot === reservation.slot ? "selected" : "" %>>
-      <%= slot %>
-    </option>
-  <% }) %>
-</select>
+            <% slots.forEach(slot => { %>
+              <option
+                value="<%= slot %>"
+                <%= slot === reservation.slot ? "selected" : "" %>
+              >
+                <%= slot %>
+              </option>
+            <% }) %>
+          </select>
         </label>
 
         <div class="clinic-actions">
           <button class="clinic-main-button" type="submit">
-            変更する
+            変更内容を確認する
           </button>
 
-          <a class="clinic-sub-button" href="/admin">
+          <a class="clinic-sub-button" href="/admin/reservations?doctorId=<%= doctorId %>">
             戻る
           </a>
         </div>
@@ -78,7 +92,6 @@
 const dateInput = document.getElementById("date");
 const slotSelect = document.getElementById("slot");
 
-// 現在選択中の時間を保持
 let currentSlot = slotSelect.value;
 
 async function loadSlots() {
@@ -96,7 +109,6 @@ async function loadSlots() {
     option.value = slot;
     option.textContent = slot;
 
-    // 元の時間があれば選択状態を維持
     if (slot === currentSlot) {
       option.selected = true;
     }
@@ -104,7 +116,6 @@ async function loadSlots() {
     slotSelect.appendChild(option);
   });
 
-  // 新しい日付に現在の時間が無い場合は先頭を選択
   currentSlot = slotSelect.value;
 }
 

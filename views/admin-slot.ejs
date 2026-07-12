@@ -1,0 +1,130 @@
+<%- include("partials/header", {
+  title: "予約枠詳細"
+}) %>
+<div class="admin-page">
+  <div class="admin-card">
+
+    <div class="admin-header">
+      <div>
+        <h1>予約枠詳細</h1>
+      </div>
+    </div>
+
+    <section class="admin-section">
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>時間</th>
+                    <th>担当医師</th>
+                    <th>患者番号</th>
+                    <th>患者氏名</th>
+                    <th>管理</th>
+                </tr>
+            </thead>
+
+          <tbody>
+  <% if (reservations.length > 0) { %>
+
+    <% reservations.forEach(reservation => { %>
+      <tr>
+        <td><%= formatJapaneseDate(date) %></td>
+        <td><%= slotLabel %></td>
+
+        <td>
+          <%= doctor.displayName || doctor.name %>
+        </td>
+
+        <td><%= reservation.patientNumber %></td>
+        <td><%= reservation.patient.name %></td>
+
+        <td>
+          <div class="admin-action-buttons">
+            <a
+              class="admin-small-button"
+              href="/admin/edit/<%= reservation.id %>?doctorId=<%= doctorId %>"
+            >
+              変更
+            </a>
+
+            <a
+              class="admin-danger-button"
+              href="/admin/cancel-confirm/<%= reservation.id %>?doctorId=<%= doctorId %>"
+            >
+              キャンセル
+            </a>
+          </div>
+        </td>
+      </tr>
+    <% }) %>
+
+    <% if (reservations.length < capacity) { %>
+      <tr>
+        <td><%= formatJapaneseDate(date) %></td>
+        <td><%= slotLabel %></td>
+
+        <td>
+          <%= doctor.displayName || doctor.name %>
+        </td>
+
+        <td>−</td>
+        <td>空き</td>
+
+        <td>
+          <div class="admin-action-buttons">
+            <a
+              class="admin-small-button"
+              href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+            >
+              予約追加
+            </a>
+          </div>
+        </td>
+      </tr>
+    <% } %>
+
+  <% } else { %>
+
+    <tr>
+      <td><%= formatJapaneseDate(date) %></td>
+      <td><%= slotLabel %></td>
+
+      <td>
+        <%= doctor.displayName || doctor.name %>
+      </td>
+
+      <td>−</td>
+      <td>予約なし</td>
+
+      <td>
+        <div class="admin-action-buttons">
+          <a
+            class="admin-small-button"
+            href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+          >
+            予約追加
+          </a>
+        </div>
+      </td>
+    </tr>
+
+  <% } %>
+</tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="clinic-actions">
+      <a
+        class="clinic-sub-button"
+        href="/admin"
+      >
+        管理画面トップへ戻る
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

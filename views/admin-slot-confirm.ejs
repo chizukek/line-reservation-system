@@ -1,0 +1,65 @@
+<%- include("partials/header", { title: "予約確認" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <div class="admin-header">
+      <div>
+        <h1>予約確認</h1>
+      </div>
+    </div>
+
+    <section class="admin-section">
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>時間</th>
+              <th>担当医師</th>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td><%= formatJapaneseDate(date) %></td>
+              <td><%= slotLabel %></td>
+              <td><%= doctor.displayName || doctor.name %></td>
+              <td><%= patient.patientNumber %></td>
+              <td><%= patient.name %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <form method="POST" action="/admin/slot/complete">
+      <input type="hidden" name="doctorId" value="<%= doctorId %>">
+      <input type="hidden" name="date" value="<%= date %>">
+      <input type="hidden" name="slot" value="<%= slot %>">
+      <input
+        type="hidden"
+        name="patientNumber"
+        value="<%= patient.patientNumber %>"
+      >
+
+      <div class="clinic-actions">
+        <button type="submit" class="clinic-main-button">
+          この内容で予約する
+        </button>
+
+        <a
+          class="clinic-sub-button"
+          href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+        >
+          患者検索へ戻る
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

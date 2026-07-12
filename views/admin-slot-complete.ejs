@@ -1,0 +1,57 @@
+<%- include("partials/header", { title: "予約完了" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <div class="admin-header">
+      <div>
+        <h1>予約が完了しました</h1>
+      </div>
+    </div>
+
+    <section class="admin-section">
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>時間</th>
+              <th>担当医師</th>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td><%= formatJapaneseDate(date) %></td>
+              <td><%= slotLabel %></td>
+              <td><%= doctor.displayName || doctor.name %></td>
+              <td><%= patient.patientNumber %></td>
+              <td><%= patient.name %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="clinic-actions">
+      <a
+        class="clinic-main-button"
+        href="/admin/slot?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+      >
+        予約枠詳細へ戻る
+      </a>
+
+      <a
+        class="clinic-sub-button"
+        href="/admin/reservations?doctorId=<%= doctorId %>"
+      >
+        予約表へ戻る
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

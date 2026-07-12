@@ -1,42 +1,62 @@
-<%- include("partials/header", { title: "予約キャンセル確認" }) %>
+<%- include("partials/header", {
+  title: "予約キャンセル確認"
+}) %>
 
 <div class="admin-page">
   <div class="admin-card">
 
-    <h1>予約キャンセル確認</h1>
-
-    <p class="clinic-lead">
-      以下の予約をキャンセルします。よろしいですか？
-    </p>
-
-    <div class="confirm-box">
-      <p>
-        <strong>日時：</strong>
-        <%= formatJapaneseDate(reservation.date) %> <%= reservation.slot %>
-      </p>
-
-      <p>
-        <strong>患者番号：</strong>
-        <%= reservation.patientNumber %>
-      </p>
-
-      <p>
-        <strong>氏名：</strong>
-        <%= reservation.patient ? reservation.patient.name : "不明" %>
-      </p>
+    <div class="admin-header">
+      <div>
+        <h1>予約キャンセル確認</h1>
+      </div>
     </div>
 
-    <form method="POST" action="/admin/cancel/<%= reservation.id %>" class="admin-form-card">
-      <div class="clinic-actions">
-        <button type="submit" class="clinic-danger-button">
-          キャンセルする
-        </button>
+    <section class="admin-section">
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>予約日</th>
+          <th>時間</th>
+          <th>担当医師</th>
+          <th>患者番号</th>
+          <th>患者氏名</th>
+        </tr>
+      </thead>
 
-        <a class="clinic-sub-button" href="/admin">
-          戻る
-        </a>
-      </div>
-    </form>
+      <tbody>
+        <tr>
+          <td><%= formatJapaneseDate(reservation.date) %></td>
+          <td><%= reservation.slot %></td>
+          <td><%= reservation.doctor.displayName || reservation.doctor.name %></td>
+          <td><%= reservation.patientNumber %></td>
+          <td><%= reservation.patient.name %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="clinic-error" style="margin-top:20px;">
+  この予約をキャンセルします。よろしいですか？
+</div>
+
+<form
+  action="/admin/cancel/<%= reservation.id %>"
+  method="POST"
+  class="clinic-actions"
+>
+  <button class="clinic-danger-button">
+    キャンセルする
+  </button>
+
+  <a
+    class="clinic-sub-button"
+    href="/admin/slot?doctorId=<%= reservation.doctorId %>&date=<%= reservation.date %>&slot=<%= encodeURIComponent(reservation.slot) %>"
+  >
+    戻る
+  </a>
+</form>
 
   </div>
 </div>

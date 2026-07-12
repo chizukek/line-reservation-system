@@ -1,0 +1,29 @@
+<%- include("partials/header", { title: "担当医選択" }) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <h1>担当医を選択</h1>
+
+    <p class="admin-lead">
+      予約を確認する担当医を選択してください。
+    </p>
+
+    <div class="doctor-list">
+      <% doctors.forEach((doctor) => { %>
+        <a href="/admin/select-doctor?doctorId=<%= doctor.id %>">
+  <%= doctor.displayName || doctor.name %>
+</a>
+      <% }) %>
+    </div>
+
+    <div class="clinic-actions">
+      <a class="clinic-sub-button" href="/admin-logout">
+        ログアウト
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

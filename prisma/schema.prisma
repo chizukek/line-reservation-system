@@ -8,24 +8,26 @@ datasource db {
 }
 
 model Reservation {
-  id              Int      @id @default(autoincrement())
-  patientNumber   String
+  id            Int    @id @default(autoincrement())
+  patientNumber String
+
+  doctorId Int
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
   date            String
   slot            String
-  reservationCode String   @unique
+  reservationCode String?
   createdAt       DateTime @default(now())
 
   patient Patient @relation(fields: [patientNumber], references: [patientNumber])
-
-  @@unique([date, slot, patientNumber])
 }
 
 model Patient {
-  id            Int      @id @default(autoincrement())
-  patientNumber String   @unique
+  id            Int       @id @default(autoincrement())
+  patientNumber String    @unique
   name          String
   birthDate     DateTime?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   reservations Reservation[]
 }
@@ -36,4 +38,28 @@ model AuditLog {
   target    String?
   detail    String?
   createdAt DateTime @default(now())
+}
+
+model Doctor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservations Reservation[]
+  slotBlocks   SlotBlock[]
+}
+
+model SlotBlock {
+  id        Int      @id @default(autoincrement())
+  doctorId  Int
+  date      String
+  slot      String
+  createdAt DateTime @default(now())
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, date, slot])
 }

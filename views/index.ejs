@@ -8,27 +8,42 @@
   <div class="clinic-card reservation-card">
 
     <h1>
-      <%= typeof isChangeMode !== "undefined" && isChangeMode ? "変更後の日時を選択" : "日時を選択" %>
+      <%= isChangeMode ? "変更後の日時を選択" : "日時を選択" %>
     </h1>
 
-    <div class="reserve-note">
-      予約は30日先まで受け付けています。<br>
-      ご希望の日時を選択してください。
-    </div>
+    <% if (typeof doctor !== "undefined" && doctor) { %>
+      <div class="reserve-note">
+        担当医：<strong><%= doctor.displayName || doctor.name %></strong><br>
+        予約は30日先まで受け付けています。<br>
+        ご希望の日時を選択してください。
+      </div>
+    <% } else { %>
+      <div class="reserve-note">
+        予約は30日先まで受け付けています。<br>
+        ご希望の日時を選択してください。
+      </div>
+    <% } %>
 
     <div class="reserve-legend">
       <span><span class="mark-open">○</span> 受付可能</span>
-      <span><span class="mark-full">×</span> 満員</span>
+      <span><span class="mark-partial">△</span> 残りわずか</span>
+      <span><span class="mark-full">満</span> 満員</span>
       <span><span class="mark-disabled">−</span> 受付不可</span>
     </div>
 
     <div class="week-nav">
-      <a class="week-btn" href="/?week=<%= Math.max(0, week - 1) %>">
+      <a
+        class="week-btn"
+        href="/reserve?doctorId=<%= doctorId %>&week=<%= Math.max(0, week - 1) %>"
+      >
         ‹ 前の7日間
       </a>
 
       <% if (canGoNextWeek) { %>
-        <a class="week-btn active" href="/?week=<%= week + 1 %>">
+        <a
+          class="week-btn active"
+          href="/reserve?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
+        >
           次の7日間 ›
         </a>
       <% } else { %>
@@ -43,13 +58,15 @@
 
         <tr class="month-row">
           <th></th>
-          <% 
+
+          <%
             let currentMonth = "";
             let monthStart = 0;
             const monthGroups = [];
 
             dates.forEach((date, index) => {
               const monthText = date.value.slice(0, 7);
+
               if (monthText !== currentMonth) {
                 if (currentMonth) {
                   monthGroups.push({
@@ -57,6 +74,7 @@
                     colspan: index - monthStart
                   });
                 }
+
                 currentMonth = monthText;
                 monthStart = index;
               }
@@ -77,7 +95,8 @@
 
         <tr class="date-row">
           <th>日時</th>
-          <% dates.forEach(date => { 
+
+          <% dates.forEach(date => {
             const d = new Date(date.value);
             const day = d.getDate();
             const weekday = ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
@@ -92,38 +111,65 @@
 
         <% slots.forEach(slot => { %>
           <tr>
-            <th class="time-cell"><%= slot %></th>
+            <th class="time-cell">
+              <%= getSlotLabel(slot, doctorId) %>
+            </th>
 
             <% dates.forEach(date => { %>
-  <% 
-    const count = reservations.filter(r => r.date === date.value && r.slot === slot).length;
-    const availableSlots = getSlotsForDate(date.value);
+              <%
+                const count = reservations.filter(
+                  r => r.date === date.value && r.slot === slot
+                ).length;
 
-    let cellClass = "";
-    let cellContent = "";
+                const availableSlots = getSlotsForDate(date.value, doctorId);
 
-    if (!availableSlots.includes(slot)) {
-      cellClass = "unavailable-cell";
-      cellContent = '<span class="mark-disabled">−</span>';
-    } else if (date.value <= today) {
-      cellClass = "unavailable-cell";
-      cellContent = '<span class="mark-disabled">−</span>';
-    } else if (date.value > maxReservableText) {
-      cellClass = "unavailable-cell";
-      cellContent = '<span class="mark-disabled">−</span>';
-    } else if (count >= 2) {
-      cellClass = "full-cell";
-      cellContent = '<span class="mark-full">×</span>';
-    } else {
-      cellClass = "open-cell";
-      cellContent = `<a class="mark-open" href="/confirm?date=${date.value}&slot=${slot}"></a>`;
-    }
-  %>
+                let cellClass = "";
+                let mark = "";
+                let href = "";
 
-  <td class="<%= cellClass %>">
-    <%- cellContent %>
-  </td>
-<% }) %>
+                const capacity = getCapacityForSlot(date.value, slot, doctorId);
+
+                if (!availableSlots.includes(slot)) {
+                  cellClass = "unavailable-cell";
+                  mark = "−";
+                } else if (date.value <= today) {
+                  cellClass = "unavailable-cell";
+                  mark = "−";
+                } else if (date.value > maxReservableText) {
+                  cellClass = "unavailable-cell";
+                  mark = "−";
+                } else if (count >= capacity) {
+                  cellClass = "full-cell";
+                  mark = "×";
+                } else if (count > 0) {
+                  cellClass = "open-cell";
+                  mark = "△";
+                  href = `/confirm?doctorId=${doctorId}&date=${date.value}&slot=${slot}`;
+                } else {
+                  cellClass = "open-cell";
+                  mark = "○";
+                  href = `/confirm?doctorId=${doctorId}&date=${date.value}&slot=${slot}`;
+                }
+              %>
+
+              <td class="<%= cellClass %>">
+                <% if (href) { %>
+                  <a class="slot-link" href="<%= href %>">
+                    <% if (mark === "○") { %>
+                      <span class="mark-open">○</span>
+                    <% } else { %>
+                      <span class="mark-partial">△</span>
+                    <% } %>
+                  </a>
+                <% } else { %>
+                  <% if (mark === "満") { %>
+                    <span class="mark-full">満</span>
+                  <% } else { %>
+                    <span class="mark-disabled">−</span>
+                  <% } %>
+                <% } %>
+              </td>
+            <% }) %>
           </tr>
         <% }) %>
 
@@ -131,6 +177,10 @@
     </div>
 
     <div class="clinic-actions">
+      <a class="clinic-sub-button" href="/select-doctor">
+        担当医を選び直す
+      </a>
+
       <a class="clinic-sub-button" href="/mypage">
         マイページへ戻る
       </a>

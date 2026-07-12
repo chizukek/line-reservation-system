@@ -6,6 +6,7 @@
     <h1>電話予約登録</h1>
 
     <p class="clinic-lead">
+      担当医：<strong><%= doctor.displayName || doctor.name %></strong><br>
       電話で受け付けた予約を登録します。
     </p>
 
@@ -15,8 +16,9 @@
       </div>
     <% } %>
 
-    
-<form action="/admin/add" method="POST" class="admin-form-card">
+    <form action="/admin/add" method="POST" class="admin-form-card">
+      <input type="hidden" name="doctorId" value="<%= doctorId %>">
+
       <label>
         <span>患者番号</span>
         <input
@@ -56,43 +58,35 @@
           内容を確認する
         </button>
 
-        <a class="clinic-sub-button" href="/admin">
+        <a class="clinic-sub-button" href="/admin/reservations?doctorId=<%= doctorId %>">
           戻る
         </a>
       </div>
-
     </form>
 
   </div>
 </div>
+
 <script>
 const dateInput = document.getElementById("date");
 const slotSelect = document.getElementById("slot");
 
 async function loadSlots() {
-
   const date = dateInput.value;
 
   if (!date) return;
 
   const res = await fetch("/api/slots?date=" + date);
-
   const slots = await res.json();
 
   slotSelect.innerHTML = "";
 
   slots.forEach(slot => {
-
     const option = document.createElement("option");
-
     option.value = slot;
-
     option.textContent = slot;
-
     slotSelect.appendChild(option);
-
   });
-
 }
 
 dateInput.addEventListener("change", loadSlots);
@@ -100,7 +94,6 @@ dateInput.addEventListener("change", loadSlots);
 if (dateInput.value) {
   loadSlots();
 }
-
 </script>
 
 <%- include("partials/footer") %>

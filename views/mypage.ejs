@@ -32,6 +32,13 @@
             <strong>心療内科</strong>
           </div>
 
+                    <% if (reservation.doctor) { %>
+            <div class="info-row">
+              <span>担当医</span>
+              
+            </div><strong><%= reservation.doctor.displayName || reservation.doctor.name %></strong>
+          <% } %>
+
           <p class="clinic-note">
             予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
           </p>

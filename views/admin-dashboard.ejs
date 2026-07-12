@@ -1,0 +1,289 @@
+<%- include("partials/header", {
+  title,
+  isAdminPage,
+  isAdminLoggedIn,
+  doctor,
+  doctors
+}) %>
+
+<%
+  const todayDate = new Date(`${today}T00:00:00+09:00`);
+
+  const formattedToday = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    month: "long",
+    day: "numeric",
+    weekday: "short"
+  }).format(todayDate);
+
+  const formattedUpdatedAt = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).format(updatedAt);
+%>
+
+<div class="admin-page-header">
+
+  <div>
+    <p class="admin-page-eyebrow">
+      ダッシュボード
+    </p>
+
+    <h1>
+      予約管理
+    </h1>
+  </div>
+
+  <a
+    class="admin-primary-button"
+    href="/admin/add?doctorId=<%= doctorId %>"
+  >
+    予約を追加
+  </a>
+
+</div>
+
+<section class="admin-panel admin-dashboard-panel">
+
+  <div class="admin-dashboard-heading">
+
+    <div>
+      <h2>
+        <%= formattedToday %>の予約状況
+      </h2>
+
+      <p class="admin-dashboard-doctor">
+        担当医：
+        <strong>
+          <%= doctor.displayName || doctor.name %>
+        </strong>
+      </p>
+    </div>
+
+    <div class="admin-update-row">
+
+      <span class="admin-updated-at">
+        最終更新
+        <strong><%= formattedUpdatedAt %></strong>
+      </span>
+
+      <button
+        class="admin-refresh-button"
+        type="button"
+        onclick="location.reload()"
+      >
+        更新する
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="admin-summary-row">
+
+    <div class="admin-summary-item">
+      <span class="admin-summary-label">
+        本日の予約
+      </span>
+
+      <strong class="admin-summary-value">
+        <%= reservations.length %>
+      </strong>
+
+      <span class="admin-summary-unit">
+        件
+      </span>
+    </div>
+
+    <div class="admin-summary-item">
+      <span class="admin-summary-label">
+        診療枠
+      </span>
+
+      <strong class="admin-summary-value">
+        <%= slots.length %>
+      </strong>
+
+      <span class="admin-summary-unit">
+        枠
+      </span>
+    </div>
+
+  </div>
+
+  <div class="reservation-table-wrapper">
+
+    <table class="reservation-table today-reservation-table">
+
+      <thead>
+        <tr>
+          <th class="today-time-column">
+            時間
+          </th>
+
+          <th>
+            患者①
+          </th>
+
+          <th>
+            患者②
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% if (slots.length === 0) { %>
+
+          <tr>
+            <td
+              colspan="3"
+              class="admin-empty-message"
+            >
+              本日の診療予定はありません。
+            </td>
+          </tr>
+
+        <% } else { %>
+
+          <% slots.forEach((slot) => { %>
+
+            <%
+              const slotReservations = reservations.filter(
+                reservation => reservation.slot === slot
+              );
+
+              const firstReservation =
+                slotReservations[0] || null;
+
+              const secondReservation =
+                slotReservations[1] || null;
+
+              const capacity =
+                getCapacityForSlot(today, slot, doctorId);
+
+              const slotUrl =
+                `/admin/slot?doctorId=${doctorId}` +
+                `&date=${today}` +
+                `&slot=${encodeURIComponent(slot)}`;
+            %>
+
+            <tr>
+
+              <th class="time-cell">
+
+                <a
+                  class="today-time-link"
+                  href="<%= slotUrl %>"
+                >
+                  <%= slot %>
+                </a>
+
+              </th>
+
+              <td class="<%= firstReservation
+                ? 'reserved-patient-cell'
+                : 'empty-patient-cell'
+              %>">
+
+                <a
+                  class="today-slot-link"
+                  href="<%= slotUrl %>"
+                  aria-label="<%= slot %>の予約枠詳細を開く"
+                >
+
+                  <% if (firstReservation) { %>
+
+                    <span class="today-patient-name">
+                      <%= firstReservation.patient.name %>
+                    </span>
+
+                  <% } else { %>
+
+                    <span class="today-empty-label">
+                      空き
+                    </span>
+
+                  <% } %>
+
+                  <span
+                    class="today-cell-arrow"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+
+                </a>
+
+              </td>
+
+              <% if (capacity >= 2) { %>
+
+                <td class="<%= secondReservation
+                  ? 'reserved-patient-cell'
+                  : 'empty-patient-cell'
+                %>">
+
+                  <a
+                    class="today-slot-link"
+                    href="<%= slotUrl %>"
+                    aria-label="<%= slot %>の予約枠詳細を開く"
+                  >
+
+                    <% if (secondReservation) { %>
+
+                      <span class="today-patient-name">
+                        <%= secondReservation.patient.name %>
+                      </span>
+
+                    <% } else { %>
+
+                      <span class="today-empty-label">
+                        空き
+                      </span>
+
+                    <% } %>
+
+                    <span
+                      class="today-cell-arrow"
+                      aria-hidden="true"
+                    >
+                      ›
+                    </span>
+
+                  </a>
+
+                </td>
+
+              <% } else { %>
+
+                <td class="unavailable-patient-cell">
+
+                  <span aria-label="設定されていない予約枠">
+                    ―
+                  </span>
+
+                </td>
+
+              <% } %>
+
+            </tr>
+
+          <% }) %>
+
+        <% } %>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>

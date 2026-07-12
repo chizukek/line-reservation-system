@@ -1,0 +1,95 @@
+<%- include("partials/header", {
+  title: "患者検索"
+}) %>
+<div class="admin-page">
+  <div class="admin-card">
+
+    <div class="admin-header">
+      <div>
+        <h1>患者検索</h1>
+      </div>
+    </div>
+
+    <section class="admin-section">
+      <form
+        method="GET"
+        action="/admin/slot/patient-search"
+        class="admin-search-form"
+      >
+        <input type="hidden" name="doctorId" value="<%= doctorId %>">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="slot" value="<%= slot %>">
+
+        <label>
+          <span>患者番号または氏名</span>
+
+          <input
+            type="text"
+            name="keyword"
+            value="<%= keyword %>"
+            placeholder="患者番号または氏名を入力"
+            autocomplete="off"
+          >
+        </label>
+
+        <button type="submit" class="clinic-main-button">
+          検索する
+        </button>
+      </form>
+    </section>
+
+    <% if (keyword) { %>
+      <section class="admin-section">
+        <h2>検索結果</h2>
+
+        <% if (patients.length === 0) { %>
+          <div class="admin-empty">
+            該当する患者は見つかりませんでした。
+          </div>
+        <% } else { %>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>患者番号</th>
+                  <th>氏名</th>
+                  <th>選択</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% patients.forEach(patient => { %>
+                  <tr>
+                    <td><%= patient.patientNumber %></td>
+                    <td><%= patient.name %></td>
+
+                    <td>
+                      <a
+                        class="admin-small-button"
+                        href="/admin/slot/confirm?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>&patientNumber=<%= patient.patientNumber %>"
+                      >
+                        この患者を選択
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </section>
+    <% } %>
+
+    <div class="clinic-actions">
+      <a
+        class="clinic-sub-button"
+        href="/admin/slot?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+      >
+        予約枠詳細へ戻る
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

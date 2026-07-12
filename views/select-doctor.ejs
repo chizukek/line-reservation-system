@@ -1,0 +1,17 @@
+<%- include("partials/header", { title: "担当医を選択" }) %>
+
+<div class="clinic-page">
+  <div class="clinic-card">
+
+    <h1>担当医を選択してください</h1>
+
+    <div class="doctor-list">
+      <% doctors.forEach((doctor) => { %>
+        <a href="/reserve?doctorId=<%= doctor.id %>" class="doctor-card">
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </a>
+      <% }) %>
+    </div>
+
+  </div>
+</div>

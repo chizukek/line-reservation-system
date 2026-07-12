@@ -13,7 +13,6 @@
       <h2>患者情報</h2>
 
       <div class="info-box">
-
         <div class="info-row">
           <span>患者番号</span>
           <strong><%= patient.patientNumber %></strong>
@@ -23,7 +22,6 @@
           <span>氏名</span>
           <strong><%= patient.name %> 様</strong>
         </div>
-
       </div>
     </section>
 
@@ -31,7 +29,6 @@
       <h2>予約内容</h2>
 
       <div class="reservation-box">
-
         <div class="info-row">
           <span>予約日</span>
           <strong><%= date %></strong>
@@ -47,41 +44,28 @@
           <strong>心療内科</strong>
         </div>
 
+        <div class="info-row">
+          <span>担当医</span>
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </div>
       </div>
     </section>
 
     <form action="/admin/add/complete" method="POST">
-
-      <input
-        type="hidden"
-        name="patientNumber"
-        value="<%= patient.patientNumber %>"
-      >
-
-      <input
-        type="hidden"
-        name="date"
-        value="<%= date %>"
-      >
-
-      <input
-        type="hidden"
-        name="slot"
-        value="<%= slot %>"
-      >
+      <input type="hidden" name="doctorId" value="<%= doctorId %>">
+      <input type="hidden" name="patientNumber" value="<%= patient.patientNumber %>">
+      <input type="hidden" name="date" value="<%= date %>">
+      <input type="hidden" name="slot" value="<%= slot %>">
 
       <div class="clinic-actions">
-
         <button class="clinic-main-button" type="submit">
           電話予約を登録する
         </button>
 
-        <a class="clinic-sub-button" href="/admin/add">
+        <a class="clinic-sub-button" href="/admin/add?doctorId=<%= doctorId %>">
           戻る
         </a>
-
       </div>
-
     </form>
 
   </div>
