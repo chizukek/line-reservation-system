@@ -45,44 +45,64 @@
     <section class="admin-section">
       <h2>変更後の内容</h2>
 
-      <form action="/admin/edit/<%= reservation.id %>" method="POST" class="admin-form-card">
-        <input type="hidden" name="doctorId" value="<%= doctorId %>">
+      <form
+  action="/admin/edit/<%= reservation.id %>/confirm"
+  method="POST"
+  class="admin-form-card"
+>
 
-        <label>
-          <span>変更後の日付</span>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value="<%= reservation.date %>"
-            required
-          >
-        </label>
+  <label>
+    <span>変更後の日付</span>
 
-        <label>
-          <span>変更後の時間</span>
-          <select id="slot" name="slot" required>
-            <% slots.forEach(slot => { %>
-              <option
-                value="<%= slot %>"
-                <%= slot === reservation.slot ? "selected" : "" %>
-              >
-                <%= slot %>
-              </option>
-            <% }) %>
-          </select>
-        </label>
+    <input
+      type="date"
+      id="date"
+      name="date"
+      value="<%= reservation.date %>"
+      required
+    >
+  </label>
 
-        <div class="clinic-actions">
-          <button class="clinic-main-button" type="submit">
-            変更内容を確認する
-          </button>
+  <label>
+    <span>変更後の時間</span>
 
-          <a class="clinic-sub-button" href="/admin/reservations?doctorId=<%= doctorId %>">
-            戻る
-          </a>
-        </div>
-      </form>
+    <select
+      id="slot"
+      name="slot"
+      required
+    >
+      <% slots.forEach((slot) => { %>
+
+        <option
+          value="<%= slot %>"
+          <%= slot === reservation.slot ? "selected" : "" %>
+        >
+          <%= getSlotLabel(slot, doctorId) %>
+        </option>
+
+      <% }) %>
+    </select>
+  </label>
+
+  <div class="clinic-actions">
+
+    <button
+      class="clinic-main-button"
+      type="submit"
+    >
+      変更内容を確認する
+    </button>
+
+    <a
+      class="clinic-sub-button"
+      href="/admin/reservations"
+    >
+      戻る
+    </a>
+
+  </div>
+
+</form>
     </section>
 
   </div>

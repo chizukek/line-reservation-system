@@ -1,38 +1,190 @@
-<%- include("partials/header", { title: "予約変更確認" }) %>
+<%- include("partials/header", {
+  title: "予約変更確認"
+}) %>
 
-<div class="admin-page">
+<div class="admin-page admin-edit-confirm-page">
   <div class="admin-card">
 
-    <h1>この内容で予約を変更しますか？</h1>
+    <header class="admin-page-header">
+      <div>
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
 
-    <div class="confirm-box">
-      <h2>変更前</h2>
-      <p><strong>日時：</strong><%= formatJapaneseDate(reservation.date) %> <%= reservation.slot %></p>
-      <p><strong>患者番号：</strong><%= reservation.patientNumber %></p>
-      <p><strong>氏名：</strong><%= reservation.patient.name %></p>
-    </div>
+        <h1>予約変更確認</h1>
 
-    <div class="confirm-box">
-      <h2>変更後</h2>
-      <p><strong>日時：</strong><%= formatJapaneseDate(newReservation.date) %> <%= newReservation.slot %></p>
-      <p><strong>患者番号：</strong><%= reservation.patientNumber %></p>
-      <p><strong>氏名：</strong><%= reservation.patient.name %></p>
-    </div>
-
-    <form method="POST" action="/admin/edit/<%= newReservation.id %>/complete">
-      <input type="hidden" name="date" value="<%= newReservation.date %>">
-      <input type="hidden" name="slot" value="<%= newReservation.slot %>">
-
-      <div class="clinic-actions">
-        <button type="submit" class="clinic-main-button">
-          変更する
-        </button>
-
-        <a class="clinic-sub-button" href="/admin/edit/<%= newReservation.id %>">
-          戻る
-        </a>
+        <p class="admin-page-description">
+          変更内容を確認して、「予約を変更する」を押してください。
+        </p>
       </div>
-    </form>
+    </header>
+
+    <section class="admin-panel">
+
+      <div class="admin-change-comparison">
+
+        <div class="admin-change-block">
+          <div class="admin-change-heading">
+            変更前
+          </div>
+
+          <dl class="admin-confirm-list">
+
+            <div class="admin-confirm-row">
+              <dt>患者番号</dt>
+              <dd>
+                <%= reservation.patient.patientNumber %>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>患者氏名</dt>
+              <dd>
+                <strong>
+                  <%= reservation.patient.name %>
+                </strong>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>担当医</dt>
+              <dd>
+                <%= reservation.doctor
+                  ? reservation.doctor.displayName ||
+                    reservation.doctor.name
+                  : doctor.displayName || doctor.name
+                %>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>日付</dt>
+              <dd>
+                <%= formatJapaneseDate(reservation.date) %>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>時間</dt>
+              <dd>
+                <%= getSlotLabel(
+                  reservation.slot,
+                  reservation.doctorId
+                ) %>
+              </dd>
+            </div>
+
+          </dl>
+        </div>
+
+        <div
+          class="admin-change-arrow"
+          aria-hidden="true"
+        >
+          →
+        </div>
+
+        <div class="admin-change-block is-new">
+          <div class="admin-change-heading">
+            変更後
+          </div>
+
+          <dl class="admin-confirm-list">
+
+            <div class="admin-confirm-row">
+              <dt>患者番号</dt>
+              <dd>
+                <%= reservation.patient.patientNumber %>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>患者氏名</dt>
+              <dd>
+                <strong>
+                  <%= reservation.patient.name %>
+                </strong>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>担当医</dt>
+              <dd>
+                <%= doctor.displayName || doctor.name %>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>日付</dt>
+              <dd>
+                <strong>
+                  <%= formatJapaneseDate(date) %>
+                </strong>
+              </dd>
+            </div>
+
+            <div class="admin-confirm-row">
+              <dt>時間</dt>
+              <dd>
+                <strong>
+                  <%= slotLabel %>
+                </strong>
+              </dd>
+            </div>
+
+          </dl>
+        </div>
+
+      </div>
+
+      <div class="admin-confirm-notice">
+        変更を確定すると、元の予約日時は変更後の日時に置き換わります。
+      </div>
+
+      <form
+        method="POST"
+        action="/admin/edit/<%= reservation.id %>/complete"
+        class="admin-confirm-form"
+      >
+        <input
+          type="hidden"
+          name="date"
+          value="<%= date %>"
+        >
+
+        <input
+          type="hidden"
+          name="slot"
+          value="<%= slot %>"
+        >
+
+        <button
+          type="submit"
+          class="admin-confirm-submit"
+        >
+          予約を変更する
+        </button>
+      </form>
+
+    </section>
+
+    <div class="admin-slot-footer-actions">
+
+      <a
+        class="admin-week-button"
+        href="/admin/edit/<%= reservation.id %>"
+      >
+        日時選択へ戻る
+      </a>
+
+      <a
+        class="admin-week-button"
+        href="/admin/reservations"
+      >
+        予約スケジュールへ戻る
+      </a>
+
+    </div>
 
   </div>
 </div>

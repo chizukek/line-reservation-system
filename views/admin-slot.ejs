@@ -1,126 +1,173 @@
 <%- include("partials/header", {
   title: "予約枠詳細"
 }) %>
-<div class="admin-page">
+
+<div class="admin-page admin-slot-page">
   <div class="admin-card">
 
-    <div class="admin-header">
+    <header class="admin-page-header">
       <div>
-        <h1>予約枠詳細</h1>
-      </div>
-    </div>
+        <p class="admin-page-eyebrow">予約管理</p>
 
-    <section class="admin-section">
-      <div class="admin-table-wrapper">
-        <table class="admin-table">
+        <h1>予約枠詳細</h1>
+
+        <p class="admin-page-description">
+          <%= formatJapaneseDate(date) %>
+          ・
+          <%= slotLabel %>
+          ・
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </p>
+      </div>
+
+      <a
+        class="admin-primary-button"
+        href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+      >
+        予約を追加
+      </a>
+    </header>
+
+    <section class="admin-panel">
+
+      <div class="admin-slot-summary">
+        <div class="admin-slot-summary-item">
+          <span>日付</span>
+          <strong><%= formatJapaneseDate(date) %></strong>
+        </div>
+
+        <div class="admin-slot-summary-item">
+          <span>時間</span>
+          <strong><%= slotLabel %></strong>
+        </div>
+
+        <div class="admin-slot-summary-item">
+          <span>担当医</span>
+          <strong><%= doctor.displayName || doctor.name %></strong>
+        </div>
+
+        <div class="admin-slot-summary-item">
+          <span>予約状況</span>
+          <strong>
+            <%= reservations.length %> / <%= capacity %>人
+          </strong>
+        </div>
+      </div>
+
+      <div class="admin-list-table-shell">
+        <table class="admin-list-table">
+
           <thead>
-                <tr>
-                    <th>日付</th>
-                    <th>時間</th>
-                    <th>担当医師</th>
-                    <th>患者番号</th>
-                    <th>患者氏名</th>
-                    <th>管理</th>
-                </tr>
-            </thead>
+            <tr>
+              <th>状態</th>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+              <th>操作</th>
+            </tr>
+          </thead>
 
           <tbody>
-  <% if (reservations.length > 0) { %>
 
-    <% reservations.forEach(reservation => { %>
-      <tr>
-        <td><%= formatJapaneseDate(date) %></td>
-        <td><%= slotLabel %></td>
+            <% reservations.forEach((reservation, index) => { %>
+              <tr>
+                <td>
+                  <span class="admin-reserved-label">
+                    予約 <%= index + 1 %>
+                  </span>
+                </td>
 
-        <td>
-          <%= doctor.displayName || doctor.name %>
-        </td>
+                <td>
+                  <%= reservation.patientNumber %>
+                </td>
 
-        <td><%= reservation.patientNumber %></td>
-        <td><%= reservation.patient.name %></td>
+                <td>
+                  <strong>
+                    <%= reservation.patient.name %>
+                  </strong>
+                </td>
 
-        <td>
-          <div class="admin-action-buttons">
-            <a
-              class="admin-small-button"
-              href="/admin/edit/<%= reservation.id %>?doctorId=<%= doctorId %>"
-            >
-              変更
-            </a>
+                <td>
+                  <div class="admin-row-actions">
 
-            <a
-              class="admin-danger-button"
-              href="/admin/cancel-confirm/<%= reservation.id %>?doctorId=<%= doctorId %>"
-            >
-              キャンセル
-            </a>
-          </div>
-        </td>
-      </tr>
-    <% }) %>
+                    <a
+                      class="admin-row-button"
+                      href="/admin/edit/<%= reservation.id %>"
+                    >
+                      変更
+                    </a>
 
-    <% if (reservations.length < capacity) { %>
-      <tr>
-        <td><%= formatJapaneseDate(date) %></td>
-        <td><%= slotLabel %></td>
+                    <a
+                      class="admin-row-button is-danger"
+                      href="/admin/cancel-confirm/<%= reservation.id %>"
+                    >
+                      キャンセル
+                    </a>
 
-        <td>
-          <%= doctor.displayName || doctor.name %>
-        </td>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
 
-        <td>−</td>
-        <td>空き</td>
+            <%
+              const remainingCapacity =
+                Math.max(0, capacity - reservations.length);
+            %>
 
-        <td>
-          <div class="admin-action-buttons">
-            <a
-              class="admin-small-button"
-              href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-            >
-              予約追加
-            </a>
-          </div>
-        </td>
-      </tr>
-    <% } %>
+            <% for (let i = 0; i < remainingCapacity; i++) { %>
+              <tr class="admin-empty-slot-row">
+                <td>
+                  <span class="admin-empty-slot-label">
+                    空き
+                  </span>
+                </td>
 
-  <% } else { %>
+                <td>−</td>
 
-    <tr>
-      <td><%= formatJapaneseDate(date) %></td>
-      <td><%= slotLabel %></td>
+                <td>
+                  予約なし
+                </td>
 
-      <td>
-        <%= doctor.displayName || doctor.name %>
-      </td>
+                <td>
+                  <a
+                    class="admin-row-button is-add"
+                    href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+                  >
+                    予約追加
+                  </a>
+                </td>
+              </tr>
+            <% } %>
 
-      <td>−</td>
-      <td>予約なし</td>
+          </tbody>
 
-      <td>
-        <div class="admin-action-buttons">
-          <a
-            class="admin-small-button"
-            href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-          >
-            予約追加
-          </a>
-        </div>
-      </td>
-    </tr>
-
-  <% } %>
-</tbody>
         </table>
       </div>
+
+      <% if (reservations.length >= capacity) { %>
+        <div class="admin-slot-full-message">
+          この予約枠は満員です。
+        </div>
+      <% } else { %>
+        <p class="admin-schedule-note">
+          あと<%= remainingCapacity %>人予約できます。
+        </p>
+      <% } %>
+
     </section>
 
-    <div class="clinic-actions">
+    <div class="admin-slot-footer-actions">
       <a
-        class="clinic-sub-button"
+        class="admin-week-button"
+        href="/admin/reservations"
+      >
+        予約スケジュールへ戻る
+      </a>
+
+      <a
+        class="admin-week-button"
         href="/admin"
       >
-        管理画面トップへ戻る
+        本日の予約へ戻る
       </a>
     </div>
 

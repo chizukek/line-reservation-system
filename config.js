@@ -25,9 +25,15 @@ const afternoonSlots = makeSlots(14, 18, 30);
 
 // A医師用
 // DBには枠の開始時刻を保存する
-const doctorAMorningSlots = ["10:00", "11:00"];
+// A医師用：30分単位
+const doctorAMondaySlots = makeSlots(17, 19, 30);
+// 17:00、17:30、18:00、18:30
 
-const doctorAAfternoonSlots = ["16:00", "17:00", "18:00"];
+const doctorATuesdayWednesdaySlots = ["12:00"];
+// 12:00〜12:30
+
+const doctorAFridaySlots = ["17:00"];
+// 17:00〜17:30
 
 const holidays = [];
 
@@ -63,19 +69,22 @@ function getSlotsForDate(dateText, doctorId) {
 
   // A医師
   if (doctorId === 1) {
-    const slots = [];
-
-    // 午前：火・水・金
-    if (weekday === 2 || weekday === 3 || weekday === 5) {
-      slots.push(...doctorAMorningSlots);
+    // 月曜：17:00〜19:00
+    if (weekday === 1) {
+      return doctorAMondaySlots;
     }
 
-    // 午後：月・火・水・金
-    if (weekday === 1 || weekday === 2 || weekday === 3 || weekday === 5) {
-      slots.push(...doctorAAfternoonSlots);
+    // 火曜・水曜：12:00〜12:30
+    if (weekday === 2 || weekday === 3) {
+      return doctorATuesdayWednesdaySlots;
     }
 
-    return slots;
+    // 金曜：17:00〜17:30
+    if (weekday === 5) {
+      return doctorAFridaySlots;
+    }
+
+    return [];
   }
 
   // B医師：今まで通り
@@ -109,34 +118,29 @@ function getSlotsForDate(dateText, doctorId) {
 function getCapacityForSlot(dateText, slot, doctorId) {
   doctorId = Number(doctorId);
 
-  // A医師
+  // A医師は全枠30分・定員3人
   if (doctorId === 1) {
-    // 午前は1枠1人
-    if (slot === "10:00" || slot === "11:00") {
-      return 1;
-    }
-
-    // 午後は1枠2人
-    if (slot === "16:00" || slot === "17:00" || slot === "18:00") {
-      return 2;
-    }
+    return 3;
   }
 
-  // B医師は今まで通り1枠2人
-  return 2;
+  // B医師は1枠2人
+  if (doctorId === 2) {
+    return 2;
+  }
+
+  return 0;
 }
 
 function getSlotLabel(slot, doctorId) {
   doctorId = Number(doctorId);
 
-  // A医師だけ時間帯として表示
   if (doctorId === 1) {
     const labels = {
-      "10:00": "10:00〜11:00",
-      "11:00": "11:00〜12:00",
-      "16:00": "16:00〜17:00",
-      "17:00": "17:00〜18:00",
-      "18:00": "18:00〜18:45",
+      "12:00": "12:00〜12:30",
+      "17:00": "17:00〜17:30",
+      "17:30": "17:30〜18:00",
+      "18:00": "18:00〜18:30",
+      "18:30": "18:30〜19:00",
     };
 
     return labels[slot] || slot;
@@ -146,7 +150,13 @@ function getSlotLabel(slot, doctorId) {
   return slot;
 }
 
-const doctorASlots = ["10:00", "11:00", "16:00", "17:00", "18:00"];
+const doctorASlots = [
+  ...new Set([
+    ...doctorAMondaySlots,
+    ...doctorATuesdayWednesdaySlots,
+    ...doctorAFridaySlots,
+  ]),
+].sort();
 
 const doctorBSlots = [...morningSlots, ...afternoonSlots];
 
@@ -160,24 +170,29 @@ function getDisplaySlots(doctorId) {
   return doctorBSlots;
 }
 
+const RESERVATION_DAYS = 60;
+
 const allSlots = [
   ...new Set([
     ...morningSlots,
     ...afternoonSlots,
-    ...doctorAMorningSlots,
-    ...doctorAAfternoonSlots,
+    ...doctorAMondaySlots,
+    ...doctorATuesdayWednesdaySlots,
+    ...doctorAFridaySlots,
   ]),
 ].sort();
 
 module.exports = {
   morningSlots,
   afternoonSlots,
-  doctorAMorningSlots,
-  doctorAAfternoonSlots,
+  doctorAMondaySlots,
+  doctorATuesdayWednesdaySlots,
+  doctorAFridaySlots,
   allSlots,
   holidays,
   getSlotsForDate,
   getCapacityForSlot,
   getSlotLabel,
   getDisplaySlots,
+  RESERVATION_DAYS,
 };

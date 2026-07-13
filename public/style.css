@@ -1,3 +1,5 @@
+
+
 :root {
   /* colors */
   --green: #008102;
@@ -306,62 +308,6 @@ button {
 .clinic-sub-button:hover {
   background: var(--green-pale);
   text-decoration: none;
-}
-
-.admin-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 24px;
-  align-items: start;
-}
-
-.admin-main {
-  min-width: 0;
-}
-
-.admin-side {
-  position: sticky;
-  top: 24px;
-}
-
-.admin-side-card {
-  background: #f7fbf8;
-  border: 1px solid #d8eadc;
-  border-radius: 16px;
-  padding: 18px;
-}
-
-.admin-side-card h2 {
-  font-size: 18px;
-  margin-bottom: 14px;
-}
-
-.admin-side-link {
-  display: block;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #d8eadc;
-  text-decoration: none;
-  color: #1f5132;
-  font-weight: 600;
-}
-
-.admin-side-link.primary {
-  background: #2f8f5b;
-  color: #ffffff;
-  border-color: #2f8f5b;
-}
-
-@media (max-width: 800px) {
-  .admin-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-side {
-    position: static;
-  }
 }
 
 /* patient pages */
@@ -774,9 +720,1870 @@ button {
   background: var(--green);
 }
 
-/* admin */
+/* utility */
+
+.error {
+  color: var(--danger);
+  font-weight: var(--fw-bold);
+}
+
+.success {
+  color: var(--green);
+  font-weight: var(--fw-bold);
+}
+
+.cancel-link {
+  display: block;
+  padding: var(--space-13);
+  border: var(--border-green);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--green);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+}
+
+/* mobile */
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+
+  h1 {
+    font-size: var(--fs-h1-mobile);
+  }
+
+  .site-header-inner {
+    padding: var(--space-10) var(--space-10);
+    align-items: flex-start;
+    gap: var(--space-10);
+  }
+
+  .site-logo img {
+    width: var(--size-logo-mobile);
+    height: var(--size-logo-mobile);
+  }
+
+  .site-name {
+    font-size: var(--fs-lg-mobile);
+  }
+
+  .site-subtitle {
+    font-size: var(--fs-xxs);
+  }
+
+  .site-nav {
+    gap: var(--space-6) var(--space-10);
+    font-size: var(--fs-xs);
+  }
+
+  .clinic-page,
+  .admin-page {
+    padding: 0;
+  }
+
+  .clinic-card,
+  .admin-card {
+    padding: var(--space-22) var(--space-12);
+    border-radius: var(--radius-lg);
+  }
+
+  .clinic-form label {
+    font-size: var(--fs-md);
+  }
+
+  .clinic-form input,
+  .clinic-form select {
+    font-size: var(--fs-md);
+  }
+
+  .info-box,
+  .reservation-box,
+  .admin-form-card {
+    padding: var(--space-16);
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    font-size: var(--fs-md);
+  }
+
+  .birth-select {
+    grid-template-columns: 1fr;
+  }
+
+  .week-nav {
+    gap: var(--space-8);
+  }
+
+  .week-btn {
+    font-size: var(--fs-sm);
+  }
+
+  .reservation-table-wrapper {
+    padding: 0;
+  }
+
+  .reservation-table th,
+  .reservation-table td {
+    padding: var(--space-6) var(--space-1);
+    font-size: var(--fs-xs);
+  }
+
+  .time-cell {
+    width: var(--w-time-cell-mobile);
+    font-size: var(--fs-xs);
+  }
+
+  .mark-full {
+    font-size: var(--fs-lg-mobile);
+  }
+
+  .mark-disabled {
+    font-size: var(--fs-md-lg);
+  }
+
+  .progress {
+    margin: var(--space-10) auto var(--space-18);
+    padding: var(--space-10) var(--space-6);
+  }
+
+  .progress-step .circle {
+    width: var(--size-progress-circle-mobile);
+    height: var(--size-progress-circle-mobile);
+    font-size: var(--fs-xs);
+  }
+
+  .progress-step .label {
+    font-size: var(--fs-tiny);
+  }
+
+  .progress .line {
+    margin: var(--space-14) var(--space-3) 0;
+  }
+
+  .admin-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-search-form .clinic-main-button {
+    width: 100%;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-add-button {
+    width: 100%;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    font-size: var(--fs-sm);
+    padding: var(--space-11) var(--space-10);
+  }
+  .admin-action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-small-button,
+  .admin-danger-button {
+    width: 100%;
+    height: var(--h-admin-small-button);
+  }
+}
+
+.confirm-warning {
+  margin: 0 0 var(--space-lg);
+  color: var(--danger);
+  font-weight: var(--fw-bold);
+}
+
+.confirm-section {
+  margin-top: var(--space-30);
+}
+
+.confirm-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.confirm-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.confirm-row:last-child {
+  border-bottom: none;
+}
+
+.confirm-label {
+  padding: 12px 14px;
+  background: #f3eddf;
+  font-weight: var(--fw-bold);
+  color: #555;
+}
+
+.confirm-value {
+  padding: 12px 14px;
+  background: #fff;
+  font-weight: var(--fw-medium);
+  color: var(--text);
+}
+
+.confirm-note-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  line-height: 1.8;
+  color: #555;
+}
+
+.terms-area {
+  margin: 26px 0 10px;
+  text-align: center;
+  font-size: var(--fs-note);
+}
+
+.terms-area a {
+  text-decoration: underline;
+}
+
+.confirm-submit-button span {
+  display: block;
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+  margin-bottom: 4px;
+}
+
+.confirm-submit-button strong {
+  display: block;
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+}
+
+@media (max-width: 768px) {
+  .confirm-row {
+    grid-template-columns: 120px 1fr;
+  }
+
+  .confirm-label,
+  .confirm-value {
+    padding: 11px 10px;
+    font-size: 14px;
+  }
+}
+
+.complete-message {
+  margin: 0 0 var(--space-30);
+  padding: 16px 18px;
+  background: var(--green-pale);
+  border: 1px solid var(--green);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--green);
+  line-height: 1.8;
+}
+
+.complete-message strong {
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+}
+
+/* =========================================================
+   管理画面：専用iPad横向き版
+   基準画面：1024px × 768px
+   管理画面は横向き固定運用を想定
+========================================================= */
+
+:root {
+  --admin-width: 1024px;
+  --admin-header-height: 64px;
+  --admin-sidebar-width: 176px;
+
+  --admin-bg: #f3f5f4;
+  --admin-white: #ffffff;
+  --admin-panel: #ffffff;
+  --admin-border: #d8dfdb;
+  --admin-border-dark: #c7d0cb;
+
+  --admin-green: #128447;
+  --admin-green-dark: #0d6d3a;
+  --admin-green-soft: #e8f4ed;
+  --admin-green-pale: #f3faf6;
+
+  --admin-text: #252a27;
+  --admin-muted: #68736d;
+  --admin-light: #929b96;
+
+  --admin-warning: #986800;
+  --admin-warning-bg: #fff8e6;
+
+  --admin-danger: #c23838;
+  --admin-danger-dark: #a72d2d;
+  --admin-danger-bg: #fff1f1;
+
+  --admin-radius: 6px;
+  --admin-touch: 44px;
+}
+
+/* ---------- 画面全体 ---------- */
+
+body {
+  margin: 0;
+}
+
+.admin-header-bar,
+.admin-layout,
+.admin-sidebar,
+.admin-main,
+.admin-page,
+.admin-card,
+.admin-panel,
+.admin-calendar-shell,
+.admin-list-table-shell,
+.admin-table-wrapper {
+  box-sizing: border-box;
+}
+
+.admin-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  min-width: var(--admin-width);
+  height: var(--admin-header-height);
+  background: var(--admin-white);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-header-bar .site-header-inner {
+  width: var(--admin-width);
+  max-width: var(--admin-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-header-bar .site-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-header-bar .site-logo img {
+  width: 38px;
+  height: 38px;
+}
+
+.admin-header-bar .site-name {
+  color: var(--admin-green);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-header-bar .site-subtitle {
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.admin-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-current-datetime {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- 医師切り替え ---------- */
+
+.doctor-selector {
+  position: relative;
+}
+
+.doctor-selector summary {
+  list-style: none;
+}
+
+.doctor-selector summary::-webkit-details-marker {
+  display: none;
+}
+
+.doctor-selector-button {
+  min-width: 132px;
+  min-height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  border-radius: var(--admin-radius);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.doctor-selector-button:hover {
+  color: var(--admin-green);
+  background: var(--admin-green-pale);
+  border-color: var(--admin-green);
+}
+
+.doctor-selector-arrow {
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.doctor-selector-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1100;
+  width: 210px;
+  padding: 6px;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(29, 45, 36, 0.14);
+}
+
+.doctor-selector-item {
+  min-height: var(--admin-touch);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--admin-text);
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.doctor-selector-item:hover,
+.doctor-selector-item.is-selected {
+  color: var(--admin-green);
+  background: var(--admin-green-soft);
+}
+
+.doctor-selector-check {
+  color: var(--admin-green);
+}
+
+.header-logout-link {
+  min-height: 40px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.header-logout-link:hover {
+  color: var(--admin-green);
+}
+
+/* ---------- 1024px本体 ---------- */
+
+.admin-layout {
+  width: var(--admin-width);
+  min-height: calc(100vh - var(--admin-header-height));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
+  background: var(--admin-bg);
+}
+
+.admin-sidebar {
+  min-width: 0;
+  background: var(--admin-white);
+  border-right: 1px solid var(--admin-border);
+}
+
+.admin-sidebar-nav {
+  position: sticky;
+  top: var(--admin-header-height);
+  padding: 14px 9px 20px;
+}
+
+.admin-sidebar-group {
+  margin-bottom: 16px;
+}
+
+.admin-sidebar-group:last-child {
+  margin-bottom: 0;
+}
+
+.admin-sidebar-label {
+  margin: 0 10px 6px;
+  color: var(--admin-light);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.admin-sidebar-link {
+  min-height: 46px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--admin-text);
+  border-radius: var(--admin-radius);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-sidebar-link:hover,
+.admin-sidebar-link.is-active {
+  color: var(--admin-green);
+  background: var(--admin-green-soft);
+  text-decoration: none;
+}
+
+.admin-sidebar-icon {
+  flex: 0 0 20px;
+  width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--admin-muted);
+  font-size: 16px;
+}
+
+.admin-sidebar-link:hover .admin-sidebar-icon,
+.admin-sidebar-link.is-active .admin-sidebar-icon {
+  color: var(--admin-green);
+}
+
+.admin-main {
+  min-width: 0;
+  width: 100%;
+  padding: 16px;
+  background: var(--admin-bg);
+}
 
 .admin-page {
+  min-height: auto;
+  padding: 0;
+  display: block;
+  background: transparent;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+/* ---------- ページ見出し ---------- */
+
+.admin-page-header {
+  min-height: 48px;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-page-header > div {
+  min-width: 0;
+}
+
+.admin-page-eyebrow {
+  margin: 0 0 1px;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.admin-page-description {
+  margin: 3px 0 0;
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ---------- パネル ---------- */
+
+.admin-panel {
+  width: 100%;
+  padding: 14px;
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-panel + .admin-panel {
+  margin-top: 12px;
+}
+
+.admin-panel-title {
+  margin: 0 0 10px;
+  color: var(--admin-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.admin-panel-description {
+  margin: -4px 0 10px;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+/* ---------- ボタン ---------- */
+
+.admin-primary-button,
+.admin-secondary-button,
+.admin-danger-outline-button,
+.admin-refresh-button,
+.admin-week-button,
+.admin-row-button {
+  box-sizing: border-box;
+  min-height: var(--admin-touch);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--admin-radius);
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-primary-button {
+  padding: 0 16px;
+  color: #ffffff;
+  background: var(--admin-green);
+  border: 1px solid var(--admin-green);
+  font-size: 13px;
+}
+
+.admin-primary-button:hover {
+  color: #ffffff;
+  background: var(--admin-green-dark);
+  border-color: var(--admin-green-dark);
+}
+
+.admin-secondary-button {
+  padding: 0 16px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 13px;
+}
+
+.admin-secondary-button:hover {
+  background: var(--admin-green-soft);
+}
+
+.admin-danger-outline-button {
+  padding: 0 16px;
+  color: var(--admin-danger);
+  background: var(--admin-white);
+  border: 1px solid #d8a3a3;
+  font-size: 13px;
+}
+
+.admin-danger-outline-button:hover {
+  background: var(--admin-danger-bg);
+}
+
+.admin-refresh-button {
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 12px;
+}
+
+.admin-refresh-button:hover {
+  background: var(--admin-green-soft);
+}
+
+/* ---------- ダッシュボード ---------- */
+
+.admin-dashboard-heading {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-dashboard-heading h2 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 16px;
+}
+
+.admin-dashboard-doctor {
+  margin: 4px 0 0;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.admin-update-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-updated-at {
+  color: var(--admin-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.admin-updated-at strong {
+  margin-left: 3px;
+  color: var(--admin-text);
+}
+
+.admin-summary-row {
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-summary-item {
+  min-height: 64px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-right: 1px solid var(--admin-border);
+}
+
+.admin-summary-item:last-child {
+  border-right: 0;
+}
+
+.admin-summary-label {
+  margin-right: auto;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.admin-summary-value {
+  color: var(--admin-text);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-summary-unit {
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+/* ---------- 本日の予約表 ---------- */
+
+.admin-table-wrapper,
+.admin-list-table-shell {
+  width: 100%;
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.today-reservation-table,
+.admin-table,
+.admin-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--admin-white);
+}
+
+.today-reservation-table {
+  table-layout: fixed;
+}
+
+.today-reservation-table th,
+.today-reservation-table td,
+.admin-table th,
+.admin-table td {
+  border-right: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.today-reservation-table th:last-child,
+.today-reservation-table td:last-child,
+.admin-table th:last-child,
+.admin-table td:last-child {
+  border-right: 0;
+}
+
+.today-reservation-table tr:last-child th,
+.today-reservation-table tr:last-child td,
+.admin-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.today-reservation-table th,
+.admin-table th {
+  padding: 8px 10px;
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.today-reservation-table td,
+.admin-table td {
+  padding: 0;
+  color: var(--admin-text);
+  font-size: 12px;
+}
+
+.today-time-column,
+.today-reservation-table .time-cell {
+  width: 104px;
+}
+
+.today-time-link,
+.today-slot-link {
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 11px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--admin-text);
+}
+
+.today-time-link {
+  justify-content: center;
+  background: var(--admin-green-pale);
+  font-weight: 700;
+  text-align: center;
+}
+
+.today-slot-link {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.today-slot-link:hover,
+.today-time-link:hover {
+  background: var(--admin-green-soft);
+}
+
+.today-patient-name {
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.today-patient-number {
+  display: block;
+  margin-top: 1px;
+  color: var(--admin-muted);
+  font-size: 9px;
+}
+
+.today-empty-label {
+  color: var(--admin-green);
+  font-weight: 700;
+}
+
+.today-cell-arrow {
+  flex: 0 0 auto;
+  color: var(--admin-light);
+  font-size: 18px;
+}
+
+.empty-patient-cell {
+  background: #fbfcfb;
+}
+
+.unavailable-patient-cell {
+  padding: 12px 6px !important;
+  color: var(--admin-light) !important;
+  background: #f0f2f1;
+  text-align: center;
+}
+
+.admin-empty-message {
+  padding: 24px 12px !important;
+  color: var(--admin-muted);
+  text-align: center;
+}
+
+/* ---------- 週間予約表 ---------- */
+
+.admin-schedule-toolbar {
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-schedule-period {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.admin-schedule-period-label {
+  color: var(--admin-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.admin-schedule-period strong {
+  color: var(--admin-text);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.admin-week-navigation {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-week-button {
+  min-width: 92px;
+  padding: 0 10px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-week-button:hover {
+  background: #edf2ef;
+}
+
+.admin-week-button.is-primary {
+  color: #ffffff;
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+}
+
+.admin-week-button.is-primary:hover {
+  background: var(--admin-green-dark);
+}
+
+.admin-week-button.is-disabled {
+  color: #a4aba7;
+  background: #f2f4f3;
+  pointer-events: none;
+}
+
+.admin-status-guide {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px 15px;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-status-guide span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-dot.is-open {
+  color: var(--admin-green);
+}
+
+.status-dot.is-few {
+  color: var(--admin-warning);
+}
+
+.status-dot.is-full,
+.status-dot.is-closed {
+  color: #7c8580;
+}
+
+.admin-calendar-shell {
+  width: 100%;
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-calendar-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: var(--admin-white);
+}
+
+.admin-calendar-table th,
+.admin-calendar-table td {
+  border-right: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-calendar-table th:last-child,
+.admin-calendar-table td:last-child {
+  border-right: 0;
+}
+
+.admin-calendar-table tbody tr:last-child th,
+.admin-calendar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-calendar-time-head,
+.admin-calendar-time-cell {
+  width: 78px;
+}
+
+.admin-calendar-time-head {
+  height: 56px;
+  color: var(--admin-muted);
+  background: #edf1ef;
+  font-size: 11px;
+}
+
+.admin-calendar-date-head {
+  height: 56px;
+  padding: 4px 1px;
+  color: var(--admin-text);
+  background: #f7f9f8;
+}
+
+.admin-calendar-date-head.is-today {
+  background: var(--admin-green-soft);
+  box-shadow: inset 0 3px 0 var(--admin-green);
+}
+
+.admin-calendar-date-head.is-saturday {
+  color: #315da8;
+}
+
+.admin-calendar-date-head.is-sunday {
+  color: var(--admin-danger);
+}
+
+.admin-calendar-date {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.admin-calendar-weekday {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+}
+
+.admin-today-badge {
+  display: inline-block;
+  margin-top: 1px;
+  padding: 1px 4px;
+  color: #ffffff;
+  background: var(--admin-green);
+  border-radius: 999px;
+  font-size: 8px;
+}
+
+.admin-calendar-time-cell {
+  height: 56px;
+  padding: 3px;
+  color: var(--admin-text);
+  background: #f7f9f8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-calendar-slot {
+  height: 56px;
+  padding: 0;
+}
+
+.admin-calendar-slot-link,
+.admin-calendar-slot-disabled {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+}
+
+.admin-calendar-slot-link {
+  color: inherit;
+}
+
+.admin-calendar-slot-link:hover {
+  filter: brightness(0.97);
+}
+
+.admin-calendar-slot.is-open {
+  color: var(--admin-green);
+  background: var(--admin-white);
+}
+
+.admin-calendar-slot.is-few {
+  color: var(--admin-warning);
+  background: var(--admin-warning-bg);
+}
+
+.admin-calendar-slot.is-full {
+  color: #626a66;
+  background: #edf0ee;
+}
+
+.admin-calendar-slot.is-closed {
+  color: #a0a7a3;
+  background: #f4f5f4;
+}
+
+.admin-calendar-status {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-calendar-count {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.admin-calendar-slot-disabled {
+  color: #a0a7a3;
+  font-size: 14px;
+}
+
+.admin-schedule-note {
+  margin: 7px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+/* ---------- 検索フォーム ---------- */
+
+.admin-search-form {
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
+  gap: 9px;
+  align-items: end;
+  background: transparent;
+  border: 0;
+}
+
+.admin-search-form label,
+.admin-form-card label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: var(--admin-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-search-form input,
+.admin-search-form select,
+.admin-form-card input,
+.admin-form-card select,
+.admin-form-card textarea {
+  width: 100%;
+  min-height: var(--admin-touch);
+  padding: 8px 10px;
+  box-sizing: border-box;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  border-radius: var(--admin-radius);
+  font-size: 13px;
+}
+
+.admin-form-card textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.admin-search-form input:focus,
+.admin-search-form select:focus,
+.admin-form-card input:focus,
+.admin-form-card select:focus,
+.admin-form-card textarea:focus {
+  outline: none;
+  border-color: var(--admin-green);
+  box-shadow: 0 0 0 3px rgba(18, 132, 71, 0.12);
+}
+
+.admin-filter-links {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.admin-result-text {
+  margin: 8px 0 0;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+/* ---------- 予約一覧 ---------- */
+
+.admin-section-title-row {
+  margin-bottom: 8px;
+}
+
+.admin-section-title-row h2 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 16px;
+}
+
+.admin-section-title-row p {
+  margin: 2px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-list-table {
+  table-layout: fixed;
+}
+
+.admin-list-table th,
+.admin-list-table td {
+  padding: 8px 7px;
+  color: var(--admin-text);
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 11px;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-table th {
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-weight: 700;
+}
+
+.admin-list-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-list-table tbody tr:hover td {
+  background: #fbfdfc;
+}
+
+.admin-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-row-actions form {
+  margin: 0;
+}
+
+.admin-row-button {
+  min-height: 38px;
+  padding: 0 8px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.admin-row-button:hover {
+  background: var(--admin-green-soft);
+}
+
+.admin-row-button.is-danger {
+  color: var(--admin-danger);
+  border-color: #d8a3a3;
+}
+
+.admin-row-button.is-danger:hover {
+  background: var(--admin-danger-bg);
+}
+
+.admin-empty-state,
+.admin-empty {
+  padding: 24px 12px;
+  color: var(--admin-muted);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------- 詳細・確認 ---------- */
+
+.admin-detail-box,
+.admin-confirm-box {
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-detail-row,
+.admin-confirm-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-detail-row:last-child,
+.admin-confirm-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-detail-label,
+.admin-confirm-label {
+  padding: 11px 12px;
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-detail-value,
+.admin-confirm-value {
+  min-width: 0;
+  padding: 11px 13px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.admin-detail-actions,
+.admin-confirm-actions,
+.admin-form-actions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-detail-actions form,
+.admin-confirm-actions form,
+.admin-form-actions form {
+  margin: 0;
+}
+
+/* ---------- 入力フォーム ---------- */
+
+.admin-form-card {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-form-help {
+  margin: -1px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-form-error,
+.admin-error {
+  margin: 0 0 10px;
+  padding: 9px 11px;
+  color: #8d2020;
+  background: var(--admin-danger-bg);
+  border-left: 4px solid var(--admin-danger);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-success {
+  margin: 0 0 10px;
+  padding: 9px 11px;
+  color: var(--admin-green-dark);
+  background: var(--admin-green-soft);
+  border-left: 4px solid var(--admin-green);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ---------- 管理ログイン ---------- */
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 48px auto 0;
+  padding: 28px;
+  box-sizing: border-box;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+}
+
+.admin-login-card h1 {
+  margin: 0 0 8px;
+  color: var(--admin-text);
+  font-size: 23px;
+  text-align: center;
+}
+
+.admin-login-card .clinic-lead {
+  margin-bottom: 22px;
+  color: var(--admin-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.admin-login-card .clinic-main-button {
+  min-height: 48px;
+  margin-top: 4px;
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+}
+
+/* ---------- 完了画面 ---------- */
+
+.complete-card {
+  max-width: 640px;
+  margin: 24px auto 0;
+  padding: 26px;
+  box-sizing: border-box;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.complete-card h1 {
+  margin-bottom: 12px;
+  font-size: 23px;
+}
+
+.complete-card .clinic-lead {
+  margin-bottom: 20px;
+  color: var(--admin-muted);
+}
+
+/* ---------- PCで確認するときもiPad幅を維持 ---------- */
+
+@media (min-width: 1025px) {
+  body {
+    background: #e7ebe9;
+  }
+
+  .admin-header-bar {
+    background: #e7ebe9;
+  }
+
+  .admin-header-bar .site-header-inner,
+  .admin-layout {
+    box-shadow: 0 0 0 1px rgba(32, 45, 38, 0.04);
+  }
+
+  .admin-header-bar .site-header-inner {
+    background: var(--admin-white);
+  }
+}
+Library
+/
+style-ipad-dedicated.css
+
+
+:root {
+  /* colors */
+  --green: #008102;
+  --green-dark: #006b02;
+  --green-pale: #eef7ef;
+  --bg: #ffffff;
+  --surface: #f6f7f6;
+  --card: #ffffff;
+  --white: #ffffff;
+  --text: #222222;
+  --text-soft: #333333;
+  --muted: #666666;
+  --muted-2: #555555;
+  --danger: #d62828;
+  --danger-dark: #b91f1f;
+  --warning-bg: #fff4e5;
+  --warning-border: #e88900;
+  --warning-text: #8a4b00;
+  --blue-text: #1d6fb8;
+  --blue-pale: #f1f6f9;
+  --red-text: #c62828;
+  --red-pale: #fbf0f0;
+  --gray-bg: #f2f2f2;
+  --gray-disabled-bg: #f5f5f5;
+  --gray-disabled-text: #aaaaaa;
+  --gray-mark: #9aa3ad;
+  --gray-mark-light: #b7bec5;
+  --progress-bg: #d9ded9;
+  --progress-text: #5f6b72;
+  --progress-muted: #8a969c;
+
+  /* borders */
+  --border: #dddddd;
+  --border-dark: #c9c9c9;
+  --border-soft: #e5e5e5;
+  --border-table: #d7d7d7;
+  --border-admin-table: #e2e6ea;
+  --border-base: 1px solid var(--border);
+  --border-dark-base: 1px solid var(--border-dark);
+  --border-green: 2px solid var(--green);
+  --border-danger: 2px solid var(--danger);
+  --border-warning: 5px solid var(--warning-border);
+
+  /* typography */
+  --font-family-base: "Yu Gothic UI", "Meiryo", sans-serif;
+  --fs-tiny: 11px;
+  --fs-xxs: 12px;
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-md-lg: 17px;
+  --fs-lg: 18px;
+  --fs-lg-mobile: 19px;
+  --fs-xl: 20px;
+  --fs-2xl: 22px;
+  --fs-brand: 24px;
+  --fs-h1: 30px;
+  --fs-h1-mobile: 24px;
+  --lh-tight: 1.2;
+  --lh-heading: 1.35;
+  --lh-date: 1.45;
+  --lh-base: 1.6;
+  --lh-note: 1.7;
+  --lh-progress: 1.3;
+  --lh-icon: 1;
+
+  /* font weight: 全体を少し細めに調整 */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* layout widths */
+  --w-container: 960px;
+  --w-card: 760px;
+  --w-reservation-card: 900px;
+  --w-admin-card: 980px;
+  --w-login-card: 520px;
+  --w-info-label: 160px;
+  --w-time-cell: 54px;
+  --w-time-cell-mobile: 48px;
+  --w-admin-small-button: 72px;
+  --w-admin-add-button: 170px;
+  --w-admin-search-button: 140px;
+  --h-page-offset: 80px;
+
+  /* spacing */
+  --space-0: 0;
+  --space-1: 1px;
+  --space-3: 3px;
+  --space-4: 4px;
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-12: 12px;
+  --space-13: 13px;
+  --space-14: 14px;
+  --space-15: 15px;
+  --space-16: 16px;
+  --space-17: 17px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-26: 26px;
+  --space-28: 28px;
+  --space-30: 30px;
+  --space-34: 34px;
+  --space-36: 36px;
+  --space-38: 38px;
+  --space-42: 42px;
+
+  /* radius */
+  --radius-sm: 4px;
+  --radius-md: 5px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-round: 50%;
+  --radius-pill: 999px;
+
+  /* component sizes */
+  --size-logo: 48px;
+  --size-logo-mobile: 42px;
+  --size-progress-circle: 34px;
+  --size-progress-circle-mobile: 30px;
+  --size-progress-line: 4px;
+  --size-mark: 30px;
+  --size-mark-height:20px;
+  --size-mark-open: 32px;
+  --size-mark-open-height:22px;
+  --size-open-circle: 12px;
+  --border-open-circle: 3px;
+  --h-admin-small-button: 34px;
+
+  /* effects */
+  --focus-ring: 0 0 0 3px rgba(0, 129, 2, 0.13);
+}
+
+/* base */
+
+body {
+  font-family: var(--font-family-base);
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-normal);
+  line-height: var(--lh-base);
+}
+
+.container {
+  max-width: var(--w-container);
+  margin: 0 auto;
+  padding: var(--space-18) var(--space-14);
+  box-sizing: border-box;
+}
+
+h1 {
+  margin: 0 0 var(--space-24);
+  color: var(--text);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-heading);
+}
+
+h2 {
+  margin: 0 0 var(--space-12);
+  color: var(--green);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+}
+
+a {
+  color: var(--green);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: var(--fs-md);
+}
+
+button {
+  cursor: pointer;
+}
+
+/* header */
+
+.site-header {
+  border-bottom: var(--border-base);
+  background: var(--white);
+}
+
+.site-header-inner {
+  max-width: var(--w-container);
+  margin: 0 auto;
+  padding: var(--space-13) var(--space-16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  gap: var(--space-16);
+}
+
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-14);
+  text-decoration: none;
+  color: inherit;
+}
+
+.site-logo img {
+  width: var(--size-logo);
+  height: var(--size-logo);
+  object-fit: contain;
+  display: block;
+}
+
+.site-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-name {
+  color: var(--green);
+  font-size: var(--fs-brand);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.site-subtitle {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+.site-nav {
+  display: flex;
+  gap: var(--space-14);
+  font-size: var(--fs-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.site-nav a {
+  color: var(--green);
+  font-weight: var(--fw-bold);
+}
+
+.admin-header-bar .site-name,
+.admin-header-bar .site-nav a {
+  color: var(--green);
+}
+
+/* common buttons */
+
+.main-button,
+.sub-button,
+.clinic-main-button,
+.clinic-sub-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-17) var(--space-18);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+}
+
+.main-button,
+.clinic-main-button {
+  background: var(--green);
+  color: var(--white);
+  border: var(--border-green);
+}
+
+.main-button:hover,
+.clinic-main-button:hover {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  text-decoration: none;
+}
+
+.sub-button,
+.clinic-sub-button {
+  background: var(--white);
+  color: var(--green);
+  border: var(--border-green);
+}
+
+.sub-button:hover,
+.clinic-sub-button:hover {
+  background: var(--green-pale);
+  text-decoration: none;
+}
+
+/* patient pages */
+
+.clinic-page {
   min-height: calc(100vh - var(--h-page-offset));
   display: flex;
   justify-content: center;
@@ -784,245 +2591,404 @@ button {
   background: var(--white);
 }
 
-.admin-card {
+.clinic-card {
   width: 100%;
+  max-width: var(--w-card);
+  background: var(--surface);
+  border: var(--border-base);
+  border-radius: var(--radius-xl);
+  padding: var(--space-38) var(--space-42);
+  box-sizing: border-box;
 }
 
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-20);
-  margin-bottom: var(--space-28);
-}
-
-.admin-header h1 {
-  margin-bottom: var(--space-6);
-}
-
-.admin-header p {
-  margin: var(--space-6) 0 0;
-  color: var(--muted);
+.clinic-lead {
+  margin: 0 0 var(--space-28);
+  color: var(--text-soft);
   font-weight: var(--fw-semibold);
 }
 
-.admin-menu {
+.clinic-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-14);
-  margin: var(--space-28) 0 var(--space-34);
+  gap: var(--space-24);
 }
 
-.admin-menu-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-18) var(--space-20);
-  background: var(--white);
-  border: var(--border-base);
-  border-radius: var(--radius-md);
-  color: var(--green);
+.clinic-form label {
+  display: grid;
+  gap: var(--space-10);
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
 }
 
-.admin-menu-item:hover {
-  background: var(--green-pale);
-  text-decoration: none;
+.clinic-form input,
+.clinic-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-15) var(--space-16);
+  border: var(--border-dark-base);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-size: var(--fs-lg);
 }
 
-.admin-search-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: var(--space-14);
-  align-items: end;
+.clinic-form input:focus,
+.clinic-form select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: var(--focus-ring);
+}
+
+.clinic-danger-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-17) var(--space-18);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  background: var(--danger);
+  color: var(--white);
+  border: var(--border-danger);
+}
+
+.clinic-danger-button:hover {
+  background: var(--danger-dark);
+  border-color: var(--danger-dark);
+}
+
+.clinic-note {
+  margin-top: var(--space-24);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-note);
+}
+
+.clinic-error,
+.notice-warning {
+  margin-bottom: var(--space-22);
+  padding: var(--space-13) var(--space-16);
+  background: var(--warning-bg);
+  border-left: var(--border-warning);
+  color: var(--warning-text);
+  font-weight: var(--fw-bold);
+}
+
+.clinic-section {
+  margin-top: var(--space-30);
+}
+
+.info-box,
+.reservation-box {
   background: var(--white);
   border: var(--border-base);
   border-radius: var(--radius-md);
   padding: var(--space-18) var(--space-22);
 }
 
-.admin-search-form label {
+.info-row {
   display: grid;
-  gap: var(--space-8);
+  grid-template-columns: var(--w-info-label) 1fr;
+  gap: var(--space-16);
+  padding: var(--space-14) 0;
+  border-bottom: var(--space-1) solid var(--border-soft);
+  font-size: var(--fs-md-lg);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row span {
   font-weight: var(--fw-bold);
 }
 
-.admin-search-form input {
+.info-row strong {
+  font-weight: var(--fw-semibold);
+  color: var(--text-soft);
+}
+
+.reservation-box h3 {
+  margin: 0 0 var(--space-12);
+  color: var(--green);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+}
+
+.clinic-actions {
+  display: grid;
+  gap: var(--space-12);
+  margin-top: var(--space-18);
+}
+
+.clinic-actions form {
+  margin: 0;
+}
+
+.empty-message {
+  margin: 0 0 var(--space-18);
+  font-weight: var(--fw-bold);
+}
+
+.clinic-logout {
+  display: block;
+  margin-top: var(--space-28);
+  text-align: center;
+  color: var(--green);
+  font-weight: var(--fw-bold);
+  text-decoration: underline;
+}
+
+/* birth select */
+
+.birth-select {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: var(--space-10);
+}
+
+.birth-select select {
   width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-13) var(--space-14);
-  border: var(--border-dark-base);
-  border-radius: var(--radius-sm);
+}
+
+/* reservation table */
+
+.reservation-card {
+  max-width: var(--w-reservation-card);
+}
+
+.reserve-title {
+  margin: var(--space-20) 0 var(--space-16);
+  color: var(--green);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+}
+
+.reserve-note {
+  margin: var(--space-18) 0 var(--space-12);
+  padding: var(--space-12) var(--space-14);
   background: var(--white);
-}
-
-.admin-search-form .clinic-main-button {
-  min-width: var(--w-admin-search-button);
-  padding: var(--space-13) var(--space-18);
-}
-
-.admin-filter-links {
-  display: flex;
-  gap: var(--space-18);
-  margin-top: var(--space-14);
-}
-
-.admin-result-text {
-  margin: var(--space-16) 0 0;
+  border: var(--border-base);
+  color: var(--text-soft);
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
 }
 
-.admin-empty {
-  background: var(--white);
-  border: var(--border-base);
+.reserve-legend {
+  display: flex;
+  gap: var(--space-24);
+  flex-wrap: wrap;
+  margin: var(--space-14) 0 var(--space-18);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+}
+
+.reserve-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.week-nav {
+  display: flex;
+  gap: var(--space-14);
+  margin: var(--space-18) 0;
+}
+
+.week-btn {
+  flex: 1;
+  padding: var(--space-12) var(--space-8);
+  border: var(--border-green);
   border-radius: var(--radius-md);
-  padding: var(--space-22);
+  background: var(--white);
+  color: var(--green);
+  text-align: center;
+  font-size: var(--fs-md);
   font-weight: var(--fw-bold);
 }
 
-.admin-table-wrapper {
-  overflow-x: auto;
+.week-btn.active {
+  background: var(--green);
+  color: var(--white);
+}
+
+.week-btn.disabled {
+  color: var(--gray-disabled-text);
+  border-color: var(--border);
+  background: var(--gray-disabled-bg);
+  pointer-events: none;
+}
+
+.reservation-table-wrapper {
+  width: 100%;
+  overflow-x: hidden;
   background: var(--white);
-  border: var(--border-base);
+  border-radius: var(--radius-md);
+  padding: var(--space-10);
+  box-sizing: border-box;
+}
+
+.reservation-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: var(--white);
+  overflow: hidden;
   border-radius: var(--radius-md);
 }
 
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--white);
-}
-
-.admin-table th,
-.admin-table td {
-  border-bottom: var(--space-1) solid var(--border-admin-table);
-  padding: var(--space-13) var(--space-12);
-  text-align: left;
+.reservation-table th,
+.reservation-table td {
+  border: var(--space-1) solid var(--border-table);
+  text-align: center;
+  vertical-align: middle;
+  padding: var(--space-7) var(--space-1);
   font-size: var(--fs-base);
-  white-space: nowrap;
+  font-weight: var(--fw-medium);
 }
 
-.admin-table th {
+.month-row th {
   background: var(--green-pale);
   color: var(--green);
   font-weight: var(--fw-bold);
 }
 
-.admin-table tr:last-child td {
-  border-bottom: none;
+.date-row th {
+  background: var(--white);
+  color: var(--text-soft);
+  line-height: var(--lh-date);
 }
 
-.admin-action-buttons {
-  display: flex;
-  gap: var(--space-8);
-  align-items: center;
+.date-row th.saturday {
+  color: var(--blue-text);
+  background: var(--blue-pale);
 }
 
-.admin-action-buttons form {
-  margin: 0;
+.date-row th.sunday {
+  color: var(--red-text);
+  background: var(--red-pale);
 }
 
-.admin-action-buttons {
-  display: flex;
-  gap: var(--space-8);
-  align-items: center;
+.time-cell {
+  width: var(--w-time-cell);
+  background: var(--gray-bg);
+  color: var(--muted-2);
 }
 
-.admin-action-buttons form {
-  margin: 0;
-}
-
-.admin-small-button,
-.admin-danger-button {
+.mark-open,
+.mark-full,
+.mark-disabled {
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-  width: var(--w-admin-small-button);
-  height: var(--h-admin-small-button);
-  padding: 0;
-  border-radius: var(--radius-sm);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
+  justify-content: center;
+  width: var(--size-mark);
+  height: var(--size-mark-height);
+  line-height: var(--lh-icon);
   text-decoration: none;
-  box-sizing: border-box;
 }
 
-.admin-small-button {
+.open-cell {
+  background: var(--white);
+}
+
+.unavailable-cell,
+.full-cell {
+  background: var(--gray-bg);
+}
+
+.mark-open {
+  position: relative;
+  width: var(--size-mark-open);
+  height: var(--size-mark-open-height);
+  font-size: 0;
+}
+
+.mark-open::before {
+  content: "";
+  width: var(--size-open-circle);
+  height: var(--size-open-circle);
+  border: var(--border-open-circle) solid var(--green);
+  border-radius: var(--radius-round);
+  display: block;
+}
+
+.mark-open:hover {
+  background: var(--green-pale);
+  border-radius: var(--radius-round);
+  text-decoration: none;
+}
+
+.mark-full {
+  color: var(--gray-mark);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-normal);
+}
+
+.mark-disabled {
+  color: var(--gray-mark-light);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-normal);
+}
+
+/* progress */
+
+.progress {
+  display: flex;
+  align-items: flex-start;
+  max-width: var(--w-card);
+  margin: var(--space-18) auto var(--space-26);
+  padding: var(--space-16) var(--space-14);
+  /*background: var(--surface);
+  border: var(--border-base);
+  border-radius: var(--radius-xl);*/
+}
+
+.progress-step {
+  flex: 0 0 auto;
+  text-align: center;
+  color: var(--progress-muted);
+  font-weight: var(--fw-bold);
+}
+
+.progress-step .circle {
+  width: var(--size-progress-circle);
+  height: var(--size-progress-circle);
+  margin: 0 auto var(--space-7);
+  border-radius: var(--radius-round);
+  background: var(--progress-bg);
+  color: var(--progress-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+}
+
+.progress-step .label {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-progress);
+  white-space: nowrap;
+}
+
+.progress-step.active {
+  color: var(--green);
+}
+
+.progress-step.active .circle {
   background: var(--green);
   color: var(--white);
-  border: var(--border-green);
 }
 
-.admin-small-button:hover {
-  background: var(--green-dark);
-  border-color: var(--green-dark);
-  text-decoration: none;
+.progress .line {
+  flex: 1;
+  height: var(--size-progress-line);
+  background: var(--progress-bg);
+  margin: var(--space-16) var(--space-6) 0;
+  border-radius: var(--radius-pill);
 }
 
-.admin-danger-button {
-  background: var(--danger);
-  color: var(--white);
-  border: none;
-}
-
-.admin-danger-button:hover {
-  background: var(--danger-dark);
-}
-
-.admin-login-card {
-  max-width: var(--w-login-card);
-}
-
-.admin-login-card h1 {
-  text-align: center;
-  margin-bottom: var(--space-12);
-}
-
-.admin-login-card .clinic-lead {
-  text-align: center;
-  margin-bottom: var(--space-30);
-}
-
-.admin-login-card .clinic-main-button {
-  margin-top: var(--space-10);
-}
-
-.admin-form-card {
-  display: grid;
-  gap: var(--space-20);
-  background: var(--white);
-  border: var(--border-base);
-  border-radius: var(--radius-md);
-  padding: var(--space-22);
-}
-
-.admin-form-card label {
-  display: grid;
-  gap: var(--space-8);
-  font-weight: var(--fw-bold);
-}
-
-.admin-form-card input,
-.admin-form-card select {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-13) var(--space-14);
-  border: var(--border-dark-base);
-  border-radius: var(--radius-sm);
-  background: var(--white);
-}
-
-.admin-form-card input:focus,
-.admin-form-card select:focus {
-  outline: none;
-  border-color: var(--green);
-  box-shadow: var(--focus-ring);
-}
-
-.admin-add-button {
-  width: auto;
-  min-width: var(--w-admin-add-button);
+.progress .line.active {
+  background: var(--green);
 }
 
 /* utility */
@@ -1310,31 +3276,124 @@ button {
   font-weight: var(--fw-bold);
 }
 
-/* =========================
-   管理画面ヘッダー
-========================= */
+/* =========================================================
+   管理画面：専用iPad横向き版
+   基準画面：1024px × 768px
+   管理画面は横向き固定運用を想定
+========================================================= */
+
+:root {
+  --admin-width: 1024px;
+  --admin-header-height: 64px;
+  --admin-sidebar-width: 176px;
+
+  --admin-bg: #f3f5f4;
+  --admin-white: #ffffff;
+  --admin-panel: #ffffff;
+  --admin-border: #d8dfdb;
+  --admin-border-dark: #c7d0cb;
+
+  --admin-green: #128447;
+  --admin-green-dark: #0d6d3a;
+  --admin-green-soft: #e8f4ed;
+  --admin-green-pale: #f3faf6;
+
+  --admin-text: #252a27;
+  --admin-muted: #68736d;
+  --admin-light: #929b96;
+
+  --admin-warning: #986800;
+  --admin-warning-bg: #fff8e6;
+
+  --admin-danger: #c23838;
+  --admin-danger-dark: #a72d2d;
+  --admin-danger-bg: #fff1f1;
+
+  --admin-radius: 6px;
+  --admin-touch: 44px;
+}
+
+/* ---------- 画面全体 ---------- */
+
+body {
+  margin: 0;
+}
+
+.admin-header-bar,
+.admin-layout,
+.admin-sidebar,
+.admin-main,
+.admin-page,
+.admin-card,
+.admin-panel,
+.admin-calendar-shell,
+.admin-list-table-shell,
+.admin-table-wrapper {
+  box-sizing: border-box;
+}
 
 .admin-header-bar {
-  background: #ffffff;
-  border-bottom: 1px solid #dfe5e8;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  min-width: var(--admin-width);
+  height: var(--admin-header-height);
+  background: var(--admin-white);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-header-bar .site-header-inner {
+  width: var(--admin-width);
+  max-width: var(--admin-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-header-bar .site-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-header-bar .site-logo img {
+  width: 38px;
+  height: 38px;
+}
+
+.admin-header-bar .site-name {
+  color: var(--admin-green);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-header-bar .site-subtitle {
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .admin-header-actions {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 18px;
-  margin-left: auto;
+  gap: 10px;
 }
 
 .admin-current-datetime {
-  color: #52616a;
-  font-size: 14px;
+  color: var(--admin-muted);
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* 医師選択 */
+/* ---------- 医師切り替え ---------- */
 
 .doctor-selector {
   position: relative;
@@ -1349,467 +3408,95 @@ button {
 }
 
 .doctor-selector-button {
-  display: flex;
+  min-width: 132px;
+  min-height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  min-width: 150px;
-  min-height: 46px;
-  padding: 0 16px;
-  border: 1px solid #cbd5da;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #263238;
-  font-size: 15px;
+  gap: 8px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  border-radius: var(--admin-radius);
+  font-size: 13px;
   font-weight: 700;
-  text-decoration: none;
   cursor: pointer;
-  box-sizing: border-box;
 }
 
 .doctor-selector-button:hover {
-  background: #f5f8f9;
+  color: var(--admin-green);
+  background: var(--admin-green-pale);
+  border-color: var(--admin-green);
 }
 
 .doctor-selector-arrow {
-  color: #68777f;
-  font-size: 11px;
+  color: var(--admin-muted);
+  font-size: 10px;
 }
 
 .doctor-selector-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
-  z-index: 1000;
-  width: 220px;
-  padding: 8px;
-  border: 1px solid #d7dfe3;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 10px 30px rgba(38, 50, 56, 0.15);
+  z-index: 1100;
+  width: 210px;
+  padding: 6px;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(29, 45, 36, 0.14);
 }
 
 .doctor-selector-item {
+  min-height: var(--admin-touch);
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 46px;
-  padding: 0 12px;
-  border-radius: 8px;
-  color: #263238;
-  font-size: 15px;
+  color: var(--admin-text);
+  border-radius: 5px;
+  font-size: 13px;
   font-weight: 600;
-  text-decoration: none;
 }
 
-.doctor-selector-item:hover {
-  background: #f1f6f8;
-}
-
+.doctor-selector-item:hover,
 .doctor-selector-item.is-selected {
-  background: #e9f3f7;
-  color: #2b6f8a;
+  color: var(--admin-green);
+  background: var(--admin-green-soft);
 }
 
 .doctor-selector-check {
-  color: #2b6f8a;
-  font-weight: 800;
+  color: var(--admin-green);
 }
 
 .header-logout-link {
-  color: #52616a;
-  font-size: 14px;
+  min-height: 40px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--admin-muted);
+  font-size: 12px;
   font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
 }
 
 .header-logout-link:hover {
-  text-decoration: underline;
+  color: var(--admin-green);
 }
 
-/* 患者用ヘッダー */
+/* ---------- 1024px本体 ---------- */
 
-.patient-site-nav {
-  margin-left: auto;
-}
-
-/* iPad・狭い画面 */
-
-@media (max-width: 900px) {
-  .admin-header-actions {
-    gap: 10px;
-  }
-
-  .admin-current-datetime {
-    font-size: 13px;
-  }
-
-  .doctor-selector-button {
-    min-width: 130px;
-  }
-}
-
-@media (max-width: 700px) {
-  .site-header-inner {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .admin-header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .admin-current-datetime {
-    display: none;
-  }
-}
-
-/* =========================
-   管理ダッシュボード
-========================= */
-
-.admin-dashboard-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.admin-dashboard-heading h2 {
-  margin: 0;
-}
-
-.admin-update-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.admin-updated-at {
-  color: #66736c;
-  font-size: 14px;
-}
-
-.admin-updated-at strong {
-  margin-left: 6px;
-  color: #26332c;
-}
-
-.admin-refresh-button {
-  min-height: 42px;
-  padding: 0 18px;
-  border: 1px solid #008102;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #008102;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.admin-refresh-button:hover {
-  background: #f0f8f0;
-}
-
-.admin-reservation-count {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-bottom: 16px;
-  font-size: 15px;
-}
-
-.admin-reservation-count strong {
-  font-size: 20px;
-}
-
-.today-reservation-table {
-  width: 100%;
-  table-layout: fixed;
-}
-
-.today-reservation-table th,
-.today-reservation-table td {
-  padding: 0;
-}
-
-.today-time-column,
-.today-reservation-table .time-cell {
-  width: 120px;
-}
-
-.today-time-link,
-.today-slot-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 64px;
-  padding: 12px 16px;
-  box-sizing: border-box;
-  color: inherit;
-  text-decoration: none;
-}
-
-.today-time-link {
-  justify-content: center;
-  font-weight: 700;
-}
-
-.today-slot-link:hover,
-.today-time-link:hover {
-  background: #f3f8f3;
-}
-
-.today-patient-name {
-  font-weight: 600;
-}
-
-.today-empty-label {
-  color: #6c776f;
-}
-
-.today-cell-arrow {
-  color: #89938c;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.reserved-patient-cell {
-  background: #ffffff;
-}
-
-.empty-patient-cell {
-  background: #fafcfb;
-}
-
-.unavailable-patient-cell {
-  background: #f1f3f2;
-  color: #9ca39f;
-  text-align: center;
-}
-
-.admin-empty-message {
-  padding: 32px 16px !important;
-  color: #69736d;
-  text-align: center;
-}
-
-
-.reservation-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.reservation-calendar-navigation {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.reservation-status-guide {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: #555;
-}
-
-.reservation-calendar-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-}
-
-.reservation-calendar {
-  width: 100%;
-  min-width: 850px;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background: #ffffff;
-}
-
-.reservation-calendar th,
-.reservation-calendar td {
-  border-right: 1px solid #dddddd;
-  border-bottom: 1px solid #dddddd;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.reservation-calendar th:last-child,
-.reservation-calendar td:last-child {
-  border-right: none;
-}
-
-.reservation-calendar tbody tr:last-child th,
-.reservation-calendar tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.reservation-calendar thead th {
-  padding: 12px 6px;
-  background: #f5f7f5;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.reservation-time-heading,
-.reservation-time-cell {
-  width: 125px;
-  min-width: 125px;
-}
-
-.reservation-time-cell {
-  padding: 12px 8px;
-  background: #fafafa;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.reservation-slot-cell {
-  height: 70px;
-  padding: 0;
-}
-
-.reservation-slot-link {
-  display: flex;
-  width: 100%;
-  height: 70px;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 2px;
-  color: #008102;
-  text-decoration: none;
-  font-weight: 700;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-}
-
-.reservation-slot-link:hover {
-  background: #edf8ed;
-}
-
-.reservation-slot-symbol {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.reservation-slot-link small {
-  font-size: 10px;
-  font-weight: 500;
-}
-
-.reservation-slot-few .reservation-slot-link {
-  color: #9a6900;
-}
-
-.reservation-slot-few .reservation-slot-link:hover {
-  background: #fff8df;
-}
-
-.reservation-slot-disabled {
-  display: flex;
-  width: 100%;
-  height: 70px;
-  align-items: center;
-  justify-content: center;
-  color: #999999;
-  background: #f7f7f7;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.reservation-slot-full .reservation-slot-disabled {
-  color: #666666;
-  background: #eeeeee;
-}
-
-.reservation-calendar .is-sunday {
-  color: #b83434;
-}
-
-.reservation-calendar .is-saturday {
-  color: #315da8;
-}
-
-@media (max-width: 700px) {
-  .reservation-calendar-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .reservation-calendar-navigation {
-    width: 100%;
-  }
-
-  .reservation-calendar-navigation .clinic-sub-button {
-    flex: 1;
-    text-align: center;
-  }
-
-  .reservation-status-guide {
-    font-size: 12px;
-  }
-}
-
-/* =========================
-   管理画面レイアウト
-========================= */
-
-:root {
-  --admin-green: #087f3f;
-  --admin-green-dark: #066b35;
-  --admin-bg: #f4f6f5;
-  --admin-white: #ffffff;
-  --admin-border: #dfe5e1;
-  --admin-text: #2f3431;
-  --admin-subtext: #778079;
-  --admin-sidebar-width: 220px;
-  --admin-header-height: 72px;
-}
-
-body {
-  margin: 0;
-  color: var(--admin-text);
+.admin-layout {
+  width: var(--admin-width);
+  min-height: calc(100vh - var(--admin-header-height));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
   background: var(--admin-bg);
 }
 
-.admin-header-bar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: var(--admin-header-height);
-  background: var(--admin-white);
-  border-bottom: 1px solid var(--admin-border);
-}
-
-.admin-header-bar .site-header-inner {
-  width: 100%;
-  max-width: none;
-  height: 100%;
-  padding: 0 24px;
-  box-sizing: border-box;
-}
-
-.admin-layout {
-  display: grid;
-  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
-  min-height: calc(100vh - var(--admin-header-height));
-}
-
 .admin-sidebar {
+  min-width: 0;
   background: var(--admin-white);
   border-right: 1px solid var(--admin-border);
 }
@@ -1817,51 +3504,52 @@ body {
 .admin-sidebar-nav {
   position: sticky;
   top: var(--admin-header-height);
-  padding: 20px 12px;
+  padding: 14px 9px 20px;
 }
 
 .admin-sidebar-group {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+}
+
+.admin-sidebar-group:last-child {
+  margin-bottom: 0;
 }
 
 .admin-sidebar-label {
-  margin: 0 12px 8px;
-  color: var(--admin-subtext);
-  font-size: 12px;
-  font-weight: 500;
+  margin: 0 10px 6px;
+  color: var(--admin-light);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 .admin-sidebar-link {
+  min-height: 46px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
-  gap: 11px;
-  min-height: 44px;
-  padding: 0 12px;
+  gap: 9px;
   color: var(--admin-text);
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 4px;
-  box-sizing: border-box;
+  border-radius: var(--admin-radius);
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.admin-sidebar-link:hover {
-  background: #f0f5f2;
-  color: var(--admin-green);
-}
-
+.admin-sidebar-link:hover,
 .admin-sidebar-link.is-active {
   color: var(--admin-green);
-  font-weight: 600;
-  background: #eaf5ef;
+  background: var(--admin-green-soft);
+  text-decoration: none;
 }
 
 .admin-sidebar-icon {
+  flex: 0 0 20px;
+  width: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  color: var(--admin-subtext);
-  font-size: 17px;
+  color: var(--admin-muted);
+  font-size: 16px;
 }
 
 .admin-sidebar-link:hover .admin-sidebar-icon,
@@ -1871,207 +3559,219 @@ body {
 
 .admin-main {
   min-width: 0;
-  padding: 28px 32px 48px;
+  width: 100%;
+  padding: 16px;
   background: var(--admin-bg);
 }
 
+.admin-page {
+  min-height: auto;
+  padding: 0;
+  display: block;
+  background: transparent;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+/* ---------- ページ見出し ---------- */
+
 .admin-page-header {
+  min-height: 48px;
+  margin: 0 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 14px;
+}
+
+.admin-page-header > div {
+  min-width: 0;
+}
+
+.admin-page-eyebrow {
+  margin: 0 0 1px;
+  color: var(--admin-muted);
+  font-size: 10px;
 }
 
 .admin-page-header h1 {
   margin: 0;
+  color: var(--admin-text);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
-.admin-panel {
-  padding: 24px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 4px;
-}
-
-.admin-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.admin-current-datetime {
-  color: var(--admin-subtext);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.doctor-selector {
-  position: relative;
-}
-
-.doctor-selector summary {
-  list-style: none;
-}
-
-.doctor-selector summary::-webkit-details-marker {
-  display: none;
-}
-
-.doctor-selector-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 38px;
-  padding: 0 14px;
-  color: var(--admin-text);
-  font-size: 14px;
-  text-decoration: none;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.doctor-selector-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 200;
-  min-width: 190px;
-  padding: 6px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 4px;
-  box-shadow: 0 6px 18px rgb(0 0 0 / 8%);
-}
-
-.doctor-selector-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 40px;
-  padding: 0 10px;
-  color: var(--admin-text);
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 3px;
-}
-
-.doctor-selector-item:hover {
-  background: #f0f5f2;
-}
-
-.doctor-selector-item.is-selected {
-  color: var(--admin-green);
-  font-weight: 600;
-}
-
-.header-logout-link {
-  color: var(--admin-subtext);
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.header-logout-link:hover {
-  color: var(--admin-green);
-  text-decoration: underline;
-}
-
-.admin-page-eyebrow {
-  margin: 0 0 4px;
-  color: var(--admin-subtext);
+.admin-page-description {
+  margin: 3px 0 0;
+  color: var(--admin-muted);
   font-size: 12px;
 }
 
-.admin-primary-button {
+.admin-page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ---------- パネル ---------- */
+
+.admin-panel {
+  width: 100%;
+  padding: 14px;
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-panel + .admin-panel {
+  margin-top: 12px;
+}
+
+.admin-panel-title {
+  margin: 0 0 10px;
+  color: var(--admin-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.admin-panel-description {
+  margin: -4px 0 10px;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+/* ---------- ボタン ---------- */
+
+.admin-primary-button,
+.admin-secondary-button,
+.admin-danger-outline-button,
+.admin-refresh-button,
+.admin-week-button,
+.admin-row-button {
+  box-sizing: border-box;
+  min-height: var(--admin-touch);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 0 18px;
+  border-radius: var(--admin-radius);
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-primary-button {
+  padding: 0 16px;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
   background: var(--admin-green);
   border: 1px solid var(--admin-green);
-  border-radius: 4px;
+  font-size: 13px;
 }
 
 .admin-primary-button:hover {
+  color: #ffffff;
   background: var(--admin-green-dark);
+  border-color: var(--admin-green-dark);
 }
 
+.admin-secondary-button {
+  padding: 0 16px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 13px;
+}
+
+.admin-secondary-button:hover {
+  background: var(--admin-green-soft);
+}
+
+.admin-danger-outline-button {
+  padding: 0 16px;
+  color: var(--admin-danger);
+  background: var(--admin-white);
+  border: 1px solid #d8a3a3;
+  font-size: 13px;
+}
+
+.admin-danger-outline-button:hover {
+  background: var(--admin-danger-bg);
+}
+
+.admin-refresh-button {
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 12px;
+}
+
+.admin-refresh-button:hover {
+  background: var(--admin-green-soft);
+}
+
+/* ---------- ダッシュボード ---------- */
+
 .admin-dashboard-heading {
+  margin-bottom: 12px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 16px;
 }
 
 .admin-dashboard-heading h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  color: var(--admin-text);
+  font-size: 16px;
 }
 
 .admin-dashboard-doctor {
-  margin: 7px 0 0;
-  color: var(--admin-subtext);
-  font-size: 13px;
+  margin: 4px 0 0;
+  color: var(--admin-muted);
+  font-size: 11px;
 }
 
 .admin-update-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .admin-updated-at {
-  color: var(--admin-subtext);
-  font-size: 12px;
+  color: var(--admin-muted);
+  font-size: 10px;
   white-space: nowrap;
 }
 
 .admin-updated-at strong {
-  margin-left: 4px;
+  margin-left: 3px;
   color: var(--admin-text);
-  font-weight: 500;
-}
-
-.admin-refresh-button {
-  min-height: 36px;
-  padding: 0 14px;
-  color: var(--admin-green);
-  font-size: 13px;
-  font-weight: 600;
-  background: #ffffff;
-  border: 1px solid var(--admin-green);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.admin-refresh-button:hover {
-  background: #edf7f1;
 }
 
 .admin-summary-row {
-  display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  background: var(--admin-white);
   border: 1px solid var(--admin-border);
-  border-radius: 4px;
+  border-radius: var(--admin-radius);
 }
 
 .admin-summary-item {
+  min-height: 64px;
+  padding: 10px 13px;
   display: flex;
-  align-items: baseline;
-  gap: 5px;
-  min-width: 180px;
-  padding: 18px 20px;
+  align-items: center;
+  gap: 6px;
   border-right: 1px solid var(--admin-border);
 }
 
@@ -2081,16 +3781,759 @@ body {
 
 .admin-summary-label {
   margin-right: auto;
-  color: var(--admin-subtext);
-  font-size: 13px;
+  color: var(--admin-muted);
+  font-size: 11px;
 }
 
 .admin-summary-value {
-  font-size: 24px;
-  font-weight: 600;
+  color: var(--admin-text);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .admin-summary-unit {
-  color: var(--admin-subtext);
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+/* ---------- 本日の予約表 ---------- */
+
+.admin-table-wrapper,
+.admin-list-table-shell {
+  width: 100%;
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.today-reservation-table,
+.admin-table,
+.admin-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--admin-white);
+}
+
+.today-reservation-table {
+  table-layout: fixed;
+}
+
+.today-reservation-table th,
+.today-reservation-table td,
+.admin-table th,
+.admin-table td {
+  border-right: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.today-reservation-table th:last-child,
+.today-reservation-table td:last-child,
+.admin-table th:last-child,
+.admin-table td:last-child {
+  border-right: 0;
+}
+
+.today-reservation-table tr:last-child th,
+.today-reservation-table tr:last-child td,
+.admin-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.today-reservation-table th,
+.admin-table th {
+  padding: 8px 10px;
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.today-reservation-table td,
+.admin-table td {
+  padding: 0;
+  color: var(--admin-text);
   font-size: 12px;
+}
+
+.today-time-column,
+.today-reservation-table .time-cell {
+  width: 104px;
+}
+
+.today-time-link,
+.today-slot-link {
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 11px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--admin-text);
+}
+
+.today-time-link {
+  justify-content: center;
+  background: var(--admin-green-pale);
+  font-weight: 700;
+  text-align: center;
+}
+
+.today-slot-link {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.today-slot-link:hover,
+.today-time-link:hover {
+  background: var(--admin-green-soft);
+}
+
+.today-patient-name {
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.today-patient-number {
+  display: block;
+  margin-top: 1px;
+  color: var(--admin-muted);
+  font-size: 9px;
+}
+
+.today-empty-label {
+  color: var(--admin-green);
+  font-weight: 700;
+}
+
+.today-cell-arrow {
+  flex: 0 0 auto;
+  color: var(--admin-light);
+  font-size: 18px;
+}
+
+.empty-patient-cell {
+  background: #fbfcfb;
+}
+
+.unavailable-patient-cell {
+  padding: 12px 6px !important;
+  color: var(--admin-light) !important;
+  background: #f0f2f1;
+  text-align: center;
+}
+
+.admin-empty-message {
+  padding: 24px 12px !important;
+  color: var(--admin-muted);
+  text-align: center;
+}
+
+/* ---------- 週間予約表 ---------- */
+
+.admin-schedule-toolbar {
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-schedule-period {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.admin-schedule-period-label {
+  color: var(--admin-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.admin-schedule-period strong {
+  color: var(--admin-text);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.admin-week-navigation {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-week-button {
+  min-width: 92px;
+  padding: 0 10px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-week-button:hover {
+  background: #edf2ef;
+}
+
+.admin-week-button.is-primary {
+  color: #ffffff;
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+}
+
+.admin-week-button.is-primary:hover {
+  background: var(--admin-green-dark);
+}
+
+.admin-week-button.is-disabled {
+  color: #a4aba7;
+  background: #f2f4f3;
+  pointer-events: none;
+}
+
+.admin-status-guide {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px 15px;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-status-guide span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-dot.is-open {
+  color: var(--admin-green);
+}
+
+.status-dot.is-few {
+  color: var(--admin-warning);
+}
+
+.status-dot.is-full,
+.status-dot.is-closed {
+  color: #7c8580;
+}
+
+.admin-calendar-shell {
+  width: 100%;
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-calendar-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: var(--admin-white);
+}
+
+.admin-calendar-table th,
+.admin-calendar-table td {
+  border-right: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-calendar-table th:last-child,
+.admin-calendar-table td:last-child {
+  border-right: 0;
+}
+
+.admin-calendar-table tbody tr:last-child th,
+.admin-calendar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-calendar-time-head,
+.admin-calendar-time-cell {
+  width: 78px;
+}
+
+.admin-calendar-time-head {
+  height: 56px;
+  color: var(--admin-muted);
+  background: #edf1ef;
+  font-size: 11px;
+}
+
+.admin-calendar-date-head {
+  height: 56px;
+  padding: 4px 1px;
+  color: var(--admin-text);
+  background: #f7f9f8;
+}
+
+.admin-calendar-date-head.is-today {
+  background: var(--admin-green-soft);
+  box-shadow: inset 0 3px 0 var(--admin-green);
+}
+
+.admin-calendar-date-head.is-saturday {
+  color: #315da8;
+}
+
+.admin-calendar-date-head.is-sunday {
+  color: var(--admin-danger);
+}
+
+.admin-calendar-date {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.admin-calendar-weekday {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+}
+
+.admin-today-badge {
+  display: inline-block;
+  margin-top: 1px;
+  padding: 1px 4px;
+  color: #ffffff;
+  background: var(--admin-green);
+  border-radius: 999px;
+  font-size: 8px;
+}
+
+.admin-calendar-time-cell {
+  height: 56px;
+  padding: 3px;
+  color: var(--admin-text);
+  background: #f7f9f8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-calendar-slot {
+  height: 56px;
+  padding: 0;
+}
+
+.admin-calendar-slot-link,
+.admin-calendar-slot-disabled {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+}
+
+.admin-calendar-slot-link {
+  color: inherit;
+}
+
+.admin-calendar-slot-link:hover {
+  filter: brightness(0.97);
+}
+
+.admin-calendar-slot.is-open {
+  color: var(--admin-green);
+  background: var(--admin-white);
+}
+
+.admin-calendar-slot.is-few {
+  color: var(--admin-warning);
+  background: var(--admin-warning-bg);
+}
+
+.admin-calendar-slot.is-full {
+  color: #626a66;
+  background: #edf0ee;
+}
+
+.admin-calendar-slot.is-closed {
+  color: #a0a7a3;
+  background: #f4f5f4;
+}
+
+.admin-calendar-status {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-calendar-count {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.admin-calendar-slot-disabled {
+  color: #a0a7a3;
+  font-size: 14px;
+}
+
+.admin-schedule-note {
+  margin: 7px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+/* ---------- 検索フォーム ---------- */
+
+.admin-search-form {
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
+  gap: 9px;
+  align-items: end;
+  background: transparent;
+  border: 0;
+}
+
+.admin-search-form label,
+.admin-form-card label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: var(--admin-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-search-form input,
+.admin-search-form select,
+.admin-form-card input,
+.admin-form-card select,
+.admin-form-card textarea {
+  width: 100%;
+  min-height: var(--admin-touch);
+  padding: 8px 10px;
+  box-sizing: border-box;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border-dark);
+  border-radius: var(--admin-radius);
+  font-size: 13px;
+}
+
+.admin-form-card textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.admin-search-form input:focus,
+.admin-search-form select:focus,
+.admin-form-card input:focus,
+.admin-form-card select:focus,
+.admin-form-card textarea:focus {
+  outline: none;
+  border-color: var(--admin-green);
+  box-shadow: 0 0 0 3px rgba(18, 132, 71, 0.12);
+}
+
+.admin-filter-links {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.admin-result-text {
+  margin: 8px 0 0;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+/* ---------- 予約一覧 ---------- */
+
+.admin-section-title-row {
+  margin-bottom: 8px;
+}
+
+.admin-section-title-row h2 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 16px;
+}
+
+.admin-section-title-row p {
+  margin: 2px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-list-table {
+  table-layout: fixed;
+}
+
+.admin-list-table th,
+.admin-list-table td {
+  padding: 8px 7px;
+  color: var(--admin-text);
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 11px;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-table th {
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-weight: 700;
+}
+
+.admin-list-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-list-table tbody tr:hover td {
+  background: #fbfdfc;
+}
+
+.admin-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-row-actions form {
+  margin: 0;
+}
+
+.admin-row-button {
+  min-height: 38px;
+  padding: 0 8px;
+  color: var(--admin-green);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-green);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.admin-row-button:hover {
+  background: var(--admin-green-soft);
+}
+
+.admin-row-button.is-danger {
+  color: var(--admin-danger);
+  border-color: #d8a3a3;
+}
+
+.admin-row-button.is-danger:hover {
+  background: var(--admin-danger-bg);
+}
+
+.admin-empty-state,
+.admin-empty {
+  padding: 24px 12px;
+  color: var(--admin-muted);
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------- 詳細・確認 ---------- */
+
+.admin-detail-box,
+.admin-confirm-box {
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-detail-row,
+.admin-confirm-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-detail-row:last-child,
+.admin-confirm-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-detail-label,
+.admin-confirm-label {
+  padding: 11px 12px;
+  color: var(--admin-muted);
+  background: #eef2f0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-detail-value,
+.admin-confirm-value {
+  min-width: 0;
+  padding: 11px 13px;
+  color: var(--admin-text);
+  background: var(--admin-white);
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.admin-detail-actions,
+.admin-confirm-actions,
+.admin-form-actions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-detail-actions form,
+.admin-confirm-actions form,
+.admin-form-actions form {
+  margin: 0;
+}
+
+/* ---------- 入力フォーム ---------- */
+
+.admin-form-card {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-form-help {
+  margin: -1px 0 0;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-form-error,
+.admin-error {
+  margin: 0 0 10px;
+  padding: 9px 11px;
+  color: #8d2020;
+  background: var(--admin-danger-bg);
+  border-left: 4px solid var(--admin-danger);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-success {
+  margin: 0 0 10px;
+  padding: 9px 11px;
+  color: var(--admin-green-dark);
+  background: var(--admin-green-soft);
+  border-left: 4px solid var(--admin-green);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ---------- 管理ログイン ---------- */
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 48px auto 0;
+  padding: 28px;
+  box-sizing: border-box;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+}
+
+.admin-login-card h1 {
+  margin: 0 0 8px;
+  color: var(--admin-text);
+  font-size: 23px;
+  text-align: center;
+}
+
+.admin-login-card .clinic-lead {
+  margin-bottom: 22px;
+  color: var(--admin-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.admin-login-card .clinic-main-button {
+  min-height: 48px;
+  margin-top: 4px;
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+}
+
+/* ---------- 完了画面 ---------- */
+
+.complete-card {
+  max-width: 640px;
+  margin: 24px auto 0;
+  padding: 26px;
+  box-sizing: border-box;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.complete-card h1 {
+  margin-bottom: 12px;
+  font-size: 23px;
+}
+
+.complete-card .clinic-lead {
+  margin-bottom: 20px;
+  color: var(--admin-muted);
+}
+
+/* ---------- PCで確認するときもiPad幅を維持 ---------- */
+
+@media (min-width: 1025px) {
+  body {
+    background: #e7ebe9;
+  }
+
+  .admin-header-bar {
+    background: #e7ebe9;
+  }
+
+  .admin-header-bar .site-header-inner,
+  .admin-layout {
+    box-shadow: 0 0 0 1px rgba(32, 45, 38, 0.04);
+  }
+
+  .admin-header-bar .site-header-inner {
+    background: var(--admin-white);
+  }
 }

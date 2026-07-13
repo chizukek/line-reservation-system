@@ -1,16 +1,51 @@
-<%- include("partials/header", { title }) %>
+<%- include("partials/header", {
+  title
+}) %>
 
-<div class="admin-page">
-  <div class="admin-card complete-card">
-    <h1><%= title %></h1>
+<div class="admin-page admin-complete-page">
+  <div class="admin-card">
 
-    <p class="clinic-lead">
-      <%= message %>
-    </p>
+    <section class="admin-panel admin-complete-panel">
 
-    <a class="clinic-main-button" href="<%= buttonLink %>">
-      <%= buttonText %>
-    </a>
+      <div
+        class="admin-complete-icon"
+        aria-hidden="true"
+      >
+        ✓
+      </div>
+
+      <p class="admin-page-eyebrow">
+        処理完了
+      </p>
+
+      <h1>
+        <%= title %>
+      </h1>
+
+      <p class="admin-complete-message">
+        <%= message %>
+      </p>
+
+      <div class="admin-complete-actions">
+
+        <a
+          class="admin-primary-button"
+          href="<%= buttonLink %>"
+        >
+          <%= buttonText %>
+        </a>
+
+        <a
+          class="admin-week-button"
+          href="/admin"
+        >
+          本日の予約へ
+        </a>
+
+      </div>
+
+    </section>
+
   </div>
 </div>
 

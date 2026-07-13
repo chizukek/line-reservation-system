@@ -1,5 +1,9 @@
 <%- include("partials/header", { title: "患者登録" }) %>
 
+<%
+const currentYear = new Date().getFullYear();
+%>
+
 <div class="admin-page">
   <div class="admin-card">
 
@@ -41,14 +45,36 @@
 
       <label>
         <span>生年月日</span>
-        <input
-          type="date"
-          name="birthDate"
-          required
-        >
+
+        <div class="birth-select">
+
+          <select name="birthYear" required>
+            <% for (let y = currentYear; y >= 1900; y--) { %>
+              <option
+  value="<%= y %>"
+  <%= y === 1990 ? "selected" : "" %>>
+  <%= y %>年
+</option>
+            <% } %>
+          </select>
+
+          <select name="birthMonth" required>
+            <% for (let m = 1; m <= 12; m++) { %>
+              <option value="<%= m %>"><%= m %>月</option>
+            <% } %>
+          </select>
+
+          <select name="birthDay" required>
+            <% for (let d = 1; d <= 31; d++) { %>
+              <option value="<%= d %>"><%= d %>日</option>
+            <% } %>
+          </select>
+
+        </div>
       </label>
 
       <div class="clinic-actions">
+
         <button class="clinic-main-button" type="submit">
           患者を登録する
         </button>
@@ -56,6 +82,7 @@
         <a class="clinic-sub-button" href="/admin/patients">
           戻る
         </a>
+
       </div>
 
     </form>
