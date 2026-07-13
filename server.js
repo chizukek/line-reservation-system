@@ -172,6 +172,36 @@ function isValidDateText(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(String(date || ""));
 }
 
+function isPastReservationSlot(date, slot) {
+  const slotStart = String(slot).split("〜")[0].trim();
+  const [hour, minute] = slotStart.split(":").map(Number);
+
+  if (
+    !isValidDateText(date) ||
+    !Number.isInteger(hour) ||
+    !Number.isInteger(minute)
+  ) {
+    return true;
+  }
+
+  const nowText = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date());
+
+  const slotText =
+    `${date} ` +
+    `${String(hour).padStart(2, "0")}:` +
+    `${String(minute).padStart(2, "0")}`;
+
+  return slotText <= nowText;
+}
+
 function isValidDoctorId(doctorId) {
   return Number.isInteger(doctorId) && doctorId > 0;
 }
@@ -589,6 +619,7 @@ app.get("/reserve", async (req, res) => {
       getSlotsForDate: config.getSlotsForDate,
       getCapacityForSlot: config.getCapacityForSlot,
       getSlotLabel: config.getSlotLabel,
+      isPastReservationSlot,
       isChangeMode: Boolean(req.session.changeReservationId),
     });
   } catch (error) {
@@ -1155,6 +1186,7 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
     getSlotsForDate: config.getSlotsForDate,
     getCapacityForSlot: config.getCapacityForSlot,
     getSlotLabel: config.getSlotLabel,
+    isPastReservationSlot,
   });
 });
 
@@ -1603,6 +1635,10 @@ app.get("/admin/slot", requireAdminLogin, async (req, res) => {
   const doctorId = Number(req.session.doctorId);
   const date = String(req.query.date || "");
   const slot = String(req.query.slot || "");
+
+  if (isPastReservationSlot(date, slot)) {
+    return res.redirect("/admin/reservations");
+  }
 
   if (!isValidDoctorId(doctorId)) {
     return res.redirect("/admin/doctors");

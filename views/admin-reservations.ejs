@@ -146,7 +146,9 @@
                     const reservationCount = slotReservations.length;
                     const remaining = Math.max(0, capacity - reservationCount);
 
-                    const isPast = date < today;
+                    const isPast =
+  date < today ||
+  isPastReservationSlot(date, slot);
                     const isOutsidePeriod = date > maxReservableText;
                     const isFull =
                       capacity > 0 &&
@@ -179,7 +181,11 @@
                   %>
 
                   <td class="admin-calendar-slot is-<%= status %>">
-                    <% if (isAvailableTime && !isOutsidePeriod) { %>
+                    <% if (
+     isAvailableTime &&
+     !isPast &&
+     !isOutsidePeriod
+) { %>
                       <a
                         class="admin-calendar-slot-link"
                         href="<%= slotUrl %>"
