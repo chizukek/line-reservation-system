@@ -1,6 +1,9 @@
-
 <%- include("partials/header", {
   title: isChangeMode ? "予約日時を変更" : "予約日時を選択"
+}) %>
+
+<%- include("partials/progress", {
+  step: 1
 }) %>
 
 <div class="clinic-page">
@@ -22,38 +25,55 @@
     <section class="clinic-section">
 
       <div class="reservation-calendar-header">
-        <div>
-          <strong>
-            <%= dates[0].label %> 〜 <%= dates[dates.length - 1].label %>
-          </strong>
-        </div>
 
-        <div class="reservation-calendar-navigation">
+  <div class="reservation-calendar-navigation">
 
-          <% if (week > 0) { %>
-            <a
-              class="clinic-sub-button"
-              href="/reserve?doctorId=<%= doctorId %>&week=<%= week - 1 %>"
-            >
-              前の週
-            </a>
-          <% } %>
+    <% if (week > 0) { %>
+      <a
+        class="reservation-week-button"
+        href="/reserve?doctorId=<%= doctorId %>&week=<%= week - 1 %>"
+        aria-label="前の週を表示"
+      >
+        <span aria-hidden="true">＜</span>
+        前の週
+      </a>
+    <% } else { %>
+      <span
+        class="reservation-week-button is-disabled"
+        aria-hidden="true"
+      >
+        ＜ 前の週
+      </span>
+    <% } %>
 
-          <% if (canGoNextWeek) { %>
-            <a
-              class="clinic-sub-button"
-              href="/reserve?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
-            >
-              次の週
-            </a>
-          <% } %>
+    <strong class="reservation-calendar-period">
+      <%= dates[0].label %> 〜 <%= dates[dates.length - 1].label %>
+    </strong>
 
-        </div>
-      </div>
+    <% if (canGoNextWeek) { %>
+      <a
+        class="reservation-week-button"
+        href="/reserve?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
+        aria-label="次の週を表示"
+      >
+        次の週
+        <span aria-hidden="true">＞</span>
+      </a>
+    <% } else { %>
+      <span
+        class="reservation-week-button is-disabled"
+        aria-hidden="true"
+      >
+        次の週 ＞
+      </span>
+    <% } %>
+
+  </div>
+
+</div>
 
       <div class="reservation-status-guide">
         <span>○ 予約できます</span>
-        <span>△ 残りわずか</span>
         <span>満 予約できません</span>
         <span>− 診療時間外</span>
       </div>
@@ -115,25 +135,19 @@
                     const isFull =
                       reservationCount >= capacity;
 
-                    const remaining =
-                      capacity - reservationCount;
-
-                    let status = "closed";
+                   let status = "closed";
                     let statusLabel = "−";
 
                     if (isAvailableTime && isWithinPeriod) {
                       if (isFull) {
                         status = "full";
                         statusLabel = "満";
-                      } else if (remaining === 1) {
-                        status = "few";
-                        statusLabel = "△";
                       } else {
                         status = "open";
                         statusLabel = "○";
                       }
                     }
-                  %>
+                    %>
 
                   <td
                     class="
@@ -144,7 +158,7 @@
                     "
                   >
 
-                    <% if (status === "open" || status === "few") { %>
+                    <% if (status === "open") { %>
 
                       <a
                         class="reservation-slot-link"
@@ -152,12 +166,8 @@
                         aria-label="<%= dateItem.label %> <%= getSlotLabel(slot, doctorId) %>を選択"
                       >
                         <span class="reservation-slot-symbol">
-                          <%= statusLabel %>
+                          ○
                         </span>
-
-                        <% if (status === "few") { %>
-                          <small>残りわずか</small>
-                        <% } %>
                       </a>
 
                     <% } else { %>
@@ -183,11 +193,12 @@
 
     <div class="clinic-actions">
       <a
-        class="clinic-sub-button"
-        href="/select-doctor"
-      >
-        担当医選択へ戻る
-      </a>
+  class="clinic-sub-button reservation-back-button"
+  href="/mypage"
+  onclick="return confirm('予約手続きを中止してマイページへ戻ります。よろしいですか？');"
+>
+  マイページに戻る
+</a>
     </div>
 
   </div>
