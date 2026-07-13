@@ -247,6 +247,20 @@ function getWeekParam(value) {
   return week;
 }
 
+function isPastReservationSlot(date, slot) {
+  const [hour, minute] = String(slot).split(":").map(Number);
+
+  if (!date || !Number.isInteger(hour) || !Number.isInteger(minute)) {
+    return true;
+  }
+
+  const slotDateTime = new Date(
+    `${date}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00+09:00`,
+  );
+
+  return slotDateTime.getTime() <= Date.now();
+}
+
 /* =========================
    管理者認証
 ========================= */
@@ -670,7 +684,8 @@ app.post("/reserve", async (req, res) => {
     !isValidPatientNumber(patientNumber) ||
     !isValidDateText(date) ||
     !isValidSlot(slot, doctorId) ||
-    !isWithinReservationPeriod(date)
+    !isWithinReservationPeriod(date) ||
+    isPastReservationSlot(date, slot)
   ) {
     return res.render("error", {
       title: "予約不可",
@@ -1526,9 +1541,10 @@ app.post("/admin/edit/:id", requireAdminLogin, async (req, res) => {
   if (
     !isValidDateText(date) ||
     !isValidSlot(slot, doctorId) ||
-    !isWithinReservationPeriod(date)
+    !isWithinReservationPeriod(date) ||
+    isPastReservationSlot(date, slot)
   ) {
-    return renderEdit("予約内容が不正です。");
+    return renderEdit("予約内容が間違っています。");
   }
 
   const availableSlots = config.getSlotsForDate(date, doctorId);
