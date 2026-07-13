@@ -127,7 +127,7 @@
               <% availableDoctors.forEach((doctorItem) => { %>
 
                 <a
-                  href="/admin/select-doctor?doctorId=<%= doctorItem.id %>"
+                  href="/admin?doctorId=<%= doctorItem.id %>"
                   class="doctor-selector-item <%= doctorItem.id === selectedDoctor.id
                     ? 'is-selected'
                     : ''
@@ -289,3 +289,13 @@
   <main class="container">
 
 <% } %>
+
+<script>
+  document.addEventListener("click", (event) => {
+    document.querySelectorAll(".doctor-selector[open]").forEach((selector) => {
+      if (!selector.contains(event.target)) {
+        selector.removeAttribute("open");
+      }
+    });
+  });
+</script>

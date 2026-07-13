@@ -426,6 +426,49 @@ button {
   width: 100%;
 }
 
+.doctor-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.doctor-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width:300px;
+  min-height: 72px;
+  padding: 0 24px;
+
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  color: var(--text);
+  text-decoration: none;
+
+  transition: .15s;
+}
+
+.doctor-card:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
+.doctor-card span {
+  color: var(--primary);
+}
+
+@media (max-width:768px){
+
+  .doctor-card{
+    min-height:64px;
+    padding:0 18px;
+  }
+
+}
+
 /* ========================================
    患者側・予約日時選択
 ======================================== */
@@ -524,6 +567,7 @@ button {
   text-align: center;
   vertical-align: middle;
   overflow: hidden;
+  white-space: wrap;
 }
 
 .reservation-calendar tr > *:last-child {

@@ -333,6 +333,10 @@ app.use((req, res, next) => {
   return next();
 });
 
+app.get("/", (req, res) => {
+  res.redirect("/psychiatry");
+});
+
 app.get("/psychiatry", (req, res) => {
   res.render("psychiatry", {
     title: "心療内科再診予約",
@@ -1023,9 +1027,17 @@ app.get("/admin/select-doctor", requireAdminLogin, async (req, res) => {
 
 app.get("/admin", requireAdminLogin, async (req, res) => {
   try {
-    const doctorId = Number(req.session.doctorId);
+    const queryDoctorId = Number(req.query.doctorId);
+    const sessionDoctorId = Number(req.session.doctorId);
 
-    if (!Number.isInteger(doctorId)) {
+    let doctorId = sessionDoctorId;
+
+    if (isValidDoctorId(queryDoctorId)) {
+      doctorId = queryDoctorId;
+      req.session.doctorId = queryDoctorId;
+    }
+
+    if (!isValidDoctorId(doctorId)) {
       return res.redirect("/admin/doctors");
     }
 
@@ -1073,6 +1085,7 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
     });
 
     const slots = config.getSlotsForDate(today, doctorId);
+
     res.render("admin-dashboard", {
       title: "予約管理",
 
@@ -1096,7 +1109,6 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
     res.status(500).send("管理画面の表示中にエラーが発生しました。");
   }
 });
-
 app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
   const doctorId = Number(req.session.doctorId);
 

@@ -1,8 +1,7 @@
 <%- include("partials/header", { title: title || "予約完了" }) %>
-
-<% if (showProgress) { %>
-  <%- include("partials/progress", { step: 3 }) %>
-<% } %>
+<%- include("partials/progress", {
+  step: 4
+}) %>
 
 <% const r = reservation || {}; %>
 <% const p = r.patient || {}; %>

@@ -1,9 +1,7 @@
 <%- include("partials/header", { title: isChangeMode ? "予約変更確認" : "予約確認" }) %>
-
-<% if (!isChangeMode) { %>
-  <%- include("partials/progress", { step: 2 }) %>
-<% } %>
-
+<%- include("partials/progress", {
+  step: 3
+}) %>
 <div class="clinic-page">
   <div class="clinic-card confirm-box">
 
