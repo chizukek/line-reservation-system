@@ -1,184 +1,144 @@
 
-
 :root {
-  /* colors */
-  --green: #008102;
-  --green-dark: #006b02;
-  --green-pale: #eef7ef;
-  --bg: #ffffff;
-  --surface: #f6f7f6;
-  --card: #ffffff;
+  --primary: #087b35;
+  --primary-dark: #055f28;
+  --primary-soft: #edf7f1;
+  --text: #202421;
+  --muted: #4f5953;
   --white: #ffffff;
-  --text: #222222;
-  --text-soft: #333333;
-  --muted: #666666;
-  --muted-2: #555555;
-  --danger: #d62828;
-  --danger-dark: #b91f1f;
-  --warning-bg: #fff4e5;
-  --warning-border: #e88900;
-  --warning-text: #8a4b00;
-  --blue-text: #1d6fb8;
-  --blue-pale: #f1f6f9;
-  --red-text: #c62828;
-  --red-pale: #fbf0f0;
-  --gray-bg: #f2f2f2;
-  --gray-disabled-bg: #f5f5f5;
-  --gray-disabled-text: #aaaaaa;
-  --gray-mark: #9aa3ad;
-  --gray-mark-light: #b7bec5;
-  --progress-bg: #d9ded9;
-  --progress-text: #5f6b72;
-  --progress-muted: #8a969c;
-
-  /* borders */
-  --border: #dddddd;
-  --border-dark: #c9c9c9;
-  --border-soft: #e5e5e5;
-  --border-table: #d7d7d7;
-  --border-admin-table: #e2e6ea;
-  --border-base: 1px solid var(--border);
-  --border-dark-base: 1px solid var(--border-dark);
-  --border-green: 2px solid var(--green);
-  --border-danger: 2px solid var(--danger);
-  --border-warning: 5px solid var(--warning-border);
-
-  /* typography */
-  --font-family-base: "Yu Gothic UI", "Meiryo", sans-serif;
-  --fs-tiny: 11px;
-  --fs-xxs: 12px;
-  --fs-xs: 13px;
-  --fs-sm: 14px;
-  --fs-base: 15px;
-  --fs-md: 16px;
-  --fs-md-lg: 17px;
-  --fs-lg: 18px;
-  --fs-lg-mobile: 19px;
-  --fs-xl: 20px;
-  --fs-2xl: 22px;
-  --fs-brand: 24px;
-  --fs-h1: 30px;
-  --fs-h1-mobile: 24px;
-  --lh-tight: 1.2;
-  --lh-heading: 1.35;
-  --lh-date: 1.45;
-  --lh-base: 1.6;
-  --lh-note: 1.7;
-  --lh-progress: 1.3;
-  --lh-icon: 1;
-
-  /* font weight: 全体を少し細めに調整 */
-  --fw-normal: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --fw-bold: 700;
-
-  /* layout widths */
-  --w-container: 960px;
-  --w-card: 760px;
-  --w-reservation-card: 900px;
-  --w-admin-card: 980px;
-  --w-login-card: 520px;
-  --w-info-label: 160px;
-  --w-time-cell: 54px;
-  --w-time-cell-mobile: 48px;
-  --w-admin-small-button: 72px;
-  --w-admin-add-button: 170px;
-  --w-admin-search-button: 140px;
-  --h-page-offset: 80px;
-
-  /* spacing */
-  --space-0: 0;
-  --space-1: 1px;
-  --space-3: 3px;
-  --space-4: 4px;
-  --space-5: 5px;
-  --space-6: 6px;
-  --space-7: 7px;
-  --space-8: 8px;
-  --space-10: 10px;
-  --space-11: 11px;
-  --space-12: 12px;
-  --space-13: 13px;
-  --space-14: 14px;
-  --space-15: 15px;
-  --space-16: 16px;
-  --space-17: 17px;
-  --space-18: 18px;
-  --space-20: 20px;
-  --space-22: 22px;
-  --space-24: 24px;
-  --space-26: 26px;
-  --space-28: 28px;
-  --space-30: 30px;
-  --space-34: 34px;
-  --space-36: 36px;
-  --space-38: 38px;
-  --space-42: 42px;
-
-  /* radius */
-  --radius-sm: 4px;
-  --radius-md: 5px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
-  --radius-round: 50%;
-  --radius-pill: 999px;
-
-  /* component sizes */
-  --size-logo: 48px;
-  --size-logo-mobile: 42px;
-  --size-progress-circle: 34px;
-  --size-progress-circle-mobile: 30px;
-  --size-progress-line: 4px;
-  --size-mark: 30px;
-  --size-mark-height:20px;
-  --size-mark-open: 32px;
-  --size-mark-open-height:22px;
-  --size-open-circle: 12px;
-  --border-open-circle: 3px;
-  --h-admin-small-button: 34px;
-
-  /* effects */
-  --focus-ring: 0 0 0 3px rgba(0, 129, 2, 0.13);
+  --page-bg: #f4f6f5;
+  --border: #cfd6d2;
+  --border-strong: #aeb8b2;
+  --danger: #c62828;
+  --danger-dark: #a91f1f;
+  --radius: 6px;
 }
 
-/* base */
+* { box-sizing: border-box; }
+
+html { font-size: 16px; }
 
 body {
-  font-family: var(--font-family-base);
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-normal);
-  line-height: var(--lh-base);
+  background: var(--white);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+p, li, label, input, select, textarea, button, a, th, td {
+  font-size: 16px;
+}
+
+small, .site-subtitle, .admin-page-eyebrow, .admin-page-description,
+.admin-panel-description, .admin-updated-at, .admin-form-help,
+.admin-result-text, .admin-schedule-note, .admin-calendar-count,
+.today-patient-number {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+button, input, select, textarea { font: inherit; }
+
+button, [class$="-button"], [class*="-button "] {
+  min-height: 42px;
+}
+
+.main-button, .sub-button, .clinic-main-button, .clinic-sub-button,
+.clinic-danger-button, .cancel-link {
+  display: inline-flex;
+  width: auto;
+  min-width: 140px;
+  max-width: 320px;
+  min-height: 44px;
+  padding: 9px 18px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.clinic-actions, .admin-detail-actions, .admin-confirm-actions, .admin-form-actions {
+  align-items: flex-start;
+}
+
+.clinic-actions form, .admin-detail-actions form, .admin-confirm-actions form, .admin-form-actions form {
+  width: auto;
+}
+
+.admin-primary-button, .admin-secondary-button, .admin-danger-outline-button,
+.admin-refresh-button, .admin-week-button, .admin-row-button {
+  width: auto;
+  min-width: 88px;
+  min-height: 42px;
+  padding: 8px 14px;
+  font-size: 15px;
+}
+
+.admin-row-button { min-width: 72px; }
+
+.admin-page-header h1, h1 { font-size: 26px; }
+h2, .admin-panel-title, .admin-section-title-row h2 { font-size: 20px; }
+
+.admin-sidebar-label, .admin-sidebar-link, .admin-current-datetime,
+.doctor-selector-button, .header-logout-link, .admin-summary-label,
+.admin-summary-unit, .admin-calendar-weekday, .admin-status-guide,
+.admin-search-form label, .admin-form-card label, .admin-list-table th,
+.admin-list-table td, .admin-detail-label, .admin-confirm-label,
+.admin-detail-value, .admin-confirm-value {
+  font-size: 14px;
+}
+
+.admin-list-table th, .admin-list-table td, .admin-table th, .admin-table td,
+.today-reservation-table th, .today-reservation-table td {
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  html { font-size: 16px; }
+  p, li, label, input, select, textarea, button, a, th, td { font-size: 16px; }
+  .main-button, .sub-button, .clinic-main-button, .clinic-sub-button,
+  .clinic-danger-button, .cancel-link {
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+body {
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+  margin: 0;
+  background: var(--white);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 .container {
-  max-width: var(--w-container);
+  max-width: 960px;
   margin: 0 auto;
-  padding: var(--space-18) var(--space-14);
+  padding: 18px 14px;
   box-sizing: border-box;
 }
 
 h1 {
-  margin: 0 0 var(--space-24);
+  margin: 0 0 24px;
   color: var(--text);
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-heading);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 h2 {
-  margin: 0 0 var(--space-12);
-  color: var(--green);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 a {
-  color: var(--green);
-  font-weight: var(--fw-bold);
+  color: var(--primary);
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -190,42 +150,40 @@ button,
 input,
 select {
   font-family: inherit;
-  font-size: var(--fs-md);
+  font-size: 16px;
 }
 
 button {
   cursor: pointer;
 }
 
-/* header */
-
 .site-header {
-  border-bottom: var(--border-base);
+  border-bottom: 1px solid var(--border);
   background: var(--white);
 }
 
 .site-header-inner {
-  max-width: var(--w-container);
+  max-width: 960px;
   margin: 0 auto;
-  padding: var(--space-13) var(--space-16);
+  padding: 13px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
-  gap: var(--space-16);
+  gap: 16px;
 }
 
 .site-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-14);
+  gap: 14px;
   text-decoration: none;
   color: inherit;
 }
 
 .site-logo img {
-  width: var(--size-logo);
-  height: var(--size-logo);
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   display: block;
 }
@@ -236,37 +194,35 @@ button {
 }
 
 .site-name {
-  color: var(--green);
-  font-size: var(--fs-brand);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-tight);
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .site-subtitle {
   color: var(--muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .site-nav {
   display: flex;
-  gap: var(--space-14);
-  font-size: var(--fs-sm);
+  gap: 14px;
+  font-size: 14px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .site-nav a {
-  color: var(--green);
-  font-weight: var(--fw-bold);
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .admin-header-bar .site-name,
 .admin-header-bar .site-nav a {
-  color: var(--green);
+  color: var(--primary);
 }
-
-/* common buttons */
 
 .main-button,
 .sub-button,
@@ -275,109 +231,107 @@ button {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: var(--space-17) var(--space-18);
-  border-radius: var(--radius-md);
+  padding: 17px 18px;
+  border-radius: 5px;
   text-align: center;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
+  font-size: 18px;
+  font-weight: 700;
   text-decoration: none;
 }
 
 .main-button,
 .clinic-main-button {
-  background: var(--green);
+  background: var(--primary);
   color: var(--white);
-  border: var(--border-green);
+  border: 2px solid var(--primary);
 }
 
 .main-button:hover,
 .clinic-main-button:hover {
-  background: var(--green-dark);
-  border-color: var(--green-dark);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
   text-decoration: none;
 }
 
 .sub-button,
 .clinic-sub-button {
   background: var(--white);
-  color: var(--green);
-  border: var(--border-green);
+  color: var(--primary);
+  border: 2px solid var(--primary);
 }
 
 .sub-button:hover,
 .clinic-sub-button:hover {
-  background: var(--green-pale);
+  background: var(--primary-soft);
   text-decoration: none;
 }
 
-/* patient pages */
-
 .clinic-page {
-  min-height: calc(100vh - var(--h-page-offset));
+  min-height: calc(100vh - 80px);
   display: flex;
   justify-content: center;
-  padding: var(--space-36) var(--space-14);
+  padding: 36px 14px;
   background: var(--white);
 }
 
 .clinic-card {
   width: 100%;
-  max-width: var(--w-card);
-  background: var(--surface);
-  border: var(--border-base);
-  border-radius: var(--radius-xl);
-  padding: var(--space-38) var(--space-42);
+  max-width: 760px;
+  background: #f6f7f6;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 38px 42px;
   box-sizing: border-box;
 }
 
 .clinic-lead {
-  margin: 0 0 var(--space-28);
-  color: var(--text-soft);
-  font-weight: var(--fw-semibold);
+  margin: 0 0 28px;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .clinic-form {
   display: grid;
-  gap: var(--space-24);
+  gap: 24px;
 }
 
 .clinic-form label {
   display: grid;
-  gap: var(--space-10);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .clinic-form input,
 .clinic-form select {
   width: 100%;
   box-sizing: border-box;
-  padding: var(--space-15) var(--space-16);
-  border: var(--border-dark-base);
-  border-radius: var(--radius-sm);
+  padding: 15px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
   background: var(--white);
-  font-size: var(--fs-lg);
+  font-size: 18px;
 }
 
 .clinic-form input:focus,
 .clinic-form select:focus {
   outline: none;
-  border-color: var(--green);
-  box-shadow: var(--focus-ring);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 129, 2, 0.13);
 }
 
 .clinic-danger-button {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: var(--space-17) var(--space-18);
-  border-radius: var(--radius-md);
+  padding: 17px 18px;
+  border-radius: 5px;
   text-align: center;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
+  font-size: 18px;
+  font-weight: 700;
   background: var(--danger);
   color: var(--white);
-  border: var(--border-danger);
+  border: 2px solid var(--danger);
 }
 
 .clinic-danger-button:hover {
@@ -386,41 +340,41 @@ button {
 }
 
 .clinic-note {
-  margin-top: var(--space-24);
+  margin-top: 24px;
   color: var(--muted);
-  font-size: var(--fs-sm);
-  line-height: var(--lh-note);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 .clinic-error,
 .notice-warning {
-  margin-bottom: var(--space-22);
-  padding: var(--space-13) var(--space-16);
-  background: var(--warning-bg);
-  border-left: var(--border-warning);
-  color: var(--warning-text);
-  font-weight: var(--fw-bold);
+  margin-bottom: 22px;
+  padding: 13px 16px;
+  background: var(--white)4e5;
+  border-left: 5px solid #e88900;
+  color: #8a4b00;
+  font-weight: 700;
 }
 
 .clinic-section {
-  margin-top: var(--space-30);
+  margin-top: 30px;
 }
 
 .info-box,
 .reservation-box {
   background: var(--white);
-  border: var(--border-base);
-  border-radius: var(--radius-md);
-  padding: var(--space-18) var(--space-22);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 18px 22px;
 }
 
 .info-row {
   display: grid;
-  grid-template-columns: var(--w-info-label) 1fr;
-  gap: var(--space-16);
-  padding: var(--space-14) 0;
-  border-bottom: var(--space-1) solid var(--border-soft);
-  font-size: var(--fs-md-lg);
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 17px;
 }
 
 .info-row:last-child {
@@ -428,25 +382,25 @@ button {
 }
 
 .info-row span {
-  font-weight: var(--fw-bold);
+  font-weight: 700;
 }
 
 .info-row strong {
-  font-weight: var(--fw-semibold);
-  color: var(--text-soft);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .reservation-box h3 {
-  margin: 0 0 var(--space-12);
-  color: var(--green);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-bold);
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .clinic-actions {
   display: grid;
-  gap: var(--space-12);
-  margin-top: var(--space-18);
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .clinic-actions form {
@@ -454,97 +408,93 @@ button {
 }
 
 .empty-message {
-  margin: 0 0 var(--space-18);
-  font-weight: var(--fw-bold);
+  margin: 0 0 18px;
+  font-weight: 700;
 }
 
 .clinic-logout {
   display: block;
-  margin-top: var(--space-28);
+  margin-top: 28px;
   text-align: center;
-  color: var(--green);
-  font-weight: var(--fw-bold);
+  color: var(--primary);
+  font-weight: 700;
   text-decoration: underline;
 }
-
-/* birth select */
 
 .birth-select {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
-  gap: var(--space-10);
+  gap: 10px;
 }
 
 .birth-select select {
   width: 100%;
 }
 
-/* reservation table */
-
 .reservation-card {
-  max-width: var(--w-reservation-card);
+  max-width: 900px;
 }
 
 .reserve-title {
-  margin: var(--space-20) 0 var(--space-16);
-  color: var(--green);
-  font-size: var(--fs-2xl);
-  font-weight: var(--fw-bold);
+  margin: 20px 0 16px;
+  color: var(--primary);
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .reserve-note {
-  margin: var(--space-18) 0 var(--space-12);
-  padding: var(--space-12) var(--space-14);
+  margin: 18px 0 12px;
+  padding: 12px 14px;
   background: var(--white);
-  border: var(--border-base);
-  color: var(--text-soft);
-  border-radius: var(--radius-lg);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .reserve-legend {
   display: flex;
-  gap: var(--space-24);
+  gap: 24px;
   flex-wrap: wrap;
-  margin: var(--space-14) 0 var(--space-18);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
+  margin: 14px 0 18px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .reserve-legend span {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-6);
+  gap: 6px;
 }
 
 .week-nav {
   display: flex;
-  gap: var(--space-14);
-  margin: var(--space-18) 0;
+  gap: 14px;
+  margin: 18px 0;
 }
 
 .week-btn {
   flex: 1;
-  padding: var(--space-12) var(--space-8);
-  border: var(--border-green);
-  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  border: 2px solid var(--primary);
+  border-radius: 5px;
   background: var(--white);
-  color: var(--green);
+  color: var(--primary);
   text-align: center;
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .week-btn.active {
-  background: var(--green);
+  background: var(--primary);
   color: var(--white);
 }
 
 .week-btn.disabled {
-  color: var(--gray-disabled-text);
+  color: #aaaaaa;
   border-color: var(--border);
-  background: var(--gray-disabled-bg);
+  background: #f5f5f5;
   pointer-events: none;
 }
 
@@ -552,8 +502,8 @@ button {
   width: 100%;
   overflow-x: hidden;
   background: var(--white);
-  border-radius: var(--radius-md);
-  padding: var(--space-10);
+  border-radius: 5px;
+  padding: 10px;
   box-sizing: border-box;
 }
 
@@ -563,45 +513,45 @@ button {
   border-collapse: collapse;
   background: var(--white);
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: 5px;
 }
 
 .reservation-table th,
 .reservation-table td {
-  border: var(--space-1) solid var(--border-table);
+  border: 1px solid #d7d7d7;
   text-align: center;
   vertical-align: middle;
-  padding: var(--space-7) var(--space-1);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
+  padding: 7px 1px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .month-row th {
-  background: var(--green-pale);
-  color: var(--green);
-  font-weight: var(--fw-bold);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .date-row th {
   background: var(--white);
-  color: var(--text-soft);
-  line-height: var(--lh-date);
+  color: var(--text);
+  line-height: 1.45;
 }
 
 .date-row th.saturday {
-  color: var(--blue-text);
-  background: var(--blue-pale);
+  color: #1d6fb8;
+  background: #f1f6f9;
 }
 
 .date-row th.sunday {
-  color: var(--red-text);
-  background: var(--red-pale);
+  color: #c62828;
+  background: #fbf0f0;
 }
 
 .time-cell {
-  width: var(--w-time-cell);
-  background: var(--gray-bg);
-  color: var(--muted-2);
+  width: 54px;
+  background: #f2f2f2;
+  color: var(--muted);
 }
 
 .mark-open,
@@ -610,9 +560,9 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--size-mark);
-  height: var(--size-mark-height);
-  line-height: var(--lh-icon);
+  width: 30px;
+  height: 20px;
+  line-height: 1;
   text-decoration: none;
 }
 
@@ -622,128 +572,120 @@ button {
 
 .unavailable-cell,
 .full-cell {
-  background: var(--gray-bg);
+  background: #f2f2f2;
 }
 
 .mark-open {
   position: relative;
-  width: var(--size-mark-open);
-  height: var(--size-mark-open-height);
+  width: 32px;
+  height: 22px;
   font-size: 0;
 }
 
 .mark-open::before {
   content: "";
-  width: var(--size-open-circle);
-  height: var(--size-open-circle);
-  border: var(--border-open-circle) solid var(--green);
-  border-radius: var(--radius-round);
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--primary);
+  border-radius: 50%;
   display: block;
 }
 
 .mark-open:hover {
-  background: var(--green-pale);
-  border-radius: var(--radius-round);
+  background: var(--primary-soft);
+  border-radius: 50%;
   text-decoration: none;
 }
 
 .mark-full {
-  color: var(--gray-mark);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-normal);
+  color: #9aa3ad;
+  font-size: 20px;
+  font-weight: 400;
 }
 
 .mark-disabled {
-  color: var(--gray-mark-light);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-normal);
+  color: #b7bec5;
+  font-size: 18px;
+  font-weight: 400;
 }
-
-/* progress */
 
 .progress {
   display: flex;
   align-items: flex-start;
-  max-width: var(--w-card);
-  margin: var(--space-18) auto var(--space-26);
-  padding: var(--space-16) var(--space-14);
-  /*background: var(--surface);
-  border: var(--border-base);
-  border-radius: var(--radius-xl);*/
+  max-width: 760px;
+  margin: 18px auto 26px;
+  padding: 16px 14px;
+
 }
 
 .progress-step {
   flex: 0 0 auto;
   text-align: center;
-  color: var(--progress-muted);
-  font-weight: var(--fw-bold);
+  color: #8a969c;
+  font-weight: 700;
 }
 
 .progress-step .circle {
-  width: var(--size-progress-circle);
-  height: var(--size-progress-circle);
-  margin: 0 auto var(--space-7);
-  border-radius: var(--radius-round);
-  background: var(--progress-bg);
-  color: var(--progress-text);
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 7px;
+  border-radius: 50%;
+  background: #d9ded9;
+  color: #5f6b72;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--fs-base);
-  font-weight: var(--fw-bold);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .progress-step .label {
-  font-size: var(--fs-sm);
-  line-height: var(--lh-progress);
+  font-size: 14px;
+  line-height: 1.3;
   white-space: nowrap;
 }
 
 .progress-step.active {
-  color: var(--green);
+  color: var(--primary);
 }
 
 .progress-step.active .circle {
-  background: var(--green);
+  background: var(--primary);
   color: var(--white);
 }
 
 .progress .line {
   flex: 1;
-  height: var(--size-progress-line);
-  background: var(--progress-bg);
-  margin: var(--space-16) var(--space-6) 0;
-  border-radius: var(--radius-pill);
+  height: 4px;
+  background: #d9ded9;
+  margin: 16px 6px 0;
+  border-radius: 999px;
 }
 
 .progress .line.active {
-  background: var(--green);
+  background: var(--primary);
 }
-
-/* utility */
 
 .error {
   color: var(--danger);
-  font-weight: var(--fw-bold);
+  font-weight: 700;
 }
 
 .success {
-  color: var(--green);
-  font-weight: var(--fw-bold);
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .cancel-link {
   display: block;
-  padding: var(--space-13);
-  border: var(--border-green);
-  border-radius: var(--radius-lg);
+  padding: 13px;
+  border: 2px solid var(--primary);
+  border-radius: 6px;
   text-align: center;
-  color: var(--green);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 700;
 }
-
-/* mobile */
 
 @media (max-width: 768px) {
   .container {
@@ -753,31 +695,31 @@ button {
   }
 
   h1 {
-    font-size: var(--fs-h1-mobile);
+    font-size: 24px;
   }
 
   .site-header-inner {
-    padding: var(--space-10) var(--space-10);
+    padding: 10px 10px;
     align-items: flex-start;
-    gap: var(--space-10);
+    gap: 10px;
   }
 
   .site-logo img {
-    width: var(--size-logo-mobile);
-    height: var(--size-logo-mobile);
+    width: 42px;
+    height: 42px;
   }
 
   .site-name {
-    font-size: var(--fs-lg-mobile);
+    font-size: 19px;
   }
 
   .site-subtitle {
-    font-size: var(--fs-xxs);
+    font-size: 14px;
   }
 
   .site-nav {
-    gap: var(--space-6) var(--space-10);
-    font-size: var(--fs-xs);
+    gap: 6px 10px;
+    font-size: 14px;
   }
 
   .clinic-page,
@@ -787,29 +729,29 @@ button {
 
   .clinic-card,
   .admin-card {
-    padding: var(--space-22) var(--space-12);
-    border-radius: var(--radius-lg);
+    padding: 22px 12px;
+    border-radius: 6px;
   }
 
   .clinic-form label {
-    font-size: var(--fs-md);
+    font-size: 16px;
   }
 
   .clinic-form input,
   .clinic-form select {
-    font-size: var(--fs-md);
+    font-size: 16px;
   }
 
   .info-box,
   .reservation-box,
   .admin-form-card {
-    padding: var(--space-16);
+    padding: 16px;
   }
 
   .info-row {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
-    font-size: var(--fs-md);
+    gap: 4px;
+    font-size: 16px;
   }
 
   .birth-select {
@@ -817,11 +759,11 @@ button {
   }
 
   .week-nav {
-    gap: var(--space-8);
+    gap: 8px;
   }
 
   .week-btn {
-    font-size: var(--fs-sm);
+    font-size: 14px;
   }
 
   .reservation-table-wrapper {
@@ -830,40 +772,40 @@ button {
 
   .reservation-table th,
   .reservation-table td {
-    padding: var(--space-6) var(--space-1);
-    font-size: var(--fs-xs);
+    padding: 6px 1px;
+    font-size: 14px;
   }
 
   .time-cell {
-    width: var(--w-time-cell-mobile);
-    font-size: var(--fs-xs);
+    width: 48px;
+    font-size: 14px;
   }
 
   .mark-full {
-    font-size: var(--fs-lg-mobile);
+    font-size: 19px;
   }
 
   .mark-disabled {
-    font-size: var(--fs-md-lg);
+    font-size: 17px;
   }
 
   .progress {
-    margin: var(--space-10) auto var(--space-18);
-    padding: var(--space-10) var(--space-6);
+    margin: 10px auto 18px;
+    padding: 10px 6px;
   }
 
   .progress-step .circle {
-    width: var(--size-progress-circle-mobile);
-    height: var(--size-progress-circle-mobile);
-    font-size: var(--fs-xs);
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
   }
 
   .progress-step .label {
-    font-size: var(--fs-tiny);
+    font-size: 14px;
   }
 
   .progress .line {
-    margin: var(--space-14) var(--space-3) 0;
+    margin: 14px 3px 0;
   }
 
   .admin-menu {
@@ -889,8 +831,8 @@ button {
 
   .admin-table th,
   .admin-table td {
-    font-size: var(--fs-sm);
-    padding: var(--space-11) var(--space-10);
+    font-size: 14px;
+    padding: 11px 10px;
   }
   .admin-action-buttons {
     flex-direction: column;
@@ -900,24 +842,24 @@ button {
   .admin-small-button,
   .admin-danger-button {
     width: 100%;
-    height: var(--h-admin-small-button);
+    height: 34px;
   }
 }
 
 .confirm-warning {
-  margin: 0 0 var(--space-lg);
+  margin: 0 0 18px;
   color: var(--danger);
-  font-weight: var(--fw-bold);
+  font-weight: 700;
 }
 
 .confirm-section {
-  margin-top: var(--space-30);
+  margin-top: 30px;
 }
 
 .confirm-table {
-  background: var(--card);
+  background: var(--white);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   overflow: hidden;
 }
 
@@ -934,21 +876,21 @@ button {
 .confirm-label {
   padding: 12px 14px;
   background: #f3eddf;
-  font-weight: var(--fw-bold);
+  font-weight: 700;
   color: #555;
 }
 
 .confirm-value {
   padding: 12px 14px;
-  background: #fff;
-  font-weight: var(--fw-medium);
+  background: var(--white);
+  font-weight: 500;
   color: var(--text);
 }
 
 .confirm-note-box {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   padding: 14px 16px;
   line-height: 1.8;
   color: #555;
@@ -957,7 +899,7 @@ button {
 .terms-area {
   margin: 26px 0 10px;
   text-align: center;
-  font-size: var(--fs-note);
+  font-size: 14px;
 }
 
 .terms-area a {
@@ -967,14 +909,14 @@ button {
 .confirm-submit-button span {
   display: block;
   font-size: 14px;
-  font-weight: var(--fw-bold);
+  font-weight: 700;
   margin-bottom: 4px;
 }
 
 .confirm-submit-button strong {
   display: block;
   font-size: 18px;
-  font-weight: var(--fw-bold);
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
@@ -990,59 +932,20 @@ button {
 }
 
 .complete-message {
-  margin: 0 0 var(--space-30);
+  margin: 0 0 30px;
   padding: 16px 18px;
-  background: var(--green-pale);
-  border: 1px solid var(--green);
-  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  border-radius: 5px;
   text-align: center;
-  color: var(--green);
+  color: var(--primary);
   line-height: 1.8;
 }
 
 .complete-message strong {
   font-size: 18px;
-  font-weight: var(--fw-bold);
+  font-weight: 700;
 }
-
-/* =========================================================
-   管理画面：専用iPad横向き版
-   基準画面：1024px × 768px
-   管理画面は横向き固定運用を想定
-========================================================= */
-
-:root {
-  --admin-width: 1024px;
-  --admin-header-height: 64px;
-  --admin-sidebar-width: 176px;
-
-  --admin-bg: #f3f5f4;
-  --admin-white: #ffffff;
-  --admin-panel: #ffffff;
-  --admin-border: #d8dfdb;
-  --admin-border-dark: #c7d0cb;
-
-  --admin-green: #128447;
-  --admin-green-dark: #0d6d3a;
-  --admin-green-soft: #e8f4ed;
-  --admin-green-pale: #f3faf6;
-
-  --admin-text: #252a27;
-  --admin-muted: #68736d;
-  --admin-light: #929b96;
-
-  --admin-warning: #986800;
-  --admin-warning-bg: #fff8e6;
-
-  --admin-danger: #c23838;
-  --admin-danger-dark: #a72d2d;
-  --admin-danger-bg: #fff1f1;
-
-  --admin-radius: 6px;
-  --admin-touch: 44px;
-}
-
-/* ---------- 画面全体 ---------- */
 
 body {
   margin: 0;
@@ -1066,15 +969,15 @@ body {
   top: 0;
   z-index: 1000;
   width: 100%;
-  min-width: var(--admin-width);
-  height: var(--admin-header-height);
-  background: var(--admin-white);
-  border-bottom: 1px solid var(--admin-border);
+  min-width: 1024px;
+  height: 64px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
 }
 
 .admin-header-bar .site-header-inner {
-  width: var(--admin-width);
-  max-width: var(--admin-width);
+  width: 1024px;
+  max-width: 1024px;
   height: 100%;
   margin: 0 auto;
   padding: 0 16px;
@@ -1096,15 +999,15 @@ body {
 }
 
 .admin-header-bar .site-name {
-  color: var(--admin-green);
+  color: var(--primary);
   font-size: 19px;
   font-weight: 700;
   line-height: 1.2;
 }
 
 .admin-header-bar .site-subtitle {
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -1116,13 +1019,11 @@ body {
 }
 
 .admin-current-datetime {
-  color: var(--admin-muted);
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
-
-/* ---------- 医師切り替え ---------- */
 
 .doctor-selector {
   position: relative;
@@ -1144,24 +1045,24 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .doctor-selector-button:hover {
-  color: var(--admin-green);
-  background: var(--admin-green-pale);
-  border-color: var(--admin-green);
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary);
 }
 
 .doctor-selector-arrow {
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .doctor-selector-menu {
@@ -1171,32 +1072,32 @@ body {
   z-index: 1100;
   width: 210px;
   padding: 6px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 10px 26px rgba(29, 45, 36, 0.14);
 }
 
 .doctor-selector-item {
-  min-height: var(--admin-touch);
+  min-height: 44px;
   padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--admin-text);
+  color: var(--text);
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .doctor-selector-item:hover,
 .doctor-selector-item.is-selected {
-  color: var(--admin-green);
-  background: var(--admin-green-soft);
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .doctor-selector-check {
-  color: var(--admin-green);
+  color: var(--primary);
 }
 
 .header-logout-link {
@@ -1204,35 +1105,33 @@ body {
   padding: 0 4px;
   display: inline-flex;
   align-items: center;
-  color: var(--admin-muted);
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 14px;
   font-weight: 600;
 }
 
 .header-logout-link:hover {
-  color: var(--admin-green);
+  color: var(--primary);
 }
 
-/* ---------- 1024px本体 ---------- */
-
 .admin-layout {
-  width: var(--admin-width);
-  min-height: calc(100vh - var(--admin-header-height));
+  width: 1024px;
+  min-height: calc(100vh - 64px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
-  background: var(--admin-bg);
+  grid-template-columns: 176px minmax(0, 1fr);
+  background: #f3f5f4;
 }
 
 .admin-sidebar {
   min-width: 0;
-  background: var(--admin-white);
-  border-right: 1px solid var(--admin-border);
+  background: var(--white);
+  border-right: 1px solid var(--border);
 }
 
 .admin-sidebar-nav {
   position: sticky;
-  top: var(--admin-header-height);
+  top: 64px;
   padding: 14px 9px 20px;
 }
 
@@ -1246,8 +1145,8 @@ body {
 
 .admin-sidebar-label {
   margin: 0 10px 6px;
-  color: var(--admin-light);
-  font-size: 10px;
+  color: #929b96;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.05em;
 }
@@ -1258,16 +1157,16 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: var(--admin-text);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .admin-sidebar-link:hover,
 .admin-sidebar-link.is-active {
-  color: var(--admin-green);
-  background: var(--admin-green-soft);
+  color: var(--primary);
+  background: var(--primary-soft);
   text-decoration: none;
 }
 
@@ -1277,20 +1176,20 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--admin-muted);
+  color: var(--muted);
   font-size: 16px;
 }
 
 .admin-sidebar-link:hover .admin-sidebar-icon,
 .admin-sidebar-link.is-active .admin-sidebar-icon {
-  color: var(--admin-green);
+  color: var(--primary);
 }
 
 .admin-main {
   min-width: 0;
   width: 100%;
   padding: 16px;
-  background: var(--admin-bg);
+  background: #f3f5f4;
 }
 
 .admin-page {
@@ -1308,8 +1207,6 @@ body {
   border: 0;
 }
 
-/* ---------- ページ見出し ---------- */
-
 .admin-page-header {
   min-height: 48px;
   margin: 0 0 12px;
@@ -1325,13 +1222,13 @@ body {
 
 .admin-page-eyebrow {
   margin: 0 0 1px;
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-page-header h1 {
   margin: 0;
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 22px;
   font-weight: 700;
   line-height: 1.25;
@@ -1339,8 +1236,8 @@ body {
 
 .admin-page-description {
   margin: 3px 0 0;
-  color: var(--admin-muted);
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-page-header-actions {
@@ -1349,14 +1246,12 @@ body {
   gap: 7px;
 }
 
-/* ---------- パネル ---------- */
-
 .admin-panel {
   width: 100%;
   padding: 14px;
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .admin-panel + .admin-panel {
@@ -1365,18 +1260,16 @@ body {
 
 .admin-panel-title {
   margin: 0 0 10px;
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 16px;
   font-weight: 700;
 }
 
 .admin-panel-description {
   margin: -4px 0 10px;
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
 }
-
-/* ---------- ボタン ---------- */
 
 .admin-primary-button,
 .admin-secondary-button,
@@ -1385,11 +1278,11 @@ body {
 .admin-week-button,
 .admin-row-button {
   box-sizing: border-box;
-  min-height: var(--admin-touch);
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--admin-radius);
+  border-radius: 6px;
   text-align: center;
   font-weight: 700;
   cursor: pointer;
@@ -1397,56 +1290,54 @@ body {
 
 .admin-primary-button {
   padding: 0 16px;
-  color: #ffffff;
-  background: var(--admin-green);
-  border: 1px solid var(--admin-green);
-  font-size: 13px;
+  color: var(--white);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  font-size: 14px;
 }
 
 .admin-primary-button:hover {
-  color: #ffffff;
-  background: var(--admin-green-dark);
-  border-color: var(--admin-green-dark);
+  color: var(--white);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
 }
 
 .admin-secondary-button {
   padding: 0 16px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 13px;
+  color: var(--primary);
+  background: var(--white);
+  border: 1px solid var(--primary);
+  font-size: 14px;
 }
 
 .admin-secondary-button:hover {
-  background: var(--admin-green-soft);
+  background: var(--primary-soft);
 }
 
 .admin-danger-outline-button {
   padding: 0 16px;
-  color: var(--admin-danger);
-  background: var(--admin-white);
+  color: var(--danger);
+  background: var(--white);
   border: 1px solid #d8a3a3;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-danger-outline-button:hover {
-  background: var(--admin-danger-bg);
+  background: var(--white)1f1;
 }
 
 .admin-refresh-button {
   min-height: 38px;
   padding: 0 12px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 12px;
+  color: var(--primary);
+  background: var(--white);
+  border: 1px solid var(--primary);
+  font-size: 14px;
 }
 
 .admin-refresh-button:hover {
-  background: var(--admin-green-soft);
+  background: var(--primary-soft);
 }
-
-/* ---------- ダッシュボード ---------- */
 
 .admin-dashboard-heading {
   margin-bottom: 12px;
@@ -1458,14 +1349,14 @@ body {
 
 .admin-dashboard-heading h2 {
   margin: 0;
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 16px;
 }
 
 .admin-dashboard-doctor {
   margin: 4px 0 0;
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-update-row {
@@ -1475,14 +1366,14 @@ body {
 }
 
 .admin-updated-at {
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
   white-space: nowrap;
 }
 
 .admin-updated-at strong {
   margin-left: 3px;
-  color: var(--admin-text);
+  color: var(--text);
 }
 
 .admin-summary-row {
@@ -1490,9 +1381,9 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .admin-summary-item {
@@ -1501,7 +1392,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-right: 1px solid var(--admin-border);
+  border-right: 1px solid var(--border);
 }
 
 .admin-summary-item:last-child {
@@ -1510,31 +1401,29 @@ body {
 
 .admin-summary-label {
   margin-right: auto;
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-summary-value {
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 22px;
   font-weight: 700;
   line-height: 1;
 }
 
 .admin-summary-unit {
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
-
-/* ---------- 本日の予約表 ---------- */
 
 .admin-table-wrapper,
 .admin-list-table-shell {
   width: 100%;
   overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .today-reservation-table,
@@ -1542,7 +1431,7 @@ body {
 .admin-list-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--admin-white);
+  background: var(--white);
 }
 
 .today-reservation-table {
@@ -1553,8 +1442,8 @@ body {
 .today-reservation-table td,
 .admin-table th,
 .admin-table td {
-  border-right: 1px solid var(--admin-border);
-  border-bottom: 1px solid var(--admin-border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .today-reservation-table th:last-child,
@@ -1573,9 +1462,9 @@ body {
 .today-reservation-table th,
 .admin-table th {
   padding: 8px 10px;
-  color: var(--admin-muted);
+  color: var(--muted);
   background: #eef2f0;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   text-align: left;
 }
@@ -1583,8 +1472,8 @@ body {
 .today-reservation-table td,
 .admin-table td {
   padding: 0;
-  color: var(--admin-text);
-  font-size: 12px;
+  color: var(--text);
+  font-size: 14px;
 }
 
 .today-time-column,
@@ -1600,12 +1489,12 @@ body {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  color: var(--admin-text);
+  color: var(--text);
 }
 
 .today-time-link {
   justify-content: center;
-  background: var(--admin-green-pale);
+  background: var(--primary-soft);
   font-weight: 700;
   text-align: center;
 }
@@ -1617,7 +1506,7 @@ body {
 
 .today-slot-link:hover,
 .today-time-link:hover {
-  background: var(--admin-green-soft);
+  background: var(--primary-soft);
 }
 
 .today-patient-name {
@@ -1629,18 +1518,18 @@ body {
 .today-patient-number {
   display: block;
   margin-top: 1px;
-  color: var(--admin-muted);
-  font-size: 9px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .today-empty-label {
-  color: var(--admin-green);
+  color: var(--primary);
   font-weight: 700;
 }
 
 .today-cell-arrow {
   flex: 0 0 auto;
-  color: var(--admin-light);
+  color: #929b96;
   font-size: 18px;
 }
 
@@ -1650,18 +1539,16 @@ body {
 
 .unavailable-patient-cell {
   padding: 12px 6px !important;
-  color: var(--admin-light) !important;
+  color: #929b96 !important;
   background: #f0f2f1;
   text-align: center;
 }
 
 .admin-empty-message {
   padding: 24px 12px !important;
-  color: var(--admin-muted);
+  color: var(--muted);
   text-align: center;
 }
-
-/* ---------- 週間予約表 ---------- */
 
 .admin-schedule-toolbar {
   margin-bottom: 9px;
@@ -1679,13 +1566,13 @@ body {
 }
 
 .admin-schedule-period-label {
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
   white-space: nowrap;
 }
 
 .admin-schedule-period strong {
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 15px;
   white-space: nowrap;
 }
@@ -1698,10 +1585,10 @@ body {
 .admin-week-button {
   min-width: 92px;
   padding: 0 10px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  font-size: 12px;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+  font-size: 14px;
   white-space: nowrap;
 }
 
@@ -1710,13 +1597,13 @@ body {
 }
 
 .admin-week-button.is-primary {
-  color: #ffffff;
-  background: var(--admin-green);
-  border-color: var(--admin-green);
+  color: var(--white);
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .admin-week-button.is-primary:hover {
-  background: var(--admin-green-dark);
+  background: var(--primary-dark);
 }
 
 .admin-week-button.is-disabled {
@@ -1730,8 +1617,8 @@ body {
   display: flex;
   align-items: center;
   gap: 7px 15px;
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-status-guide span {
@@ -1747,16 +1634,16 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .status-dot.is-open {
-  color: var(--admin-green);
+  color: var(--primary);
 }
 
 .status-dot.is-few {
-  color: var(--admin-warning);
+  color: #986800;
 }
 
 .status-dot.is-full,
@@ -1767,22 +1654,22 @@ body {
 .admin-calendar-shell {
   width: 100%;
   overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .admin-calendar-table {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  background: var(--admin-white);
+  background: var(--white);
 }
 
 .admin-calendar-table th,
 .admin-calendar-table td {
-  border-right: 1px solid var(--admin-border);
-  border-bottom: 1px solid var(--admin-border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   text-align: center;
   vertical-align: middle;
 }
@@ -1804,21 +1691,21 @@ body {
 
 .admin-calendar-time-head {
   height: 56px;
-  color: var(--admin-muted);
+  color: var(--muted);
   background: #edf1ef;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .admin-calendar-date-head {
   height: 56px;
   padding: 4px 1px;
-  color: var(--admin-text);
+  color: var(--text);
   background: #f7f9f8;
 }
 
 .admin-calendar-date-head.is-today {
-  background: var(--admin-green-soft);
-  box-shadow: inset 0 3px 0 var(--admin-green);
+  background: var(--primary-soft);
+  box-shadow: inset 0 3px 0 var(--primary);
 }
 
 .admin-calendar-date-head.is-saturday {
@@ -1826,7 +1713,7 @@ body {
 }
 
 .admin-calendar-date-head.is-sunday {
-  color: var(--admin-danger);
+  color: var(--danger);
 }
 
 .admin-calendar-date {
@@ -1839,25 +1726,25 @@ body {
 .admin-calendar-weekday {
   display: block;
   margin-top: 2px;
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .admin-today-badge {
   display: inline-block;
   margin-top: 1px;
   padding: 1px 4px;
-  color: #ffffff;
-  background: var(--admin-green);
+  color: var(--white);
+  background: var(--primary);
   border-radius: 999px;
-  font-size: 8px;
+  font-size: 14px;
 }
 
 .admin-calendar-time-cell {
   height: 56px;
   padding: 3px;
-  color: var(--admin-text);
+  color: var(--text);
   background: #f7f9f8;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1888,13 +1775,13 @@ body {
 }
 
 .admin-calendar-slot.is-open {
-  color: var(--admin-green);
-  background: var(--admin-white);
+  color: var(--primary);
+  background: var(--white);
 }
 
 .admin-calendar-slot.is-few {
-  color: var(--admin-warning);
-  background: var(--admin-warning-bg);
+  color: #986800;
+  background: var(--white)8e6;
 }
 
 .admin-calendar-slot.is-full {
@@ -1914,7 +1801,7 @@ body {
 }
 
 .admin-calendar-count {
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -1925,11 +1812,9 @@ body {
 
 .admin-schedule-note {
   margin: 7px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
-
-/* ---------- 検索フォーム ---------- */
 
 .admin-search-form {
   padding: 0;
@@ -1946,8 +1831,8 @@ body {
   min-width: 0;
   display: grid;
   gap: 5px;
-  color: var(--admin-text);
-  font-size: 11px;
+  color: var(--text);
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -1957,14 +1842,14 @@ body {
 .admin-form-card select,
 .admin-form-card textarea {
   width: 100%;
-  min-height: var(--admin-touch);
+  min-height: 44px;
   padding: 8px 10px;
   box-sizing: border-box;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 .admin-form-card textarea {
@@ -1978,7 +1863,7 @@ body {
 .admin-form-card select:focus,
 .admin-form-card textarea:focus {
   outline: none;
-  border-color: var(--admin-green);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(18, 132, 71, 0.12);
 }
 
@@ -1986,16 +1871,14 @@ body {
   margin-top: 8px;
   display: flex;
   gap: 12px;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .admin-result-text {
   margin: 8px 0 0;
-  color: var(--admin-muted);
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
 }
-
-/* ---------- 予約一覧 ---------- */
 
 .admin-section-title-row {
   margin-bottom: 8px;
@@ -2003,14 +1886,14 @@ body {
 
 .admin-section-title-row h2 {
   margin: 0;
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 16px;
 }
 
 .admin-section-title-row p {
   margin: 2px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-list-table {
@@ -2020,16 +1903,16 @@ body {
 .admin-list-table th,
 .admin-list-table td {
   padding: 8px 7px;
-  color: var(--admin-text);
-  border-bottom: 1px solid var(--admin-border);
-  font-size: 11px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
   text-align: left;
   vertical-align: middle;
   overflow-wrap: anywhere;
 }
 
 .admin-list-table th {
-  color: var(--admin-muted);
+  color: var(--muted);
   background: #eef2f0;
   font-weight: 700;
 }
@@ -2055,2325 +1938,52 @@ body {
 .admin-row-button {
   min-height: 38px;
   padding: 0 8px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 10px;
+  color: var(--primary);
+  background: var(--white);
+  border: 1px solid var(--primary);
+  font-size: 14px;
   white-space: nowrap;
 }
 
 .admin-row-button:hover {
-  background: var(--admin-green-soft);
+  background: var(--primary-soft);
 }
 
 .admin-row-button.is-danger {
-  color: var(--admin-danger);
+  color: var(--danger);
   border-color: #d8a3a3;
 }
 
 .admin-row-button.is-danger:hover {
-  background: var(--admin-danger-bg);
+  background: var(--white)1f1;
 }
 
 .admin-empty-state,
 .admin-empty {
   padding: 24px 12px;
-  color: var(--admin-muted);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-  font-size: 12px;
+  color: var(--muted);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
   text-align: center;
 }
-
-/* ---------- 詳細・確認 ---------- */
 
 .admin-detail-box,
 .admin-confirm-box {
   overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .admin-detail-row,
 .admin-confirm-row {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr);
-  border-bottom: 1px solid var(--admin-border);
-}
-
-.admin-detail-row:last-child,
-.admin-confirm-row:last-child {
-  border-bottom: 0;
-}
-
-.admin-detail-label,
-.admin-confirm-label {
-  padding: 11px 12px;
-  color: var(--admin-muted);
-  background: #eef2f0;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.admin-detail-value,
-.admin-confirm-value {
-  min-width: 0;
-  padding: 11px 13px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  font-size: 12px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.admin-detail-actions,
-.admin-confirm-actions,
-.admin-form-actions {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.admin-detail-actions form,
-.admin-confirm-actions form,
-.admin-form-actions form {
-  margin: 0;
-}
-
-/* ---------- 入力フォーム ---------- */
-
-.admin-form-card {
-  padding: 14px;
-  display: grid;
-  gap: 12px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.admin-form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.admin-form-help {
-  margin: -1px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-.admin-form-error,
-.admin-error {
-  margin: 0 0 10px;
-  padding: 9px 11px;
-  color: #8d2020;
-  background: var(--admin-danger-bg);
-  border-left: 4px solid var(--admin-danger);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.admin-success {
-  margin: 0 0 10px;
-  padding: 9px 11px;
-  color: var(--admin-green-dark);
-  background: var(--admin-green-soft);
-  border-left: 4px solid var(--admin-green);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* ---------- 管理ログイン ---------- */
-
-.admin-login-card {
-  width: 100%;
-  max-width: 440px;
-  margin: 48px auto 0;
-  padding: 28px;
-  box-sizing: border-box;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 10px;
-}
-
-.admin-login-card h1 {
-  margin: 0 0 8px;
-  color: var(--admin-text);
-  font-size: 23px;
-  text-align: center;
-}
-
-.admin-login-card .clinic-lead {
-  margin-bottom: 22px;
-  color: var(--admin-muted);
-  font-size: 13px;
-  text-align: center;
-}
-
-.admin-login-card .clinic-main-button {
-  min-height: 48px;
-  margin-top: 4px;
-  background: var(--admin-green);
-  border-color: var(--admin-green);
-}
-
-/* ---------- 完了画面 ---------- */
-
-.complete-card {
-  max-width: 640px;
-  margin: 24px auto 0;
-  padding: 26px;
-  box-sizing: border-box;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 10px;
-  text-align: center;
-}
-
-.complete-card h1 {
-  margin-bottom: 12px;
-  font-size: 23px;
-}
-
-.complete-card .clinic-lead {
-  margin-bottom: 20px;
-  color: var(--admin-muted);
-}
-
-/* ---------- PCで確認するときもiPad幅を維持 ---------- */
-
-@media (min-width: 1025px) {
-  body {
-    background: #e7ebe9;
-  }
-
-  .admin-header-bar {
-    background: #e7ebe9;
-  }
-
-  .admin-header-bar .site-header-inner,
-  .admin-layout {
-    box-shadow: 0 0 0 1px rgba(32, 45, 38, 0.04);
-  }
-
-  .admin-header-bar .site-header-inner {
-    background: var(--admin-white);
-  }
-}
-Library
-/
-style-ipad-dedicated.css
-
-
-:root {
-  /* colors */
-  --green: #008102;
-  --green-dark: #006b02;
-  --green-pale: #eef7ef;
-  --bg: #ffffff;
-  --surface: #f6f7f6;
-  --card: #ffffff;
-  --white: #ffffff;
-  --text: #222222;
-  --text-soft: #333333;
-  --muted: #666666;
-  --muted-2: #555555;
-  --danger: #d62828;
-  --danger-dark: #b91f1f;
-  --warning-bg: #fff4e5;
-  --warning-border: #e88900;
-  --warning-text: #8a4b00;
-  --blue-text: #1d6fb8;
-  --blue-pale: #f1f6f9;
-  --red-text: #c62828;
-  --red-pale: #fbf0f0;
-  --gray-bg: #f2f2f2;
-  --gray-disabled-bg: #f5f5f5;
-  --gray-disabled-text: #aaaaaa;
-  --gray-mark: #9aa3ad;
-  --gray-mark-light: #b7bec5;
-  --progress-bg: #d9ded9;
-  --progress-text: #5f6b72;
-  --progress-muted: #8a969c;
-
-  /* borders */
-  --border: #dddddd;
-  --border-dark: #c9c9c9;
-  --border-soft: #e5e5e5;
-  --border-table: #d7d7d7;
-  --border-admin-table: #e2e6ea;
-  --border-base: 1px solid var(--border);
-  --border-dark-base: 1px solid var(--border-dark);
-  --border-green: 2px solid var(--green);
-  --border-danger: 2px solid var(--danger);
-  --border-warning: 5px solid var(--warning-border);
-
-  /* typography */
-  --font-family-base: "Yu Gothic UI", "Meiryo", sans-serif;
-  --fs-tiny: 11px;
-  --fs-xxs: 12px;
-  --fs-xs: 13px;
-  --fs-sm: 14px;
-  --fs-base: 15px;
-  --fs-md: 16px;
-  --fs-md-lg: 17px;
-  --fs-lg: 18px;
-  --fs-lg-mobile: 19px;
-  --fs-xl: 20px;
-  --fs-2xl: 22px;
-  --fs-brand: 24px;
-  --fs-h1: 30px;
-  --fs-h1-mobile: 24px;
-  --lh-tight: 1.2;
-  --lh-heading: 1.35;
-  --lh-date: 1.45;
-  --lh-base: 1.6;
-  --lh-note: 1.7;
-  --lh-progress: 1.3;
-  --lh-icon: 1;
-
-  /* font weight: 全体を少し細めに調整 */
-  --fw-normal: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --fw-bold: 700;
-
-  /* layout widths */
-  --w-container: 960px;
-  --w-card: 760px;
-  --w-reservation-card: 900px;
-  --w-admin-card: 980px;
-  --w-login-card: 520px;
-  --w-info-label: 160px;
-  --w-time-cell: 54px;
-  --w-time-cell-mobile: 48px;
-  --w-admin-small-button: 72px;
-  --w-admin-add-button: 170px;
-  --w-admin-search-button: 140px;
-  --h-page-offset: 80px;
-
-  /* spacing */
-  --space-0: 0;
-  --space-1: 1px;
-  --space-3: 3px;
-  --space-4: 4px;
-  --space-5: 5px;
-  --space-6: 6px;
-  --space-7: 7px;
-  --space-8: 8px;
-  --space-10: 10px;
-  --space-11: 11px;
-  --space-12: 12px;
-  --space-13: 13px;
-  --space-14: 14px;
-  --space-15: 15px;
-  --space-16: 16px;
-  --space-17: 17px;
-  --space-18: 18px;
-  --space-20: 20px;
-  --space-22: 22px;
-  --space-24: 24px;
-  --space-26: 26px;
-  --space-28: 28px;
-  --space-30: 30px;
-  --space-34: 34px;
-  --space-36: 36px;
-  --space-38: 38px;
-  --space-42: 42px;
-
-  /* radius */
-  --radius-sm: 4px;
-  --radius-md: 5px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
-  --radius-round: 50%;
-  --radius-pill: 999px;
-
-  /* component sizes */
-  --size-logo: 48px;
-  --size-logo-mobile: 42px;
-  --size-progress-circle: 34px;
-  --size-progress-circle-mobile: 30px;
-  --size-progress-line: 4px;
-  --size-mark: 30px;
-  --size-mark-height:20px;
-  --size-mark-open: 32px;
-  --size-mark-open-height:22px;
-  --size-open-circle: 12px;
-  --border-open-circle: 3px;
-  --h-admin-small-button: 34px;
-
-  /* effects */
-  --focus-ring: 0 0 0 3px rgba(0, 129, 2, 0.13);
-}
-
-/* base */
-
-body {
-  font-family: var(--font-family-base);
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-normal);
-  line-height: var(--lh-base);
-}
-
-.container {
-  max-width: var(--w-container);
-  margin: 0 auto;
-  padding: var(--space-18) var(--space-14);
-  box-sizing: border-box;
-}
-
-h1 {
-  margin: 0 0 var(--space-24);
-  color: var(--text);
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-heading);
-}
-
-h2 {
-  margin: 0 0 var(--space-12);
-  color: var(--green);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
-}
-
-a {
-  color: var(--green);
-  font-weight: var(--fw-bold);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-button,
-input,
-select {
-  font-family: inherit;
-  font-size: var(--fs-md);
-}
-
-button {
-  cursor: pointer;
-}
-
-/* header */
-
-.site-header {
-  border-bottom: var(--border-base);
-  background: var(--white);
-}
-
-.site-header-inner {
-  max-width: var(--w-container);
-  margin: 0 auto;
-  padding: var(--space-13) var(--space-16);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  gap: var(--space-16);
-}
-
-.site-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-14);
-  text-decoration: none;
-  color: inherit;
-}
-
-.site-logo img {
-  width: var(--size-logo);
-  height: var(--size-logo);
-  object-fit: contain;
-  display: block;
-}
-
-.site-brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.site-name {
-  color: var(--green);
-  font-size: var(--fs-brand);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-tight);
-}
-
-.site-subtitle {
-  color: var(--muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-}
-
-.site-nav {
-  display: flex;
-  gap: var(--space-14);
-  font-size: var(--fs-sm);
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.site-nav a {
-  color: var(--green);
-  font-weight: var(--fw-bold);
-}
-
-.admin-header-bar .site-name,
-.admin-header-bar .site-nav a {
-  color: var(--green);
-}
-
-/* common buttons */
-
-.main-button,
-.sub-button,
-.clinic-main-button,
-.clinic-sub-button {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-17) var(--space-18);
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
-  text-decoration: none;
-}
-
-.main-button,
-.clinic-main-button {
-  background: var(--green);
-  color: var(--white);
-  border: var(--border-green);
-}
-
-.main-button:hover,
-.clinic-main-button:hover {
-  background: var(--green-dark);
-  border-color: var(--green-dark);
-  text-decoration: none;
-}
-
-.sub-button,
-.clinic-sub-button {
-  background: var(--white);
-  color: var(--green);
-  border: var(--border-green);
-}
-
-.sub-button:hover,
-.clinic-sub-button:hover {
-  background: var(--green-pale);
-  text-decoration: none;
-}
-
-/* patient pages */
-
-.clinic-page {
-  min-height: calc(100vh - var(--h-page-offset));
-  display: flex;
-  justify-content: center;
-  padding: var(--space-36) var(--space-14);
-  background: var(--white);
-}
-
-.clinic-card {
-  width: 100%;
-  max-width: var(--w-card);
-  background: var(--surface);
-  border: var(--border-base);
-  border-radius: var(--radius-xl);
-  padding: var(--space-38) var(--space-42);
-  box-sizing: border-box;
-}
-
-.clinic-lead {
-  margin: 0 0 var(--space-28);
-  color: var(--text-soft);
-  font-weight: var(--fw-semibold);
-}
-
-.clinic-form {
-  display: grid;
-  gap: var(--space-24);
-}
-
-.clinic-form label {
-  display: grid;
-  gap: var(--space-10);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
-}
-
-.clinic-form input,
-.clinic-form select {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-15) var(--space-16);
-  border: var(--border-dark-base);
-  border-radius: var(--radius-sm);
-  background: var(--white);
-  font-size: var(--fs-lg);
-}
-
-.clinic-form input:focus,
-.clinic-form select:focus {
-  outline: none;
-  border-color: var(--green);
-  box-shadow: var(--focus-ring);
-}
-
-.clinic-danger-button {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-17) var(--space-18);
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
-  background: var(--danger);
-  color: var(--white);
-  border: var(--border-danger);
-}
-
-.clinic-danger-button:hover {
-  background: var(--danger-dark);
-  border-color: var(--danger-dark);
-}
-
-.clinic-note {
-  margin-top: var(--space-24);
-  color: var(--muted);
-  font-size: var(--fs-sm);
-  line-height: var(--lh-note);
-}
-
-.clinic-error,
-.notice-warning {
-  margin-bottom: var(--space-22);
-  padding: var(--space-13) var(--space-16);
-  background: var(--warning-bg);
-  border-left: var(--border-warning);
-  color: var(--warning-text);
-  font-weight: var(--fw-bold);
-}
-
-.clinic-section {
-  margin-top: var(--space-30);
-}
-
-.info-box,
-.reservation-box {
-  background: var(--white);
-  border: var(--border-base);
-  border-radius: var(--radius-md);
-  padding: var(--space-18) var(--space-22);
-}
-
-.info-row {
-  display: grid;
-  grid-template-columns: var(--w-info-label) 1fr;
-  gap: var(--space-16);
-  padding: var(--space-14) 0;
-  border-bottom: var(--space-1) solid var(--border-soft);
-  font-size: var(--fs-md-lg);
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row span {
-  font-weight: var(--fw-bold);
-}
-
-.info-row strong {
-  font-weight: var(--fw-semibold);
-  color: var(--text-soft);
-}
-
-.reservation-box h3 {
-  margin: 0 0 var(--space-12);
-  color: var(--green);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-bold);
-}
-
-.clinic-actions {
-  display: grid;
-  gap: var(--space-12);
-  margin-top: var(--space-18);
-}
-
-.clinic-actions form {
-  margin: 0;
-}
-
-.empty-message {
-  margin: 0 0 var(--space-18);
-  font-weight: var(--fw-bold);
-}
-
-.clinic-logout {
-  display: block;
-  margin-top: var(--space-28);
-  text-align: center;
-  color: var(--green);
-  font-weight: var(--fw-bold);
-  text-decoration: underline;
-}
-
-/* birth select */
-
-.birth-select {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: var(--space-10);
-}
-
-.birth-select select {
-  width: 100%;
-}
-
-/* reservation table */
-
-.reservation-card {
-  max-width: var(--w-reservation-card);
-}
-
-.reserve-title {
-  margin: var(--space-20) 0 var(--space-16);
-  color: var(--green);
-  font-size: var(--fs-2xl);
-  font-weight: var(--fw-bold);
-}
-
-.reserve-note {
-  margin: var(--space-18) 0 var(--space-12);
-  padding: var(--space-12) var(--space-14);
-  background: var(--white);
-  border: var(--border-base);
-  color: var(--text-soft);
-  border-radius: var(--radius-lg);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-}
-
-.reserve-legend {
-  display: flex;
-  gap: var(--space-24);
-  flex-wrap: wrap;
-  margin: var(--space-14) 0 var(--space-18);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-}
-
-.reserve-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-6);
-}
-
-.week-nav {
-  display: flex;
-  gap: var(--space-14);
-  margin: var(--space-18) 0;
-}
-
-.week-btn {
-  flex: 1;
-  padding: var(--space-12) var(--space-8);
-  border: var(--border-green);
-  border-radius: var(--radius-md);
-  background: var(--white);
-  color: var(--green);
-  text-align: center;
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
-}
-
-.week-btn.active {
-  background: var(--green);
-  color: var(--white);
-}
-
-.week-btn.disabled {
-  color: var(--gray-disabled-text);
-  border-color: var(--border);
-  background: var(--gray-disabled-bg);
-  pointer-events: none;
-}
-
-.reservation-table-wrapper {
-  width: 100%;
-  overflow-x: hidden;
-  background: var(--white);
-  border-radius: var(--radius-md);
-  padding: var(--space-10);
-  box-sizing: border-box;
-}
-
-.reservation-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  background: var(--white);
-  overflow: hidden;
-  border-radius: var(--radius-md);
-}
-
-.reservation-table th,
-.reservation-table td {
-  border: var(--space-1) solid var(--border-table);
-  text-align: center;
-  vertical-align: middle;
-  padding: var(--space-7) var(--space-1);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-}
-
-.month-row th {
-  background: var(--green-pale);
-  color: var(--green);
-  font-weight: var(--fw-bold);
-}
-
-.date-row th {
-  background: var(--white);
-  color: var(--text-soft);
-  line-height: var(--lh-date);
-}
-
-.date-row th.saturday {
-  color: var(--blue-text);
-  background: var(--blue-pale);
-}
-
-.date-row th.sunday {
-  color: var(--red-text);
-  background: var(--red-pale);
-}
-
-.time-cell {
-  width: var(--w-time-cell);
-  background: var(--gray-bg);
-  color: var(--muted-2);
-}
-
-.mark-open,
-.mark-full,
-.mark-disabled {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-mark);
-  height: var(--size-mark-height);
-  line-height: var(--lh-icon);
-  text-decoration: none;
-}
-
-.open-cell {
-  background: var(--white);
-}
-
-.unavailable-cell,
-.full-cell {
-  background: var(--gray-bg);
-}
-
-.mark-open {
-  position: relative;
-  width: var(--size-mark-open);
-  height: var(--size-mark-open-height);
-  font-size: 0;
-}
-
-.mark-open::before {
-  content: "";
-  width: var(--size-open-circle);
-  height: var(--size-open-circle);
-  border: var(--border-open-circle) solid var(--green);
-  border-radius: var(--radius-round);
-  display: block;
-}
-
-.mark-open:hover {
-  background: var(--green-pale);
-  border-radius: var(--radius-round);
-  text-decoration: none;
-}
-
-.mark-full {
-  color: var(--gray-mark);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-normal);
-}
-
-.mark-disabled {
-  color: var(--gray-mark-light);
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-normal);
-}
-
-/* progress */
-
-.progress {
-  display: flex;
-  align-items: flex-start;
-  max-width: var(--w-card);
-  margin: var(--space-18) auto var(--space-26);
-  padding: var(--space-16) var(--space-14);
-  /*background: var(--surface);
-  border: var(--border-base);
-  border-radius: var(--radius-xl);*/
-}
-
-.progress-step {
-  flex: 0 0 auto;
-  text-align: center;
-  color: var(--progress-muted);
-  font-weight: var(--fw-bold);
-}
-
-.progress-step .circle {
-  width: var(--size-progress-circle);
-  height: var(--size-progress-circle);
-  margin: 0 auto var(--space-7);
-  border-radius: var(--radius-round);
-  background: var(--progress-bg);
-  color: var(--progress-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--fs-base);
-  font-weight: var(--fw-bold);
-}
-
-.progress-step .label {
-  font-size: var(--fs-sm);
-  line-height: var(--lh-progress);
-  white-space: nowrap;
-}
-
-.progress-step.active {
-  color: var(--green);
-}
-
-.progress-step.active .circle {
-  background: var(--green);
-  color: var(--white);
-}
-
-.progress .line {
-  flex: 1;
-  height: var(--size-progress-line);
-  background: var(--progress-bg);
-  margin: var(--space-16) var(--space-6) 0;
-  border-radius: var(--radius-pill);
-}
-
-.progress .line.active {
-  background: var(--green);
-}
-
-/* utility */
-
-.error {
-  color: var(--danger);
-  font-weight: var(--fw-bold);
-}
-
-.success {
-  color: var(--green);
-  font-weight: var(--fw-bold);
-}
-
-.cancel-link {
-  display: block;
-  padding: var(--space-13);
-  border: var(--border-green);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  color: var(--green);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
-}
-
-/* mobile */
-
-@media (max-width: 768px) {
-  .container {
-    width: 100%;
-    max-width: none;
-    padding: 0;
-  }
-
-  h1 {
-    font-size: var(--fs-h1-mobile);
-  }
-
-  .site-header-inner {
-    padding: var(--space-10) var(--space-10);
-    align-items: flex-start;
-    gap: var(--space-10);
-  }
-
-  .site-logo img {
-    width: var(--size-logo-mobile);
-    height: var(--size-logo-mobile);
-  }
-
-  .site-name {
-    font-size: var(--fs-lg-mobile);
-  }
-
-  .site-subtitle {
-    font-size: var(--fs-xxs);
-  }
-
-  .site-nav {
-    gap: var(--space-6) var(--space-10);
-    font-size: var(--fs-xs);
-  }
-
-  .clinic-page,
-  .admin-page {
-    padding: 0;
-  }
-
-  .clinic-card,
-  .admin-card {
-    padding: var(--space-22) var(--space-12);
-    border-radius: var(--radius-lg);
-  }
-
-  .clinic-form label {
-    font-size: var(--fs-md);
-  }
-
-  .clinic-form input,
-  .clinic-form select {
-    font-size: var(--fs-md);
-  }
-
-  .info-box,
-  .reservation-box,
-  .admin-form-card {
-    padding: var(--space-16);
-  }
-
-  .info-row {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-    font-size: var(--fs-md);
-  }
-
-  .birth-select {
-    grid-template-columns: 1fr;
-  }
-
-  .week-nav {
-    gap: var(--space-8);
-  }
-
-  .week-btn {
-    font-size: var(--fs-sm);
-  }
-
-  .reservation-table-wrapper {
-    padding: 0;
-  }
-
-  .reservation-table th,
-  .reservation-table td {
-    padding: var(--space-6) var(--space-1);
-    font-size: var(--fs-xs);
-  }
-
-  .time-cell {
-    width: var(--w-time-cell-mobile);
-    font-size: var(--fs-xs);
-  }
-
-  .mark-full {
-    font-size: var(--fs-lg-mobile);
-  }
-
-  .mark-disabled {
-    font-size: var(--fs-md-lg);
-  }
-
-  .progress {
-    margin: var(--space-10) auto var(--space-18);
-    padding: var(--space-10) var(--space-6);
-  }
-
-  .progress-step .circle {
-    width: var(--size-progress-circle-mobile);
-    height: var(--size-progress-circle-mobile);
-    font-size: var(--fs-xs);
-  }
-
-  .progress-step .label {
-    font-size: var(--fs-tiny);
-  }
-
-  .progress .line {
-    margin: var(--space-14) var(--space-3) 0;
-  }
-
-  .admin-menu {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-search-form {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-search-form .clinic-main-button {
-    width: 100%;
-  }
-
-  .admin-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .admin-add-button {
-    width: 100%;
-  }
-
-  .admin-table th,
-  .admin-table td {
-    font-size: var(--fs-sm);
-    padding: var(--space-11) var(--space-10);
-  }
-  .admin-action-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .admin-small-button,
-  .admin-danger-button {
-    width: 100%;
-    height: var(--h-admin-small-button);
-  }
-}
-
-.confirm-warning {
-  margin: 0 0 var(--space-lg);
-  color: var(--danger);
-  font-weight: var(--fw-bold);
-}
-
-.confirm-section {
-  margin-top: var(--space-30);
-}
-
-.confirm-table {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.confirm-row {
-  display: grid;
-  grid-template-columns: 150px 1fr;
   border-bottom: 1px solid var(--border);
 }
 
-.confirm-row:last-child {
-  border-bottom: none;
-}
-
-.confirm-label {
-  padding: 12px 14px;
-  background: #f3eddf;
-  font-weight: var(--fw-bold);
-  color: #555;
-}
-
-.confirm-value {
-  padding: 12px 14px;
-  background: #fff;
-  font-weight: var(--fw-medium);
-  color: var(--text);
-}
-
-.confirm-note-box {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  line-height: 1.8;
-  color: #555;
-}
-
-.terms-area {
-  margin: 26px 0 10px;
-  text-align: center;
-  font-size: var(--fs-note);
-}
-
-.terms-area a {
-  text-decoration: underline;
-}
-
-.confirm-submit-button span {
-  display: block;
-  font-size: 14px;
-  font-weight: var(--fw-bold);
-  margin-bottom: 4px;
-}
-
-.confirm-submit-button strong {
-  display: block;
-  font-size: 18px;
-  font-weight: var(--fw-bold);
-}
-
-@media (max-width: 768px) {
-  .confirm-row {
-    grid-template-columns: 120px 1fr;
-  }
-
-  .confirm-label,
-  .confirm-value {
-    padding: 11px 10px;
-    font-size: 14px;
-  }
-}
-
-.complete-message {
-  margin: 0 0 var(--space-30);
-  padding: 16px 18px;
-  background: var(--green-pale);
-  border: 1px solid var(--green);
-  border-radius: var(--radius-md);
-  text-align: center;
-  color: var(--green);
-  line-height: 1.8;
-}
-
-.complete-message strong {
-  font-size: 18px;
-  font-weight: var(--fw-bold);
-}
-
-/* =========================================================
-   管理画面：専用iPad横向き版
-   基準画面：1024px × 768px
-   管理画面は横向き固定運用を想定
-========================================================= */
-
-:root {
-  --admin-width: 1024px;
-  --admin-header-height: 64px;
-  --admin-sidebar-width: 176px;
-
-  --admin-bg: #f3f5f4;
-  --admin-white: #ffffff;
-  --admin-panel: #ffffff;
-  --admin-border: #d8dfdb;
-  --admin-border-dark: #c7d0cb;
-
-  --admin-green: #128447;
-  --admin-green-dark: #0d6d3a;
-  --admin-green-soft: #e8f4ed;
-  --admin-green-pale: #f3faf6;
-
-  --admin-text: #252a27;
-  --admin-muted: #68736d;
-  --admin-light: #929b96;
-
-  --admin-warning: #986800;
-  --admin-warning-bg: #fff8e6;
-
-  --admin-danger: #c23838;
-  --admin-danger-dark: #a72d2d;
-  --admin-danger-bg: #fff1f1;
-
-  --admin-radius: 6px;
-  --admin-touch: 44px;
-}
-
-/* ---------- 画面全体 ---------- */
-
-body {
-  margin: 0;
-}
-
-.admin-header-bar,
-.admin-layout,
-.admin-sidebar,
-.admin-main,
-.admin-page,
-.admin-card,
-.admin-panel,
-.admin-calendar-shell,
-.admin-list-table-shell,
-.admin-table-wrapper {
-  box-sizing: border-box;
-}
-
-.admin-header-bar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
-  min-width: var(--admin-width);
-  height: var(--admin-header-height);
-  background: var(--admin-white);
-  border-bottom: 1px solid var(--admin-border);
-}
-
-.admin-header-bar .site-header-inner {
-  width: var(--admin-width);
-  max-width: var(--admin-width);
-  height: 100%;
-  margin: 0 auto;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.admin-header-bar .site-brand {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.admin-header-bar .site-logo img {
-  width: 38px;
-  height: 38px;
-}
-
-.admin-header-bar .site-name {
-  color: var(--admin-green);
-  font-size: 19px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.admin-header-bar .site-subtitle {
-  color: var(--admin-muted);
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.admin-header-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.admin-current-datetime {
-  color: var(--admin-muted);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* ---------- 医師切り替え ---------- */
-
-.doctor-selector {
-  position: relative;
-}
-
-.doctor-selector summary {
-  list-style: none;
-}
-
-.doctor-selector summary::-webkit-details-marker {
-  display: none;
-}
-
-.doctor-selector-button {
-  min-width: 132px;
-  min-height: 40px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.doctor-selector-button:hover {
-  color: var(--admin-green);
-  background: var(--admin-green-pale);
-  border-color: var(--admin-green);
-}
-
-.doctor-selector-arrow {
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-.doctor-selector-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 1100;
-  width: 210px;
-  padding: 6px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: 8px;
-  box-shadow: 0 10px 26px rgba(29, 45, 36, 0.14);
-}
-
-.doctor-selector-item {
-  min-height: var(--admin-touch);
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--admin-text);
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.doctor-selector-item:hover,
-.doctor-selector-item.is-selected {
-  color: var(--admin-green);
-  background: var(--admin-green-soft);
-}
-
-.doctor-selector-check {
-  color: var(--admin-green);
-}
-
-.header-logout-link {
-  min-height: 40px;
-  padding: 0 4px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--admin-muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.header-logout-link:hover {
-  color: var(--admin-green);
-}
-
-/* ---------- 1024px本体 ---------- */
-
-.admin-layout {
-  width: var(--admin-width);
-  min-height: calc(100vh - var(--admin-header-height));
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
-  background: var(--admin-bg);
-}
-
-.admin-sidebar {
-  min-width: 0;
-  background: var(--admin-white);
-  border-right: 1px solid var(--admin-border);
-}
-
-.admin-sidebar-nav {
-  position: sticky;
-  top: var(--admin-header-height);
-  padding: 14px 9px 20px;
-}
-
-.admin-sidebar-group {
-  margin-bottom: 16px;
-}
-
-.admin-sidebar-group:last-child {
-  margin-bottom: 0;
-}
-
-.admin-sidebar-label {
-  margin: 0 10px 6px;
-  color: var(--admin-light);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.admin-sidebar-link {
-  min-height: 46px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: var(--admin-text);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.admin-sidebar-link:hover,
-.admin-sidebar-link.is-active {
-  color: var(--admin-green);
-  background: var(--admin-green-soft);
-  text-decoration: none;
-}
-
-.admin-sidebar-icon {
-  flex: 0 0 20px;
-  width: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--admin-muted);
-  font-size: 16px;
-}
-
-.admin-sidebar-link:hover .admin-sidebar-icon,
-.admin-sidebar-link.is-active .admin-sidebar-icon {
-  color: var(--admin-green);
-}
-
-.admin-main {
-  min-width: 0;
-  width: 100%;
-  padding: 16px;
-  background: var(--admin-bg);
-}
-
-.admin-page {
-  min-height: auto;
-  padding: 0;
-  display: block;
-  background: transparent;
-}
-
-.admin-card {
-  width: 100%;
-  max-width: none;
-  padding: 0;
-  background: transparent;
-  border: 0;
-}
-
-/* ---------- ページ見出し ---------- */
-
-.admin-page-header {
-  min-height: 48px;
-  margin: 0 0 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.admin-page-header > div {
-  min-width: 0;
-}
-
-.admin-page-eyebrow {
-  margin: 0 0 1px;
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-.admin-page-header h1 {
-  margin: 0;
-  color: var(--admin-text);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.admin-page-description {
-  margin: 3px 0 0;
-  color: var(--admin-muted);
-  font-size: 12px;
-}
-
-.admin-page-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-/* ---------- パネル ---------- */
-
-.admin-panel {
-  width: 100%;
-  padding: 14px;
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.admin-panel + .admin-panel {
-  margin-top: 12px;
-}
-
-.admin-panel-title {
-  margin: 0 0 10px;
-  color: var(--admin-text);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.admin-panel-description {
-  margin: -4px 0 10px;
-  color: var(--admin-muted);
-  font-size: 11px;
-}
-
-/* ---------- ボタン ---------- */
-
-.admin-primary-button,
-.admin-secondary-button,
-.admin-danger-outline-button,
-.admin-refresh-button,
-.admin-week-button,
-.admin-row-button {
-  box-sizing: border-box;
-  min-height: var(--admin-touch);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--admin-radius);
-  text-align: center;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.admin-primary-button {
-  padding: 0 16px;
-  color: #ffffff;
-  background: var(--admin-green);
-  border: 1px solid var(--admin-green);
-  font-size: 13px;
-}
-
-.admin-primary-button:hover {
-  color: #ffffff;
-  background: var(--admin-green-dark);
-  border-color: var(--admin-green-dark);
-}
-
-.admin-secondary-button {
-  padding: 0 16px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 13px;
-}
-
-.admin-secondary-button:hover {
-  background: var(--admin-green-soft);
-}
-
-.admin-danger-outline-button {
-  padding: 0 16px;
-  color: var(--admin-danger);
-  background: var(--admin-white);
-  border: 1px solid #d8a3a3;
-  font-size: 13px;
-}
-
-.admin-danger-outline-button:hover {
-  background: var(--admin-danger-bg);
-}
-
-.admin-refresh-button {
-  min-height: 38px;
-  padding: 0 12px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 12px;
-}
-
-.admin-refresh-button:hover {
-  background: var(--admin-green-soft);
-}
-
-/* ---------- ダッシュボード ---------- */
-
-.admin-dashboard-heading {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.admin-dashboard-heading h2 {
-  margin: 0;
-  color: var(--admin-text);
-  font-size: 16px;
-}
-
-.admin-dashboard-doctor {
-  margin: 4px 0 0;
-  color: var(--admin-muted);
-  font-size: 11px;
-}
-
-.admin-update-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.admin-updated-at {
-  color: var(--admin-muted);
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.admin-updated-at strong {
-  margin-left: 3px;
-  color: var(--admin-text);
-}
-
-.admin-summary-row {
-  margin-bottom: 12px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.admin-summary-item {
-  min-height: 64px;
-  padding: 10px 13px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border-right: 1px solid var(--admin-border);
-}
-
-.admin-summary-item:last-child {
-  border-right: 0;
-}
-
-.admin-summary-label {
-  margin-right: auto;
-  color: var(--admin-muted);
-  font-size: 11px;
-}
-
-.admin-summary-value {
-  color: var(--admin-text);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.admin-summary-unit {
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-/* ---------- 本日の予約表 ---------- */
-
-.admin-table-wrapper,
-.admin-list-table-shell {
-  width: 100%;
-  overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.today-reservation-table,
-.admin-table,
-.admin-list-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--admin-white);
-}
-
-.today-reservation-table {
-  table-layout: fixed;
-}
-
-.today-reservation-table th,
-.today-reservation-table td,
-.admin-table th,
-.admin-table td {
-  border-right: 1px solid var(--admin-border);
-  border-bottom: 1px solid var(--admin-border);
-}
-
-.today-reservation-table th:last-child,
-.today-reservation-table td:last-child,
-.admin-table th:last-child,
-.admin-table td:last-child {
-  border-right: 0;
-}
-
-.today-reservation-table tr:last-child th,
-.today-reservation-table tr:last-child td,
-.admin-table tr:last-child td {
-  border-bottom: 0;
-}
-
-.today-reservation-table th,
-.admin-table th {
-  padding: 8px 10px;
-  color: var(--admin-muted);
-  background: #eef2f0;
-  font-size: 11px;
-  font-weight: 700;
-  text-align: left;
-}
-
-.today-reservation-table td,
-.admin-table td {
-  padding: 0;
-  color: var(--admin-text);
-  font-size: 12px;
-}
-
-.today-time-column,
-.today-reservation-table .time-cell {
-  width: 104px;
-}
-
-.today-time-link,
-.today-slot-link {
-  width: 100%;
-  min-height: 54px;
-  padding: 8px 11px;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  color: var(--admin-text);
-}
-
-.today-time-link {
-  justify-content: center;
-  background: var(--admin-green-pale);
-  font-weight: 700;
-  text-align: center;
-}
-
-.today-slot-link {
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.today-slot-link:hover,
-.today-time-link:hover {
-  background: var(--admin-green-soft);
-}
-
-.today-patient-name {
-  min-width: 0;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-}
-
-.today-patient-number {
-  display: block;
-  margin-top: 1px;
-  color: var(--admin-muted);
-  font-size: 9px;
-}
-
-.today-empty-label {
-  color: var(--admin-green);
-  font-weight: 700;
-}
-
-.today-cell-arrow {
-  flex: 0 0 auto;
-  color: var(--admin-light);
-  font-size: 18px;
-}
-
-.empty-patient-cell {
-  background: #fbfcfb;
-}
-
-.unavailable-patient-cell {
-  padding: 12px 6px !important;
-  color: var(--admin-light) !important;
-  background: #f0f2f1;
-  text-align: center;
-}
-
-.admin-empty-message {
-  padding: 24px 12px !important;
-  color: var(--admin-muted);
-  text-align: center;
-}
-
-/* ---------- 週間予約表 ---------- */
-
-.admin-schedule-toolbar {
-  margin-bottom: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.admin-schedule-period {
-  min-width: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.admin-schedule-period-label {
-  color: var(--admin-muted);
-  font-size: 11px;
-  white-space: nowrap;
-}
-
-.admin-schedule-period strong {
-  color: var(--admin-text);
-  font-size: 15px;
-  white-space: nowrap;
-}
-
-.admin-week-navigation {
-  display: flex;
-  gap: 6px;
-}
-
-.admin-week-button {
-  min-width: 92px;
-  padding: 0 10px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.admin-week-button:hover {
-  background: #edf2ef;
-}
-
-.admin-week-button.is-primary {
-  color: #ffffff;
-  background: var(--admin-green);
-  border-color: var(--admin-green);
-}
-
-.admin-week-button.is-primary:hover {
-  background: var(--admin-green-dark);
-}
-
-.admin-week-button.is-disabled {
-  color: #a4aba7;
-  background: #f2f4f3;
-  pointer-events: none;
-}
-
-.admin-status-guide {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 7px 15px;
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-.admin-status-guide span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.status-dot {
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.status-dot.is-open {
-  color: var(--admin-green);
-}
-
-.status-dot.is-few {
-  color: var(--admin-warning);
-}
-
-.status-dot.is-full,
-.status-dot.is-closed {
-  color: #7c8580;
-}
-
-.admin-calendar-shell {
-  width: 100%;
-  overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.admin-calendar-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  background: var(--admin-white);
-}
-
-.admin-calendar-table th,
-.admin-calendar-table td {
-  border-right: 1px solid var(--admin-border);
-  border-bottom: 1px solid var(--admin-border);
-  text-align: center;
-  vertical-align: middle;
-}
-
-.admin-calendar-table th:last-child,
-.admin-calendar-table td:last-child {
-  border-right: 0;
-}
-
-.admin-calendar-table tbody tr:last-child th,
-.admin-calendar-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.admin-calendar-time-head,
-.admin-calendar-time-cell {
-  width: 78px;
-}
-
-.admin-calendar-time-head {
-  height: 56px;
-  color: var(--admin-muted);
-  background: #edf1ef;
-  font-size: 11px;
-}
-
-.admin-calendar-date-head {
-  height: 56px;
-  padding: 4px 1px;
-  color: var(--admin-text);
-  background: #f7f9f8;
-}
-
-.admin-calendar-date-head.is-today {
-  background: var(--admin-green-soft);
-  box-shadow: inset 0 3px 0 var(--admin-green);
-}
-
-.admin-calendar-date-head.is-saturday {
-  color: #315da8;
-}
-
-.admin-calendar-date-head.is-sunday {
-  color: var(--admin-danger);
-}
-
-.admin-calendar-date {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.05;
-}
-
-.admin-calendar-weekday {
-  display: block;
-  margin-top: 2px;
-  font-size: 10px;
-}
-
-.admin-today-badge {
-  display: inline-block;
-  margin-top: 1px;
-  padding: 1px 4px;
-  color: #ffffff;
-  background: var(--admin-green);
-  border-radius: 999px;
-  font-size: 8px;
-}
-
-.admin-calendar-time-cell {
-  height: 56px;
-  padding: 3px;
-  color: var(--admin-text);
-  background: #f7f9f8;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.admin-calendar-slot {
-  height: 56px;
-  padding: 0;
-}
-
-.admin-calendar-slot-link,
-.admin-calendar-slot-disabled {
-  width: 100%;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 2px;
-  box-sizing: border-box;
-}
-
-.admin-calendar-slot-link {
-  color: inherit;
-}
-
-.admin-calendar-slot-link:hover {
-  filter: brightness(0.97);
-}
-
-.admin-calendar-slot.is-open {
-  color: var(--admin-green);
-  background: var(--admin-white);
-}
-
-.admin-calendar-slot.is-few {
-  color: var(--admin-warning);
-  background: var(--admin-warning-bg);
-}
-
-.admin-calendar-slot.is-full {
-  color: #626a66;
-  background: #edf0ee;
-}
-
-.admin-calendar-slot.is-closed {
-  color: #a0a7a3;
-  background: #f4f5f4;
-}
-
-.admin-calendar-status {
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.admin-calendar-count {
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.admin-calendar-slot-disabled {
-  color: #a0a7a3;
-  font-size: 14px;
-}
-
-.admin-schedule-note {
-  margin: 7px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-/* ---------- 検索フォーム ---------- */
-
-.admin-search-form {
-  padding: 0;
-  display: grid;
-  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
-  gap: 9px;
-  align-items: end;
-  background: transparent;
-  border: 0;
-}
-
-.admin-search-form label,
-.admin-form-card label {
-  min-width: 0;
-  display: grid;
-  gap: 5px;
-  color: var(--admin-text);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.admin-search-form input,
-.admin-search-form select,
-.admin-form-card input,
-.admin-form-card select,
-.admin-form-card textarea {
-  width: 100%;
-  min-height: var(--admin-touch);
-  padding: 8px 10px;
-  box-sizing: border-box;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border-dark);
-  border-radius: var(--admin-radius);
-  font-size: 13px;
-}
-
-.admin-form-card textarea {
-  min-height: 96px;
-  resize: vertical;
-}
-
-.admin-search-form input:focus,
-.admin-search-form select:focus,
-.admin-form-card input:focus,
-.admin-form-card select:focus,
-.admin-form-card textarea:focus {
-  outline: none;
-  border-color: var(--admin-green);
-  box-shadow: 0 0 0 3px rgba(18, 132, 71, 0.12);
-}
-
-.admin-filter-links {
-  margin-top: 8px;
-  display: flex;
-  gap: 12px;
-  font-size: 11px;
-}
-
-.admin-result-text {
-  margin: 8px 0 0;
-  color: var(--admin-muted);
-  font-size: 11px;
-}
-
-/* ---------- 予約一覧 ---------- */
-
-.admin-section-title-row {
-  margin-bottom: 8px;
-}
-
-.admin-section-title-row h2 {
-  margin: 0;
-  color: var(--admin-text);
-  font-size: 16px;
-}
-
-.admin-section-title-row p {
-  margin: 2px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
-}
-
-.admin-list-table {
-  table-layout: fixed;
-}
-
-.admin-list-table th,
-.admin-list-table td {
-  padding: 8px 7px;
-  color: var(--admin-text);
-  border-bottom: 1px solid var(--admin-border);
-  font-size: 11px;
-  text-align: left;
-  vertical-align: middle;
-  overflow-wrap: anywhere;
-}
-
-.admin-list-table th {
-  color: var(--admin-muted);
-  background: #eef2f0;
-  font-weight: 700;
-}
-
-.admin-list-table tr:last-child td {
-  border-bottom: 0;
-}
-
-.admin-list-table tbody tr:hover td {
-  background: #fbfdfc;
-}
-
-.admin-row-actions {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.admin-row-actions form {
-  margin: 0;
-}
-
-.admin-row-button {
-  min-height: 38px;
-  padding: 0 8px;
-  color: var(--admin-green);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-green);
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.admin-row-button:hover {
-  background: var(--admin-green-soft);
-}
-
-.admin-row-button.is-danger {
-  color: var(--admin-danger);
-  border-color: #d8a3a3;
-}
-
-.admin-row-button.is-danger:hover {
-  background: var(--admin-danger-bg);
-}
-
-.admin-empty-state,
-.admin-empty {
-  padding: 24px 12px;
-  color: var(--admin-muted);
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-  font-size: 12px;
-  text-align: center;
-}
-
-/* ---------- 詳細・確認 ---------- */
-
-.admin-detail-box,
-.admin-confirm-box {
-  overflow: hidden;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-}
-
-.admin-detail-row,
-.admin-confirm-row {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
-  border-bottom: 1px solid var(--admin-border);
-}
-
 .admin-detail-row:last-child,
 .admin-confirm-row:last-child {
   border-bottom: 0;
@@ -4382,9 +1992,9 @@ body {
 .admin-detail-label,
 .admin-confirm-label {
   padding: 11px 12px;
-  color: var(--admin-muted);
+  color: var(--muted);
   background: #eef2f0;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -4392,9 +2002,9 @@ body {
 .admin-confirm-value {
   min-width: 0;
   padding: 11px 13px;
-  color: var(--admin-text);
-  background: var(--admin-white);
-  font-size: 12px;
+  color: var(--text);
+  background: var(--white);
+  font-size: 14px;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -4414,15 +2024,13 @@ body {
   margin: 0;
 }
 
-/* ---------- 入力フォーム ---------- */
-
 .admin-form-card {
   padding: 14px;
   display: grid;
   gap: 12px;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .admin-form-row {
@@ -4433,8 +2041,8 @@ body {
 
 .admin-form-help {
   margin: -1px 0 0;
-  color: var(--admin-muted);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .admin-form-error,
@@ -4442,25 +2050,23 @@ body {
   margin: 0 0 10px;
   padding: 9px 11px;
   color: #8d2020;
-  background: var(--admin-danger-bg);
-  border-left: 4px solid var(--admin-danger);
+  background: var(--white)1f1;
+  border-left: 4px solid var(--danger);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .admin-success {
   margin: 0 0 10px;
   padding: 9px 11px;
-  color: var(--admin-green-dark);
-  background: var(--admin-green-soft);
-  border-left: 4px solid var(--admin-green);
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  border-left: 4px solid var(--primary);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
-
-/* ---------- 管理ログイン ---------- */
 
 .admin-login-card {
   width: 100%;
@@ -4468,41 +2074,39 @@ body {
   margin: 48px auto 0;
   padding: 28px;
   box-sizing: border-box;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 
 .admin-login-card h1 {
   margin: 0 0 8px;
-  color: var(--admin-text);
+  color: var(--text);
   font-size: 23px;
   text-align: center;
 }
 
 .admin-login-card .clinic-lead {
   margin-bottom: 22px;
-  color: var(--admin-muted);
-  font-size: 13px;
+  color: var(--muted);
+  font-size: 14px;
   text-align: center;
 }
 
 .admin-login-card .clinic-main-button {
   min-height: 48px;
   margin-top: 4px;
-  background: var(--admin-green);
-  border-color: var(--admin-green);
+  background: var(--primary);
+  border-color: var(--primary);
 }
-
-/* ---------- 完了画面 ---------- */
 
 .complete-card {
   max-width: 640px;
   margin: 24px auto 0;
   padding: 26px;
   box-sizing: border-box;
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 10px;
   text-align: center;
 }
@@ -4514,10 +2118,8 @@ body {
 
 .complete-card .clinic-lead {
   margin-bottom: 20px;
-  color: var(--admin-muted);
+  color: var(--muted);
 }
-
-/* ---------- PCで確認するときもiPad幅を維持 ---------- */
 
 @media (min-width: 1025px) {
   body {
@@ -4534,6 +2136,6 @@ body {
   }
 
   .admin-header-bar .site-header-inner {
-    background: var(--admin-white);
+    background: var(--white);
   }
 }
