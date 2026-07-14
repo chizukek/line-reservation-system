@@ -1,3 +1,4 @@
+```ejs
 <%- include("partials/header", {
   title,
   isAdminPage,
@@ -22,6 +23,59 @@
     minute: "2-digit",
     second: "2-digit"
   }).format(updatedAt);
+
+  /*
+   * 現在の日本時間を「HH:MM」形式で取得
+   */
+  const currentTime = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(new Date());
+
+  /*
+   * 「10:00〜11:00」のような表示から開始時刻を取得
+   */
+  const getSlotStartTime = (slot) => {
+    return String(slot).split(/[〜～-]/)[0].trim();
+  };
+
+  /*
+   * 現在時刻以降に開始する予約数
+   */
+  const remainingReservationCount = reservations.filter((reservation) => {
+    const startTime = getSlotStartTime(reservation.slot);
+    return startTime >= currentTime;
+  }).length;
+
+  /*
+   * 本日の診療枠の中で最大の定員数を取得
+   *
+   * 例：
+   * 10:00〜11:00が定員1人
+   * 16:00〜17:00が定員2人
+   * → 患者列は2列表示
+   */
+  const maxCapacity = slots.length > 0
+    ? Math.max(
+        ...slots.map((slot) =>
+          getCapacityForSlot(today, slot, doctorId)
+        )
+      )
+    : 0;
+
+  /*
+   * 1 → ①、2 → ② のように表示
+   */
+  const circledNumbers = [
+    "①", "②", "③", "④", "⑤",
+    "⑥", "⑦", "⑧", "⑨", "⑩"
+  ];
+
+  const getPatientColumnLabel = (index) => {
+    return circledNumbers[index] || String(index + 1);
+  };
 %>
 
 <div class="admin-page-header">
@@ -99,15 +153,15 @@
 
     <div class="admin-summary-item">
       <span class="admin-summary-label">
-        診療枠
+        本日の残りの診療数
       </span>
 
       <strong class="admin-summary-value">
-        <%= slots.length %>
+        <%= remainingReservationCount %>
       </strong>
 
       <span class="admin-summary-unit">
-        枠
+        件
       </span>
     </div>
 
@@ -123,13 +177,11 @@
             時間
           </th>
 
-          <th>
-            患者①
-          </th>
-
-          <th>
-            患者②
-          </th>
+          <% for (let index = 0; index < maxCapacity; index++) { %>
+            <th>
+              患者<%= getPatientColumnLabel(index) %>
+            </th>
+          <% } %>
         </tr>
       </thead>
 
@@ -139,7 +191,7 @@
 
           <tr>
             <td
-              colspan="3"
+              colspan="<%= Math.max(maxCapacity + 1, 1) %>"
               class="admin-empty-message"
             >
               本日の診療予定はありません。
@@ -152,14 +204,8 @@
 
             <%
               const slotReservations = reservations.filter(
-                reservation => reservation.slot === slot
+                (reservation) => reservation.slot === slot
               );
-
-              const firstReservation =
-                slotReservations[0] || null;
-
-              const secondReservation =
-                slotReservations[1] || null;
 
               const capacity =
                 getCapacityForSlot(today, slot, doctorId);
@@ -183,89 +229,69 @@
 
               </th>
 
-              <td class="<%= firstReservation
-                ? 'reserved-patient-cell'
-                : 'empty-patient-cell'
-              %>">
+              <% for (
+                let patientIndex = 0;
+                patientIndex < maxCapacity;
+                patientIndex++
+              ) { %>
 
-                <a
-                  class="today-slot-link"
-                  href="<%= slotUrl %>"
-                  aria-label="<%= slot %>の予約枠詳細を開く"
-                >
+                <%
+                  const reservation =
+                    slotReservations[patientIndex] || null;
 
-                  <% if (firstReservation) { %>
+                  const isAvailableColumn =
+                    patientIndex < capacity;
+                %>
 
-                    <span class="today-patient-name">
-                      <%= firstReservation.patient.name %>
-                    </span>
+                <% if (isAvailableColumn) { %>
 
-                  <% } else { %>
+                  <td class="<%= reservation
+                    ? 'reserved-patient-cell'
+                    : 'empty-patient-cell'
+                  %>">
 
-                    <span class="today-empty-label">
-                      空き
-                    </span>
-
-                  <% } %>
-
-                  <span
-                    class="today-cell-arrow"
-                    aria-hidden="true"
-                  >
-                    ›
-                  </span>
-
-                </a>
-
-              </td>
-
-              <% if (capacity >= 2) { %>
-
-                <td class="<%= secondReservation
-                  ? 'reserved-patient-cell'
-                  : 'empty-patient-cell'
-                %>">
-
-                  <a
-                    class="today-slot-link"
-                    href="<%= slotUrl %>"
-                    aria-label="<%= slot %>の予約枠詳細を開く"
-                  >
-
-                    <% if (secondReservation) { %>
-
-                      <span class="today-patient-name">
-                        <%= secondReservation.patient.name %>
-                      </span>
-
-                    <% } else { %>
-
-                      <span class="today-empty-label">
-                        空き
-                      </span>
-
-                    <% } %>
-
-                    <span
-                      class="today-cell-arrow"
-                      aria-hidden="true"
+                    <a
+                      class="today-slot-link"
+                      href="<%= slotUrl %>"
+                      aria-label="<%= slot %>の予約枠詳細を開く"
                     >
-                      ›
+
+                      <% if (reservation) { %>
+
+                        <span class="today-patient-name">
+                          <%= reservation.patient.name %>
+                        </span>
+
+                      <% } else { %>
+
+                        <span class="today-empty-label">
+                          空き
+                        </span>
+
+                      <% } %>
+
+                      <span
+                        class="today-cell-arrow"
+                        aria-hidden="true"
+                      >
+                        ›
+                      </span>
+
+                    </a>
+
+                  </td>
+
+                <% } else { %>
+
+                  <td class="unavailable-patient-cell">
+
+                    <span aria-label="設定されていない予約枠">
+                      ―
                     </span>
 
-                  </a>
+                  </td>
 
-                </td>
-
-              <% } else { %>
-
-                <td class="unavailable-patient-cell">
-
-                  <span aria-label="設定されていない予約枠">
-                    ―
-                  </span>
-
-                </td>
+                <% } %>
 
               <% } %>
 
@@ -287,3 +313,4 @@
   isAdminPage: true,
   isAdminLoggedIn
 }) %>
+```
