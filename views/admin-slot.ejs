@@ -20,17 +20,20 @@
         </p>
       </div>
 
-      <a
-        class="admin-primary-button"
-        href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-      >
-        予約を追加
-      </a>
+      <% if (isOpen && reservations.length < capacity) { %>
+        <a
+          class="admin-primary-button"
+          href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+        >
+          予約を追加
+        </a>
+      <% } %>
     </header>
 
     <section class="admin-panel">
 
       <div class="admin-slot-summary">
+
         <div class="admin-slot-summary-item">
           <span>日付</span>
           <strong><%= formatJapaneseDate(date) %></strong>
@@ -47,115 +50,271 @@
         </div>
 
         <div class="admin-slot-summary-item">
-          <span>予約状況</span>
+          <span>診療状態</span>
           <strong>
-            <%= reservations.length %> / <%= capacity %>人
+            <%= isOpen ? "診療" : "休診" %>
           </strong>
         </div>
-      </div>
 
-      <div class="admin-list-table-shell">
-        <table class="admin-list-table">
-
-          <thead>
-            <tr>
-              <th>状態</th>
-              <th>患者番号</th>
-              <th>患者氏名</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            <% reservations.forEach((reservation, index) => { %>
-              <tr>
-                <td>
-                  <span class="admin-reserved-label">
-                    予約 <%= index + 1 %>
-                  </span>
-                </td>
-
-                <td>
-                  <%= reservation.patientNumber %>
-                </td>
-
-                <td>
-                  <strong>
-                    <%= reservation.patient.name %>
-                  </strong>
-                </td>
-
-                <td>
-                  <div class="admin-row-actions">
-
-                    <a
-                      class="admin-row-button"
-                      href="/admin/edit/<%= reservation.id %>"
-                    >
-                      変更
-                    </a>
-
-                    <a
-                      class="admin-row-button is-danger"
-                      href="/admin/cancel-confirm/<%= reservation.id %>"
-                    >
-                      キャンセル
-                    </a>
-
-                  </div>
-                </td>
-              </tr>
-            <% }) %>
-
-            <%
-              const remainingCapacity =
-                Math.max(0, capacity - reservations.length);
-            %>
-
-            <% for (let i = 0; i < remainingCapacity; i++) { %>
-              <tr class="admin-empty-slot-row">
-                <td>
-                  <span class="admin-empty-slot-label">
-                    空き
-                  </span>
-                </td>
-
-                <td>−</td>
-
-                <td>
-                  予約なし
-                </td>
-
-                <td>
-                  <a
-                    class="admin-row-button is-add"
-                    href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-                  >
-                    予約追加
-                  </a>
-                </td>
-              </tr>
+        <div class="admin-slot-summary-item">
+          <span>予約状況</span>
+          <strong>
+            <% if (isOpen) { %>
+              <%= reservations.length %> / <%= capacity %>人
+            <% } else { %>
+              受付なし
             <% } %>
-
-          </tbody>
-
-        </table>
-      </div>
-
-      <% if (reservations.length >= capacity) { %>
-        <div class="admin-slot-full-message">
-          この予約枠は満員です。
+          </strong>
         </div>
-      <% } else { %>
-        <p class="admin-schedule-note">
-          あと<%= remainingCapacity %>人予約できます。
-        </p>
-      <% } %>
+
+      </div>
 
     </section>
 
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        この枠の診療設定
+      </h2>
+
+      <form
+        class="admin-form-card"
+        method="post"
+        action="/admin/slot/settings"
+      >
+        <input
+          type="hidden"
+          name="date"
+          value="<%= date %>"
+        >
+
+        <input
+          type="hidden"
+          name="slot"
+          value="<%= slot %>"
+        >
+
+        <label>
+          診療状態
+
+          <select
+            name="isOpen"
+            <%= reservations.length > 0 ? "disabled" : "" %>
+          >
+            <option
+              value="true"
+              <%= isOpen ? "selected" : "" %>
+            >
+              診療
+            </option>
+
+            <option
+              value="false"
+              <%= !isOpen ? "selected" : "" %>
+            >
+              休診
+            </option>
+          </select>
+        </label>
+
+        <% if (reservations.length > 0) { %>
+
+          <input
+            type="hidden"
+            name="isOpen"
+            value="true"
+          >
+
+          <p class="admin-form-help">
+            予約が入っているため、休診には変更できません。
+          </p>
+
+        <% } %>
+
+        <label>
+          定員
+
+          <select
+            name="capacity"
+            <%= !isOpen && reservations.length === 0 ? "" : "" %>
+          >
+            <%
+              const minimumCapacity =
+                Math.max(1, reservations.length);
+
+              const maximumCapacity = 5;
+            %>
+
+            <% for (
+              let number = minimumCapacity;
+              number <= maximumCapacity;
+              number++
+            ) { %>
+
+              <option
+                value="<%= number %>"
+                <%= number === capacity ? "selected" : "" %>
+              >
+                <%= number %>人
+              </option>
+
+            <% } %>
+          </select>
+        </label>
+
+        <p class="admin-form-help">
+          現在の予約数：<%= reservations.length %>人
+        </p>
+
+        <% if (reservations.length > 0) { %>
+          <p class="admin-form-help">
+            定員は現在の予約数以上に設定してください。
+          </p>
+        <% } %>
+
+        <div class="admin-form-actions">
+          <button
+            type="submit"
+            class="admin-primary-button"
+          >
+            設定を保存
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+    <% if (isOpen) { %>
+
+      <section class="admin-panel">
+
+        <h2 class="admin-panel-title">
+          予約者
+        </h2>
+
+        <div class="admin-list-table-shell">
+          <table class="admin-list-table">
+
+            <thead>
+              <tr>
+                <th>状態</th>
+                <th>患者番号</th>
+                <th>患者氏名</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <% reservations.forEach((reservation, index) => { %>
+
+                <tr>
+                  <td>
+                    <span class="admin-reserved-label">
+                      予約 <%= index + 1 %>
+                    </span>
+                  </td>
+
+                  <td>
+                    <%= reservation.patientNumber %>
+                  </td>
+
+                  <td>
+                    <strong>
+                      <%= reservation.patient.name %>
+                    </strong>
+                  </td>
+
+                  <td>
+                    <div class="admin-row-actions">
+
+                      <a
+                        class="admin-row-button"
+                        href="/admin/edit/<%= reservation.id %>"
+                      >
+                        変更
+                      </a>
+
+                      <a
+                        class="admin-row-button is-danger"
+                        href="/admin/cancel-confirm/<%= reservation.id %>"
+                      >
+                        キャンセル
+                      </a>
+
+                    </div>
+                  </td>
+                </tr>
+
+              <% }) %>
+
+              <%
+                const remainingCapacity =
+                  Math.max(
+                    0,
+                    capacity - reservations.length
+                  );
+              %>
+
+              <% for (
+                let i = 0;
+                i < remainingCapacity;
+                i++
+              ) { %>
+
+                <tr class="admin-empty-slot-row">
+
+                  <td>
+                    <span class="admin-empty-slot-label">
+                      空き
+                    </span>
+                  </td>
+
+                  <td>−</td>
+
+                  <td>−</td>
+
+                  <td>
+                    <a
+                      class="admin-row-button is-add"
+                      href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+                    >
+                      予約追加
+                    </a>
+                  </td>
+
+                </tr>
+
+              <% } %>
+
+            </tbody>
+
+          </table>
+        </div>
+
+        <% if (reservations.length >= capacity) { %>
+
+          <div class="admin-slot-full-message">
+            この予約枠は満員です。
+          </div>
+
+        <% } %>
+
+      </section>
+
+    <% } else { %>
+
+      <section class="admin-panel">
+        <div class="admin-empty-state">
+          この枠は休診に設定されています。
+        </div>
+      </section>
+
+    <% } %>
+
     <div class="admin-slot-footer-actions">
+
       <a
         class="admin-week-button"
         href="/admin/reservations"
@@ -169,6 +328,7 @@
       >
         本日の予約へ戻る
       </a>
+
     </div>
 
   </div>

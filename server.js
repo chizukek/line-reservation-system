@@ -305,6 +305,38 @@ function requireAdminLogin(req, res, next) {
   return next();
 }
 
+async function getSlotSetting(date, slot, doctorId) {
+  const override = await prisma.slotOverride.findUnique({
+    where: {
+      doctorId_date_slot: {
+        doctorId,
+        date,
+        slot,
+      },
+    },
+  });
+
+  if (override) {
+    return {
+      isOpen: override.isOpen,
+      capacity: override.isOpen ? override.capacity : 0,
+      isOverride: true,
+    };
+  }
+
+  const availableSlots = config.getSlotsForDate(date, doctorId);
+
+  const isOpen = availableSlots.includes(slot);
+
+  return {
+    isOpen,
+
+    capacity: isOpen ? config.getCapacityForSlot(date, slot, doctorId) : 0,
+
+    isOverride: false,
+  };
+}
+
 /* =========================
    操作ログ
 ========================= */
@@ -1644,75 +1676,204 @@ app.post("/admin/edit/:id", requireAdminLogin, async (req, res) => {
 });
 
 app.get("/admin/slot", requireAdminLogin, async (req, res) => {
-  const doctorId = Number(req.session.doctorId);
-  const date = String(req.query.date || "");
-  const slot = String(req.query.slot || "");
+  try {
+    const doctorId = Number(req.session.doctorId);
+    const date = String(req.query.date || "");
+    const slot = String(req.query.slot || "");
 
-  if (isPastReservationSlot(date, slot)) {
-    return res.redirect("/admin/reservations");
-  }
+    if (!isValidDoctorId(doctorId)) {
+      return res.redirect("/admin/doctors");
+    }
 
-  if (!isValidDoctorId(doctorId)) {
-    return res.redirect("/admin/doctors");
-  }
+    if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
+      return res.redirect("/admin/reservations");
+    }
 
-  if (
-    !isValidDoctorId(doctorId) ||
-    !isValidDateText(date) ||
-    !isValidSlot(slot, doctorId)
-  ) {
-    return res.redirect("/admin");
-  }
+    if (isPastReservationSlot(date, slot)) {
+      return res.redirect("/admin/reservations");
+    }
 
-  const doctor = await prisma.doctor.findUnique({
-    where: {
-      id: doctorId,
-    },
-  });
-
-  if (!doctor || !doctor.isActive) {
-    return res.redirect("/admin");
-  }
-
-  const availableSlots = config.getSlotsForDate(date, doctorId);
-
-  if (!availableSlots.includes(slot)) {
-    return res.render("error", {
-      title: "枠詳細",
-      heading: "診療時間外",
-      message: "この日時は診療時間外です。",
-      detail: "",
-      backUrl: `/admin/reservations?doctorId=${doctorId}`,
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
     });
-  }
 
-  const reservations = await prisma.reservation.findMany({
-    where: {
+    if (!doctor) {
+      req.session.doctorId = null;
+      return res.redirect("/admin/doctors");
+    }
+
+    const slotSetting = await getSlotSetting(date, slot, doctorId);
+
+    const reservations = await prisma.reservation.findMany({
+      where: {
+        doctorId,
+        date,
+        slot,
+      },
+      include: {
+        patient: true,
+        doctor: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    return res.render("admin-slot", {
+      title: "予約枠詳細",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+
+      isOpen: slotSetting.isOpen,
+      isOverride: slotSetting.isOverride,
+
+      doctor,
       doctorId,
       date,
       slot,
-    },
-    include: {
-      patient: true,
-      doctor: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
 
-  const capacity = config.getCapacityForSlot(date, slot, doctorId);
+      slotLabel: config.getSlotLabel(slot, doctorId),
 
-  res.render("admin-slot", {
-    title: "予約枠詳細",
-    doctor,
-    doctorId,
-    date,
-    slot,
-    slotLabel: config.getSlotLabel(slot, doctorId),
-    reservations,
-    capacity,
-  });
+      reservations,
+      capacity: slotSetting.capacity,
+      slotSetting,
+    });
+  } catch (error) {
+    console.error("予約枠詳細表示エラー:", error);
+
+    return res.status(500).send("予約枠詳細の表示中にエラーが発生しました。");
+  }
+});
+
+app.post("/admin/slot/settings", requireAdminLogin, async (req, res) => {
+  try {
+    const doctorId = Number(req.session.doctorId);
+    const date = String(req.body.date || "");
+    const slot = String(req.body.slot || "");
+    const isOpen = req.body.isOpen === "true";
+    const capacity = Number(req.body.capacity);
+
+    const backUrl =
+      `/admin/slot?date=${encodeURIComponent(date)}` +
+      `&slot=${encodeURIComponent(slot)}`;
+
+    if (!isValidDoctorId(doctorId)) {
+      return res.redirect("/admin/doctors");
+    }
+
+    if (
+      !isValidDateText(date) ||
+      !isValidSlot(slot, doctorId) ||
+      !Number.isInteger(capacity) ||
+      capacity < 1 ||
+      capacity > 5
+    ) {
+      return res.render("error", {
+        title: "設定変更エラー",
+        heading: "設定内容が不正です",
+        message: "診療状態または定員を確認してください。",
+        detail: "",
+        backUrl,
+      });
+    }
+
+    if (isPastReservationSlot(date, slot)) {
+      return res.render("error", {
+        title: "設定変更不可",
+        heading: "過去の予約枠です",
+        message: "過去の予約枠は変更できません。",
+        detail: "",
+        backUrl: "/admin/reservations",
+      });
+    }
+
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
+    });
+
+    if (!doctor) {
+      req.session.doctorId = null;
+      return res.redirect("/admin/doctors");
+    }
+
+    const reservationCount = await prisma.reservation.count({
+      where: {
+        doctorId,
+        date,
+        slot,
+      },
+    });
+
+    if (reservationCount > 0 && !isOpen) {
+      return res.render("error", {
+        title: "設定変更不可",
+        heading: "休診に変更できません",
+        message: "すでに予約が入っているため、この枠を休診には変更できません。",
+        detail: `現在の予約数：${reservationCount}人`,
+        backUrl,
+      });
+    }
+
+    if (isOpen && capacity < reservationCount) {
+      return res.render("error", {
+        title: "設定変更不可",
+        heading: "定員を減らせません",
+        message: "定員は、現在入っている予約数以上に設定してください。",
+        detail:
+          `現在の予約数：${reservationCount}人 / ` +
+          `指定した定員：${capacity}人`,
+        backUrl,
+      });
+    }
+
+    await prisma.slotOverride.upsert({
+      where: {
+        doctorId_date_slot: {
+          doctorId,
+          date,
+          slot,
+        },
+      },
+      update: {
+        isOpen,
+        capacity: isOpen ? capacity : 0,
+      },
+      create: {
+        doctorId,
+        date,
+        slot,
+        isOpen,
+        capacity: isOpen ? capacity : 0,
+      },
+    });
+
+    await createAuditLog(
+      "予約枠設定変更",
+      `医師ID:${doctorId}`,
+      isOpen
+        ? `${date} ${slot} / 診療 / 定員${capacity}人`
+        : `${date} ${slot} / 休診`,
+    );
+
+    return res.redirect(backUrl);
+  } catch (error) {
+    console.error("予約枠設定変更エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "設定変更エラー",
+      heading: "エラーが発生しました",
+      message: "予約枠設定の変更中にエラーが発生しました。",
+      detail: "",
+      backUrl: "/admin/reservations",
+    });
+  }
 });
 
 app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
