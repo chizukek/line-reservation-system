@@ -1235,7 +1235,10 @@ body {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+}
+
+.admin-header-actions > * + * {
+  margin-left: 10px;
 }
 
 .admin-current-datetime {
@@ -1320,18 +1323,27 @@ body {
   color: var(--primary);
 }
 
-.header-logout-link {
+.header-primary-link {
   min-height: 40px;
-  padding: 0 4px;
+  padding: 0 14px;
   display: inline-flex;
   align-items: center;
-  color: var(--muted);
+  justify-content: center;
+
+  color: var(--white);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  text-decoration: none;
 }
 
-.header-logout-link:hover {
-  color: var(--primary);
+.header-primary-link:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  text-decoration: none;
 }
 
 .admin-layout {
