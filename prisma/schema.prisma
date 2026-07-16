@@ -8,18 +8,16 @@ datasource db {
 }
 
 model Reservation {
-  id            Int    @id @default(autoincrement())
-  patientNumber String
-
-  doctorId Int
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
+  id              Int      @id @default(autoincrement())
+  patientNumber   String
+  doctorId        Int
   date            String
   slot            String
   reservationCode String?
   createdAt       DateTime @default(now())
 
   patient Patient @relation(fields: [patientNumber], references: [patientNumber])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
 }
 
 model Patient {
@@ -48,18 +46,23 @@ model Doctor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  reservations Reservation[]
-  slotBlocks   SlotBlock[]
+  reservations  Reservation[]
+  slotOverrides SlotOverride[]
 }
 
-model SlotBlock {
+model SlotOverride {
   id        Int      @id @default(autoincrement())
   doctorId  Int
   date      String
   slot      String
+  isOpen    Boolean  @default(true)
+  capacity  Int
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, date, slot])
+  @@index([date])
+  @@index([doctorId, date])
 }

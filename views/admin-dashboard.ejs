@@ -1,4 +1,3 @@
-```ejs
 <%- include("partials/header", {
   title,
   isAdminPage,
@@ -21,56 +20,107 @@
     timeZone: "Asia/Tokyo",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit"
+    second: "2-digit",
+    hour12: false
   }).format(updatedAt);
 
   /*
-   * 現在の日本時間を「HH:MM」形式で取得
+   * 現在の日本時間をHH:MM形式で取得
    */
-  const currentTime = new Intl.DateTimeFormat("sv-SE", {
+  const currentTime = new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false
-  }).format(new Date());
+  })
+    .format(new Date())
+    .replace("24:", "00:");
 
   /*
-   * 「10:00〜11:00」のような表示から開始時刻を取得
+   * 「10:00〜11:00」や「10:00」から
+   * 開始時刻の「10:00」だけを取得
    */
   const getSlotStartTime = (slot) => {
-    return String(slot).split(/[〜～-]/)[0].trim();
+    return String(slot || "")
+      .split(/[〜～-]/)[0]
+      .trim();
   };
 
   /*
-   * 現在時刻以降に開始する予約数
+   * 予約日をYYYY-MM-DD形式にそろえる
    */
-  const remainingReservationCount = reservations.filter((reservation) => {
-    const startTime = getSlotStartTime(reservation.slot);
-    return startTime >= currentTime;
-  }).length;
+  const getReservationDateText = (reservationDate) => {
+    if (!reservationDate) {
+      return "";
+    }
+
+    if (
+      typeof reservationDate === "string" &&
+      /^\d{4}-\d{2}-\d{2}/.test(reservationDate)
+    ) {
+      return reservationDate.slice(0, 10);
+    }
+
+    const date = new Date(reservationDate);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(date);
+  };
 
   /*
-   * 本日の診療枠の中で最大の定員数を取得
+   * 今日の予約だけに限定
+   */
+  const todayReservations = reservations.filter((reservation) => {
+    return getReservationDateText(reservation.date) === today;
+  });
+
+  /*
+   * 現在時刻以降に開始する予約の人数
+   */
+  const remainingReservationCount = todayReservations.filter(
+    (reservation) => {
+      const startTime = getSlotStartTime(reservation.slot);
+
+      return startTime && startTime >= currentTime;
+    }
+  ).length;
+
+  /*
+   * 本日の各時間帯のうち、最大の定員数を取得
    *
-   * 例：
-   * 10:00〜11:00が定員1人
-   * 16:00〜17:00が定員2人
-   * → 患者列は2列表示
+   * 最大定員が1人なら患者列は1列、
+   * 最大定員が3人なら患者列は3列表示する
    */
   const maxCapacity = slots.length > 0
     ? Math.max(
-        ...slots.map((slot) =>
-          getCapacityForSlot(today, slot, doctorId)
-        )
+        ...slots.map((slot) => {
+          return getCapacityForSlot(today, slot, doctorId);
+        })
       )
     : 0;
 
   /*
-   * 1 → ①、2 → ② のように表示
+   * 患者①、患者②の表示に使用
    */
   const circledNumbers = [
-    "①", "②", "③", "④", "⑤",
-    "⑥", "⑦", "⑧", "⑨", "⑩"
+    "①",
+    "②",
+    "③",
+    "④",
+    "⑤",
+    "⑥",
+    "⑦",
+    "⑧",
+    "⑨",
+    "⑩"
   ];
 
   const getPatientColumnLabel = (index) => {
@@ -120,7 +170,9 @@
 
       <span class="admin-updated-at">
         最終更新
-        <strong><%= formattedUpdatedAt %></strong>
+        <strong>
+          <%= formattedUpdatedAt %>
+        </strong>
       </span>
 
       <button
@@ -138,20 +190,23 @@
   <div class="admin-summary-row">
 
     <div class="admin-summary-item">
+
       <span class="admin-summary-label">
         本日の予約
       </span>
 
       <strong class="admin-summary-value">
-        <%= reservations.length %>
+        <%= todayReservations.length %>
       </strong>
 
       <span class="admin-summary-unit">
         件
       </span>
+
     </div>
 
     <div class="admin-summary-item">
+
       <span class="admin-summary-label">
         本日の残りの診療数
       </span>
@@ -163,6 +218,7 @@
       <span class="admin-summary-unit">
         件
       </span>
+
     </div>
 
   </div>
@@ -173,15 +229,19 @@
 
       <thead>
         <tr>
+
           <th class="today-time-column">
             時間
           </th>
 
           <% for (let index = 0; index < maxCapacity; index++) { %>
+
             <th>
               患者<%= getPatientColumnLabel(index) %>
             </th>
+
           <% } %>
+
         </tr>
       </thead>
 
@@ -203,12 +263,27 @@
           <% slots.forEach((slot) => { %>
 
             <%
-              const slotReservations = reservations.filter(
-                (reservation) => reservation.slot === slot
+              const slotStartTime = getSlotStartTime(slot);
+
+              /*
+               * 表示中の時間帯に該当する予約だけを取得
+               *
+               * DBのslotが「10:00」、
+               * 表示枠が「10:00〜11:00」でも一致させる
+               */
+              const slotReservations = todayReservations.filter(
+                (reservation) => {
+                  return (
+                    getSlotStartTime(reservation.slot) === slotStartTime
+                  );
+                }
               );
 
-              const capacity =
-                getCapacityForSlot(today, slot, doctorId);
+              const capacity = getCapacityForSlot(
+                today,
+                slot,
+                doctorId
+              );
 
               const slotUrl =
                 `/admin/slot?doctorId=${doctorId}` +
@@ -313,4 +388,3 @@
   isAdminPage: true,
   isAdminLoggedIn
 }) %>
-```

@@ -1,169 +1,408 @@
 <%- include("partials/header", {
-  title: "予約スケジュール"
+  title: "予約スケジュール",
+  isAdminPage: true,
+  isAdminLoggedIn,
+  doctor,
+  doctors
 }) %>
+
+<%
+  /*
+   * 日付をYYYY-MM-DD形式にそろえる
+   */
+  const getDateText = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    if (
+      typeof value === "string" &&
+      /^\d{4}-\d{2}-\d{2}/.test(value)
+    ) {
+      return value.slice(0, 10);
+    }
+
+    const dateObject = new Date(value);
+
+    if (Number.isNaN(dateObject.getTime())) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(dateObject);
+  };
+
+  /*
+   * 年を表示せず「7/14(火)」形式にする
+   */
+  const formatShortDate = (value) => {
+    const dateText = getDateText(value);
+
+    if (!dateText) {
+      return "";
+    }
+
+    const dateObject =
+      new Date(`${dateText}T00:00:00+09:00`);
+
+    return new Intl.DateTimeFormat("ja-JP", {
+      timeZone: "Asia/Tokyo",
+      month: "numeric",
+      day: "numeric",
+      weekday: "short"
+    }).format(dateObject);
+  };
+
+  /*
+   * 「10:00〜11:00」と「10:00」から
+   * 開始時刻だけを取得
+   */
+  const getSlotStartTime = (slot) => {
+    return String(slot || "")
+      .split(/[〜～-]/)[0]
+      .trim();
+  };
+
+  /*
+   * 表示期間
+   */
+  const startDate =
+    dates.length > 0
+      ? getDateText(dates[0].value)
+      : "";
+
+  const endDate =
+    dates.length > 0
+      ? getDateText(dates[dates.length - 1].value)
+      : "";
+
+  const periodLabel =
+    startDate && endDate
+      ? `${formatShortDate(startDate)} 〜 ${formatShortDate(endDate)}`
+      : "";
+
+  /*
+   * 前後の週へのURL
+   */
+  const previousWeekUrl =
+    week > 0
+      ? `/admin/reservations?week=${week - 1}`
+      : null;
+
+  const nextWeekUrl =
+    canGoNextWeek
+      ? `/admin/reservations?week=${week + 1}`
+      : null;
+
+  /*
+   * この週の予約を日付・時間順に並べる
+   */
+  const weeklyReservations = reservations
+    .filter((reservation) => {
+      const reservationDate =
+        getDateText(reservation.date);
+
+      return (
+        reservationDate >= startDate &&
+        reservationDate <= endDate
+      );
+    })
+    .sort((a, b) => {
+      const dateCompare =
+        getDateText(a.date).localeCompare(
+          getDateText(b.date)
+        );
+
+      if (dateCompare !== 0) {
+        return dateCompare;
+      }
+
+      return getSlotStartTime(a.slot).localeCompare(
+        getSlotStartTime(b.slot)
+      );
+    });
+%>
 
 <div class="admin-page admin-reservations-page">
   <div class="admin-card">
 
     <header class="admin-page-header">
+
       <div>
-        <p class="admin-page-eyebrow">予約管理</p>
-        <h1>予約スケジュール</h1>
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          予約スケジュール
+        </h1>
+
         <p class="admin-page-description">
           担当医：
-          <strong><%= doctor.displayName || doctor.name %></strong>
+          <strong>
+            <%= doctor.displayName || doctor.name %>
+          </strong>
         </p>
       </div>
 
-      <a
-        class="admin-primary-button"
-        href="/admin"
-      >
-        本日の予約へ
-      </a>
     </header>
 
     <section class="admin-panel admin-schedule-panel">
 
       <div class="admin-schedule-toolbar">
-        <div class="admin-schedule-period">
-          <span class="admin-schedule-period-label">表示期間</span>
-          <strong>
-            <%= dates[0].label %> 〜 <%= dates[dates.length - 1].label %>
-          </strong>
-        </div>
 
-        <nav
-          class="admin-week-navigation"
-          aria-label="週の切り替え"
-        >
-          <% if (week > 0) { %>
+        <div class="admin-toolbar-left">
+
+          <% if (previousWeekUrl) { %>
+
             <a
               class="admin-week-button"
-              href="/admin/reservations?week=<%= week - 1 %>"
+              href="<%= previousWeekUrl %>"
             >
               ‹ 前の週
             </a>
+
           <% } else { %>
-            <span class="admin-week-button is-disabled">
+
+            <span
+              class="admin-week-button is-disabled"
+              aria-disabled="true"
+            >
               ‹ 前の週
             </span>
+
           <% } %>
 
-          <% if (canGoNextWeek) { %>
+        </div>
+
+        <div class="admin-toolbar-center">
+
+          <span class="admin-schedule-period-label">
+            表示期間
+          </span>
+
+          <strong>
+            <%= periodLabel %>
+          </strong>
+
+        </div>
+
+        <div class="admin-toolbar-right">
+
+          <% if (nextWeekUrl) { %>
+
             <a
               class="admin-week-button is-primary"
-              href="/admin/reservations?week=<%= week + 1 %>"
+              href="<%= nextWeekUrl %>"
             >
               次の週 ›
             </a>
+
           <% } else { %>
-            <span class="admin-week-button is-disabled">
+
+            <span
+              class="admin-week-button is-disabled"
+              aria-disabled="true"
+            >
               次の週 ›
             </span>
+
           <% } %>
-        </nav>
+
+        </div>
+
       </div>
 
-      <div class="admin-status-guide" aria-label="予約状況">
-        <span><b class="status-dot is-open">○</b>空きあり</span>
-        <span><b class="status-dot is-few">△</b>残り1人</span>
-        <span><b class="status-dot is-full">満</b>満員</span>
-        <span><b class="status-dot is-closed">−</b>受付不可</span>
+      <div
+        class="admin-status-guide"
+        aria-label="予約状況"
+      >
+
+        <span>
+          <b class="status-dot is-open">○</b>
+          空きあり
+        </span>
+
+        <span>
+          <b class="status-dot is-few">△</b>
+          残り1人
+        </span>
+
+        <span>
+          <b class="status-dot is-full">満</b>
+          満員
+        </span>
+
+        <span>
+          <b class="status-dot is-closed">休</b>
+          休診
+        </span>
+
+        <span>
+          <b class="status-dot is-closed">−</b>
+          診療時間外
+        </span>
+
       </div>
 
       <div class="admin-calendar-shell">
+
         <table class="admin-calendar-table">
 
           <thead>
             <tr>
-              <th class="admin-calendar-time-head">時間</th>
+
+              <th class="admin-calendar-time-head">
+                時間
+              </th>
 
               <% dates.forEach((dateItem) => { %>
-                <%
-                  const [year, month, day] =
-                    dateItem.value.split("-").map(Number);
 
-                  const dateObject = new Date(year, month - 1, day);
+                <%
+                  const dateText =
+                    getDateText(dateItem.value);
+
+                  const [
+                    year,
+                    month,
+                    day
+                  ] = dateText.split("-").map(Number);
+
+                  const dateObject =
+                    new Date(
+                      `${dateText}T00:00:00+09:00`
+                    );
+
+                  const dayNumber =
+                    dateObject.getDay();
+
                   const weekday =
                     ["日", "月", "火", "水", "木", "金", "土"][
-                      dateObject.getDay()
+                      dayNumber
                     ];
-
-                  const isToday = dateItem.value === today;
                 %>
 
                 <th
                   class="
                     admin-calendar-date-head
-                    <%= dateObject.getDay() === 0 ? 'is-sunday' : '' %>
-                    <%= dateObject.getDay() === 6 ? 'is-saturday' : '' %>
-                    <%= isToday ? 'is-today' : '' %>
+                    <%= dayNumber === 0
+                      ? 'is-sunday'
+                      : ''
+                    %>
+                    <%= dayNumber === 6
+                      ? 'is-saturday'
+                      : ''
+                    %>
                   "
                 >
+
                   <span class="admin-calendar-date">
                     <%= month %>/<%= day %>
                   </span>
+
                   <span class="admin-calendar-weekday">
                     <%= weekday %>
                   </span>
-                  <% if (isToday) { %>
-                    <span class="admin-today-badge">本日</span>
-                  <% } %>
+
                 </th>
+
               <% }) %>
+
             </tr>
           </thead>
 
           <tbody>
+
             <% slots.forEach((slot) => { %>
+
               <tr>
+
                 <th class="admin-calendar-time-cell">
                   <%= getSlotLabel(slot, doctorId) %>
                 </th>
 
                 <% dates.forEach((dateItem) => { %>
+
                   <%
-                    const date = dateItem.value;
+                    const date =
+                      getDateText(dateItem.value);
 
-                    const availableSlots =
-                      getSlotsForDate(date, doctorId);
+                    /*
+                     * server.jsで作成した診療枠設定を取得
+                     */
+                    const settingKey =
+                      `${date}_${slot}`;
 
-                    const isAvailableTime =
-                      availableSlots.includes(slot);
+                    const setting =
+                      slotSettings[settingKey] || {
+                        isScheduled: false,
+                        isOpen: false,
+                        isOverride: false,
+                        capacity: 0
+                      };
+
+                    const isScheduled =
+                      setting.isScheduled === true;
+
+                    const isOpen =
+                      setting.isOpen === true;
 
                     const capacity =
-                      getCapacityForSlot(date, slot, doctorId);
+                      Number(setting.capacity) || 0;
 
+                    /*
+                     * この日付・時間・担当医の予約だけを取得
+                     */
                     const slotReservations =
                       reservations.filter((reservation) => {
                         return (
-                          reservation.date === date &&
-                          reservation.slot === slot
+                          getDateText(reservation.date) === date &&
+                          reservation.slot === slot &&
+                          Number(reservation.doctorId) ===
+                            Number(doctorId)
                         );
                       });
 
-                    const reservationCount = slotReservations.length;
-                    const remaining = Math.max(0, capacity - reservationCount);
+                    const reservationCount =
+                      slotReservations.length;
+
+                    const remaining =
+                      Math.max(
+                        0,
+                        capacity - reservationCount
+                      );
 
                     const isPast =
-  date < today ||
-  isPastReservationSlot(date, slot);
-                    const isOutsidePeriod = date > maxReservableText;
+                      date < today ||
+                      isPastReservationSlot(date, slot);
+
+                    const isOutsidePeriod =
+                      date > maxReservableText;
+
                     const isFull =
+                      isOpen &&
                       capacity > 0 &&
                       reservationCount >= capacity;
 
+                    /*
+                     * 表示状態
+                     */
                     let status = "closed";
                     let statusLabel = "−";
 
                     if (
-                      isAvailableTime &&
+                      isScheduled &&
                       !isPast &&
-                      !isOutsidePeriod &&
-                      capacity > 0
+                      !isOutsidePeriod
                     ) {
-                      if (isFull) {
+                      if (!isOpen) {
+                        status = "closed";
+                        statusLabel = "休";
+                      } else if (isFull) {
                         status = "full";
                         statusLabel = "満";
                       } else if (remaining === 1) {
@@ -175,75 +414,115 @@
                       }
                     }
 
+                    /*
+                     * 通常の診療枠で、未来の日付なら、
+                     * 休診中でも詳細画面を開けるようにする
+                     */
+                    const isSelectable =
+                      isScheduled &&
+                      !isPast &&
+                      !isOutsidePeriod;
+
                     const slotUrl =
-  `/admin/slot?date=${date}` +
-  `&slot=${encodeURIComponent(slot)}`;
+                      `/admin/slot?date=${date}` +
+                      `&slot=${encodeURIComponent(slot)}`;
                   %>
 
-                  <td class="admin-calendar-slot is-<%= status %>">
-                    <% if (
-     isAvailableTime &&
-     !isPast &&
-     !isOutsidePeriod
-) { %>
+                  <td
+                    class="
+                      admin-calendar-slot
+                      is-<%= status %>
+                      <%= setting.isOverride
+                        ? 'has-override'
+                        : ''
+                      %>
+                    "
+                  >
+
+                    <% if (isSelectable) { %>
+
                       <a
                         class="admin-calendar-slot-link"
                         href="<%= slotUrl %>"
-                        aria-label="<%= dateItem.label %> <%= getSlotLabel(slot, doctorId) %>の予約枠詳細"
+                        aria-label="<%= formatShortDate(date) %> <%= getSlotLabel(slot, doctorId) %>の予約枠詳細"
                       >
+
                         <span class="admin-calendar-status">
                           <%= statusLabel %>
                         </span>
 
-                        <span class="admin-calendar-count">
-                          <%= reservationCount %>/<%= capacity %>
-                        </span>
+                        <% if (isOpen && capacity > 0) { %>
+
+                          <span class="admin-calendar-count">
+                            <%= reservationCount %>/<%= capacity %>
+                          </span>
+
+                        <% } else if (!isOpen) { %>
+
+                          <span class="admin-calendar-count">
+                            休診
+                          </span>
+
+                        <% } %>
+
                       </a>
+
                     <% } else { %>
-                      <span class="admin-calendar-slot-disabled">−</span>
+
+                      <span class="admin-calendar-slot-disabled">
+                        −
+                      </span>
+
                     <% } %>
+
                   </td>
+
                 <% }) %>
+
               </tr>
+
             <% }) %>
+
           </tbody>
 
         </table>
+
       </div>
 
       <p class="admin-schedule-note">
-        枠をタップすると、予約者の確認・予約追加・変更・キャンセルができます。
+        枠をタップすると、予約者の確認・予約追加・変更・キャンセル・診療状態の変更ができます。
       </p>
+
     </section>
 
     <section class="admin-panel admin-weekly-list-panel">
+
       <div class="admin-section-title-row">
+
         <div>
-          <h2>この週の予約</h2>
-          <p><%= dates[0].label %> 〜 <%= dates[dates.length - 1].label %></p>
+          <h2>
+            この週の予約
+          </h2>
+
+          <p>
+            <%= periodLabel %>
+          </p>
         </div>
+
       </div>
 
-      <%
-        const startDate = dates[0].value;
-        const endDate = dates[dates.length - 1].value;
-
-        const weeklyReservations =
-          reservations.filter((reservation) => {
-            return (
-              reservation.date >= startDate &&
-              reservation.date <= endDate
-            );
-          });
-      %>
-
       <% if (weeklyReservations.length === 0) { %>
+
         <div class="admin-empty-state">
           この週の予約はありません。
         </div>
+
       <% } else { %>
+
         <div class="admin-list-table-shell">
+
           <table class="admin-list-table">
+
             <thead>
               <tr>
                 <th>日付</th>
@@ -255,27 +534,35 @@
             </thead>
 
             <tbody>
+
               <% weeklyReservations.forEach((reservation) => { %>
+
                 <tr>
-                  <td><%= formatJapaneseDate(reservation.date) %></td>
+
+                  <td>
+                    <%= formatShortDate(reservation.date) %>
+                  </td>
+
                   <td>
                     <%= getSlotLabel(
                       reservation.slot,
                       reservation.doctorId
                     ) %>
                   </td>
-                  <td><%= reservation.patient.patientNumber %></td>
+
                   <td>
-                    <strong><%= reservation.patient.name %></strong>
+                    <%= reservation.patient.patientNumber %>
                   </td>
+
                   <td>
+                    <strong>
+                      <%= reservation.patient.name %>
+                    </strong>
+                  </td>
+
+                  <td>
+
                     <div class="admin-row-actions">
-                      <a
-                        class="admin-row-button"
-                        href="/admin/slot?date=<%= reservation.date %>&slot=<%= encodeURIComponent(reservation.slot) %>"
-                      >
-                        詳細
-                      </a>
 
                       <a
                         class="admin-row-button"
@@ -290,17 +577,29 @@
                       >
                         キャンセル
                       </a>
+
                     </div>
+
                   </td>
+
                 </tr>
+
               <% }) %>
+
             </tbody>
+
           </table>
+
         </div>
+
       <% } %>
+
     </section>
 
   </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>

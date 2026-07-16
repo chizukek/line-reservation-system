@@ -1,149 +1,424 @@
-<%- include("partials/header", { title: "予約変更" }) %>
+<%- include("partials/header", {
+  title: "予約変更",
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>
 
 <div class="admin-page">
   <div class="admin-card">
 
-    <h1>予約変更</h1>
+    <header class="admin-page-header">
+      <div>
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          予約変更
+        </h1>
+
+        <p class="admin-page-description">
+          変更後の日時を選択してください。
+        </p>
+      </div>
+    </header>
 
     <% if (error) { %>
-      <div class="clinic-error">
+      <div
+        class="clinic-error"
+        role="alert"
+      >
         <%= error %>
       </div>
     <% } %>
 
     <section class="admin-section">
-      <h2>現在の予約</h2>
 
-      <div class="reservation-box">
-        <div class="info-row">
-          <span>担当医</span>
-          <strong><%= doctor.displayName || doctor.name %></strong>
-        </div>
+      <h2>
+        現在の予約
+      </h2>
 
-        <div class="info-row">
-          <span>患者番号</span>
-          <strong><%= reservation.patientNumber %></strong>
-        </div>
+      <table class="admin-info-table">
+  <thead>
+    <tr>
+      <th>予約日</th>
+      <th>時間</th>
+      <th>担当医</th>
+      <th>患者番号</th>
+      <th>患者氏名</th>
+    </tr>
+  </thead>
 
-        <div class="info-row">
-          <span>氏名</span>
-          <strong><%= reservation.patient.name %> 様</strong>
-        </div>
+  <tbody>
+    <tr>
+      <td>
+        <%= formatJapaneseDate(reservation.date) %>
+      </td>
 
-        <div class="info-row">
-          <span>予約日</span>
-          <strong><%= formatJapaneseDate(reservation.date) %></strong>
-        </div>
+      <td>
+        <%= getSlotLabel(reservation.slot, doctorId) %>
+      </td>
 
-        <div class="info-row">
-          <span>時間</span>
-          <strong><%= reservation.slot %></strong>
-        </div>
-      </div>
+      <td>
+        <%= doctor.displayName || doctor.name %>
+      </td>
+
+      <td>
+        <%= reservation.patientNumber %>
+      </td>
+
+      <td>
+        <strong>
+          <%= reservation.patient.name %> 様
+        </strong>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
     </section>
 
     <section class="admin-section">
-      <h2>変更後の内容</h2>
+
+      <h2>
+        変更後の内容
+      </h2>
 
       <form
   action="/admin/edit/<%= reservation.id %>/confirm"
   method="POST"
   class="admin-form-card"
+  id="reservation-edit-form"
+  data-doctor-id="<%= doctorId %>"
+  data-reservation-id="<%= reservation.id %>"
+  data-current-slot="<%= reservation.slot %>"
 >
 
-  <label>
-    <span>変更後の日付</span>
-
-    <input
-      type="date"
-      id="date"
-      name="date"
-      value="<%= reservation.date %>"
-      required
-    >
-  </label>
-
-  <label>
-    <span>変更後の時間</span>
-
-    <select
-      id="slot"
-      name="slot"
-      required
-    >
-      <% slots.forEach((slot) => { %>
-
-        <option
-          value="<%= slot %>"
-          <%= slot === reservation.slot ? "selected" : "" %>
+        <input
+          type="hidden"
+          name="doctorId"
+          value="<%= doctorId %>"
         >
-          <%= getSlotLabel(slot, doctorId) %>
-        </option>
 
-      <% }) %>
-    </select>
-  </label>
+        <label>
+          <span>
+            変更後の日付
+          </span>
 
-  <div class="clinic-actions">
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value="<%= reservation.date %>"
+            required
+          >
+        </label>
 
-    <button
-      class="clinic-main-button"
-      type="submit"
-    >
-      変更内容を確認する
-    </button>
+        <label>
+          <span>
+            変更後の時間
+          </span>
 
-    <a
-      class="clinic-sub-button"
-      href="/admin/reservations"
-    >
-      戻る
-    </a>
+          <select
+            id="slot"
+            name="slot"
+            required
+          >
+            <% slots.forEach((slot) => { %>
 
-  </div>
+              <option
+                value="<%= slot %>"
+                <%= slot === reservation.slot
+                  ? "selected"
+                  : ""
+                %>
+              >
+                <%= getSlotLabel(slot, doctorId) %>
+              </option>
 
-</form>
+            <% }) %>
+          </select>
+        </label>
+
+        <p
+          id="slot-message"
+          class="admin-form-message"
+          aria-live="polite"
+          hidden
+        ></p>
+
+        <div class="clinic-actions">
+
+          <button
+            class="clinic-main-button"
+            id="submit-button"
+            type="submit"
+          >
+            変更内容を確認する
+          </button>
+
+          <a
+            class="clinic-sub-button"
+            href="/admin/reservations"
+          >
+            戻る
+          </a>
+
+        </div>
+
+      </form>
+
     </section>
 
   </div>
 </div>
 
 <script>
-const dateInput = document.getElementById("date");
-const slotSelect = document.getElementById("slot");
+  const form =
+    document.getElementById("reservation-edit-form");
 
-let currentSlot = slotSelect.value;
+  const dateInput =
+    document.getElementById("date");
 
-async function loadSlots() {
-  const date = dateInput.value;
+  const slotSelect =
+    document.getElementById("slot");
 
-  if (!date) return;
+  const slotMessage =
+    document.getElementById("slot-message");
 
-  const res = await fetch("/api/slots?date=" + date);
-  const slots = await res.json();
+  const submitButton =
+    document.getElementById("submit-button");
 
-  slotSelect.innerHTML = "";
+  const doctorId =
+    form.dataset.doctorId;
 
-  slots.forEach(slot => {
-    const option = document.createElement("option");
-    option.value = slot;
-    option.textContent = slot;
+  const reservationId =
+    form.dataset.reservationId;
 
-    if (slot === currentSlot) {
-      option.selected = true;
-    }
+  let selectedSlot =
+    form.dataset.currentSlot;
+
+  function showMessage(message) {
+    slotMessage.textContent = message;
+    slotMessage.hidden = !message;
+  }
+
+  function showEmptyOption(message) {
+    slotSelect.innerHTML = "";
+
+    const option =
+      document.createElement("option");
+
+    option.value = "";
+    option.textContent = message;
 
     slotSelect.appendChild(option);
-  });
+  }
 
-  currentSlot = slotSelect.value;
-}
+  function setLoading(isLoading) {
+    slotSelect.disabled = isLoading;
+    submitButton.disabled = isLoading;
 
-dateInput.addEventListener("change", loadSlots);
+    if (isLoading) {
+      showMessage(
+        "予約可能な時間を読み込んでいます。",
+      );
+    }
+  }
 
-if (dateInput.value) {
-  loadSlots();
-}
+  async function loadSlots({
+    preserveCurrentSlot = false,
+  } = {}) {
+    const date = dateInput.value;
+
+    if (!date) {
+      showEmptyOption(
+        "日付を選択してください",
+      );
+
+      slotSelect.disabled = true;
+      submitButton.disabled = true;
+
+      showMessage(
+        "変更後の日付を選択してください。",
+      );
+
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const params =
+        new URLSearchParams({
+          date,
+          doctorId,
+          excludeReservationId:
+            reservationId,
+        });
+
+      const response =
+        await fetch(
+          `/api/admin/slots?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+          },
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTPエラー: ${response.status}`,
+        );
+      }
+
+      const result =
+        await response.json();
+
+      const slots =
+        Array.isArray(result)
+          ? result
+          : result.slots;
+
+      if (!Array.isArray(slots)) {
+        throw new Error(
+          "予約枠の形式が正しくありません。",
+        );
+      }
+
+      if (slots.length === 0) {
+        showEmptyOption(
+          "予約可能な時間がありません",
+        );
+
+        slotSelect.disabled = true;
+        submitButton.disabled = true;
+
+        showMessage(
+          "この日に予約可能な時間はありません。",
+        );
+
+        return;
+      }
+
+      slotSelect.innerHTML = "";
+
+      let selectedSlotExists = false;
+
+      slots.forEach((slotItem) => {
+        const value =
+          typeof slotItem === "string"
+            ? slotItem
+            : slotItem.value;
+
+        const label =
+          typeof slotItem === "string"
+            ? slotItem
+            : slotItem.label || slotItem.value;
+
+        if (!value) {
+          return;
+        }
+
+        const option =
+          document.createElement("option");
+
+        option.value = value;
+        option.textContent = label;
+
+        if (
+          preserveCurrentSlot &&
+          value === selectedSlot
+        ) {
+          option.selected = true;
+          selectedSlotExists = true;
+        }
+
+        slotSelect.appendChild(option);
+      });
+
+      if (
+        preserveCurrentSlot &&
+        !selectedSlotExists
+      ) {
+        selectedSlot =
+          slotSelect.value;
+      }
+
+      if (!preserveCurrentSlot) {
+        selectedSlot =
+          slotSelect.value;
+      }
+
+      slotSelect.disabled = false;
+      submitButton.disabled = false;
+
+      showMessage("");
+    } catch (error) {
+      console.error(
+        "予約可能時間取得エラー:",
+        error,
+      );
+
+      showEmptyOption(
+        "予約時間を取得できませんでした",
+      );
+
+      slotSelect.disabled = true;
+      submitButton.disabled = true;
+
+      showMessage(
+        "予約時間を取得できませんでした。ページを再読み込みしてください。",
+      );
+    }
+  }
+
+  dateInput.addEventListener(
+    "change",
+    () => {
+      selectedSlot = "";
+
+      loadSlots({
+        preserveCurrentSlot: false,
+      });
+    },
+  );
+
+  slotSelect.addEventListener(
+    "change",
+    () => {
+      selectedSlot =
+        slotSelect.value;
+    },
+  );
+
+  form.addEventListener(
+    "submit",
+    (event) => {
+      if (
+        !dateInput.value ||
+        !slotSelect.value ||
+        slotSelect.disabled
+      ) {
+        event.preventDefault();
+
+        showMessage(
+          "予約可能な日時を選択してください。",
+        );
+      }
+    },
+  );
+
+  if (dateInput.value) {
+    loadSlots({
+      preserveCurrentSlot: true,
+    });
+  }
 </script>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>

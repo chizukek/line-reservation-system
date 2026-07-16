@@ -10,6 +10,19 @@
         <p class="admin-page-eyebrow">予約管理</p>
 
         <h1>予約枠詳細</h1>
+       <% if (success === "status") { %>
+  <div class="admin-success-message" role="status">
+    診療ステータスを変更しました。
+  </div>
+<% } else if (success === "capacity") { %>
+  <div class="admin-success-message" role="status">
+    予約枠の定員を変更しました。
+  </div>
+<% } else if (success === "setting") { %>
+  <div class="admin-success-message" role="status">
+    予約枠の設定を保存しました。
+  </div>
+<% } %>
 
         <p class="admin-page-description">
           <%= formatJapaneseDate(date) %>
@@ -20,14 +33,22 @@
         </p>
       </div>
 
-      <% if (isOpen && reservations.length < capacity) { %>
-        <a
-          class="admin-primary-button"
-          href="/admin/slot/patient-search?date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-        >
-          予約を追加
-        </a>
-      <% } %>
+      <% if (isOpen && !isFull) { %>
+  <a
+    class="admin-primary-button"
+    href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
+  >
+    予約を追加
+  </a>
+<% } else if (!isOpen) { %>
+  <span class="admin-status is-closed">
+    休診
+  </span>
+<% } else { %>
+  <span class="admin-status is-full">
+    満員
+  </span>
+<% } %>
     </header>
 
     <section class="admin-panel">

@@ -1,0 +1,145 @@
+<%- include("partials/header", {
+  title: "患者検索",
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <div class="admin-header">
+      <div>
+        <h1>患者管理</h1>
+        <p>患者番号または氏名で検索してください。</p>
+      </div>
+
+      <a
+        class="clinic-main-button admin-add-button"
+        href="/admin/patients/add"
+      >
+        ＋ 患者登録
+      </a>
+    </div>
+
+    <section class="admin-section">
+      <h2>患者検索</h2>
+
+      <form
+        class="admin-search-form"
+        action="/admin/patients"
+        method="GET"
+      >
+        <label class="admin-search-field">
+          <span>患者番号または氏名</span>
+
+          <input
+            type="search"
+            name="keyword"
+            value="<%= keyword || "" %>"
+            placeholder="例：12345 または 山田"
+            autocomplete="off"
+          >
+        </label>
+
+        <button
+          class="clinic-main-button"
+          type="submit"
+        >
+          検索
+        </button>
+      </form>
+    </section>
+
+    <% if (keyword) { %>
+
+      <section class="admin-section">
+        <div class="admin-section-header">
+          <h2>検索結果</h2>
+
+          <span class="admin-result-count">
+            <%= patients.length %>件
+          </span>
+        </div>
+
+        <% if (patients.length === 0) { %>
+
+          <div class="admin-empty">
+            「<%= keyword %>」に一致する患者はいません。
+          </div>
+
+        <% } else { %>
+
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+
+              <thead>
+                <tr>
+                  <th>患者番号</th>
+                  <th>氏名</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% patients.forEach((patient) => { %>
+
+                  <tr>
+                    <td>
+                      <strong><%= patient.patientNumber %></strong>
+                    </td>
+
+                    <td>
+                      <%= patient.name %>
+                    </td>
+
+                    <td>
+                      <div class="admin-action-buttons">
+
+                        <a
+                          class="admin-small-button"
+                          href="/admin/patients/edit/<%= patient.id %>"
+                        >
+                          編集
+                        </a>
+
+                        <a
+                          class="admin-danger-button-outline"
+                          href="/admin/patients/delete/<%= patient.id %>"
+                        >
+                          削除
+                        </a>
+
+                      </div>
+                    </td>
+                  </tr>
+
+                <% }) %>
+              </tbody>
+
+            </table>
+          </div>
+
+        <% } %>
+      </section>
+
+    <% } else { %>
+
+      <div class="admin-empty">
+        検索条件を入力すると、患者情報が表示されます。
+      </div>
+
+    <% } %>
+
+    <div class="clinic-actions">
+      <a
+        class="clinic-sub-button"
+        href="/admin"
+      >
+        管理画面へ戻る
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
