@@ -164,6 +164,17 @@ function formatJapaneseDate(dateText) {
   );
 }
 
+function formatJapaneseDateShort(dateText) {
+  const date = new Date(`${dateText}T00:00:00+09:00`);
+
+  return new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    month: "numeric",
+    day: "numeric",
+    weekday: "short",
+  }).format(date);
+}
+
 function isValidPatientNumber(patientNumber) {
   return /^\d{5}$/.test(String(patientNumber || ""));
 }
@@ -347,7 +358,17 @@ async function createAuditLog(action, target = null, detail = null) {
 ========================= */
 
 app.use((req, res, next) => {
+  /*
+   * 患者側：年あり
+   * 例 2026年7月17日(金)
+   */
   res.locals.formatJapaneseDate = formatJapaneseDate;
+
+  /*
+   * 管理画面：年なし
+   * 例 7月17日(金)
+   */
+  res.locals.formatJapaneseDateShort = formatJapaneseDateShort;
 
   return next();
 });
@@ -1249,7 +1270,7 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
       today,
       slots,
       reservations,
-
+      formatJapaneseDateShort,
       getCapacityForSlot: config.getCapacityForSlot,
 
       updatedAt: new Date(),
@@ -1261,6 +1282,7 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
   }
 });
 app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
+  const editReservationId = Number(req.query.editReservationId || 0);
   try {
     const doctorId = Number(req.session.doctorId);
 
@@ -1275,6 +1297,19 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
     if (!doctor || !doctor.isActive) {
       req.session.doctorId = null;
       return res.redirect("/admin/doctors");
+    }
+
+    let editReservation = null;
+
+    if (editReservationId > 0) {
+      editReservation = await prisma.reservation.findUnique({
+        where: {
+          id: editReservationId,
+        },
+        include: {
+          patient: true,
+        },
+      });
     }
 
     const week = getWeekParam(req.query.week);
@@ -1394,9 +1429,11 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
       today,
       maxReservableText,
       canGoNextWeek,
-
+      formatJapaneseDateShort,
       getSlotLabel: config.getSlotLabel,
       isPastReservationSlot,
+      editReservationId,
+      editReservation,
     });
   } catch (error) {
     console.error("予約スケジュール表示エラー:", error);
@@ -1738,6 +1775,7 @@ app.get("/admin/edit/:id", requireAdminLogin, async (req, res) => {
     reservation,
     slots: config.getDisplaySlots(doctorId),
     error: null,
+    formatJapaneseDateShort,
     getSlotLabel: config.getSlotLabel,
   });
 });
@@ -1864,9 +1902,10 @@ app.get("/admin/slot", requireAdminLogin, async (req, res) => {
       return res.redirect("/admin/reservations");
     }
 
-    if (isPastReservationSlot(date, slot)) {
-      return res.redirect("/admin/reservations");
-    }
+    /*
+     * 管理画面では過去枠も詳細を確認できるようにするため、
+     * isPastReservationSlotによるリダイレクトは行わない
+     */
 
     const doctor = await prisma.doctor.findFirst({
       where: {
@@ -1898,10 +1937,13 @@ app.get("/admin/slot", requireAdminLogin, async (req, res) => {
     });
 
     const reservationCount = reservations.length;
+
     const remaining = Math.max(slotSetting.capacity - reservationCount, 0);
 
     const isFull =
       slotSetting.isOpen && reservationCount >= slotSetting.capacity;
+
+    const isPast = isPastReservationSlot(date, slot);
 
     return res.render("admin-slot", {
       title: "予約枠詳細",
@@ -1920,11 +1962,13 @@ app.get("/admin/slot", requireAdminLogin, async (req, res) => {
       reservationCount,
       remaining,
       isFull,
+      isPast,
 
       isOpen: slotSetting.isOpen,
       isOverride: slotSetting.isOverride,
       capacity: slotSetting.capacity,
       slotSetting,
+      formatJapaneseDateShort,
 
       success,
     });
@@ -2084,99 +2128,171 @@ app.post("/admin/slot/settings", requireAdminLogin, async (req, res) => {
 });
 
 app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
-  const doctorId = Number(req.session.doctorId);
-  const date = String(req.query.date || "");
-  const slot = String(req.query.slot || "");
-  const keyword = String(req.query.keyword || "").trim();
+  try {
+    const doctorId = Number(req.session.doctorId);
 
-  if (!isValidDoctorId(doctorId)) {
-    return res.redirect("/admin/doctors");
-  }
+    const date = String(req.query.date || "");
 
-  if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
-    return res.redirect("/admin/reservations");
-  }
+    const slot = String(req.query.slot || "");
 
-  const doctor = await prisma.doctor.findFirst({
-    where: {
-      id: doctorId,
-      isActive: true,
-    },
-  });
+    const keyword = String(req.query.keyword || "").trim();
 
-  if (!doctor) {
-    req.session.doctorId = null;
-    return res.redirect("/admin/doctors");
-  }
+    if (!isValidDoctorId(doctorId)) {
+      return res.redirect("/admin/doctors");
+    }
 
-  const availableSlots = config.getSlotsForDate(date, doctorId);
+    if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
+      return res.redirect("/admin/reservations");
+    }
 
-  if (!availableSlots.includes(slot)) {
-    return res.render("error", {
-      title: "患者検索",
-      heading: "診療時間外です",
-      message: "この日時には予約を追加できません。",
-      detail: "",
-      backUrl: `/admin/slot?date=${date}` + `&slot=${encodeURIComponent(slot)}`,
+    if (isPastReservationSlot(date, slot)) {
+      return res.render("error", {
+        title: "患者検索",
+        heading: "受付終了しています",
+        message: "過去の予約枠には予約を追加できません。",
+        detail: "",
+        backUrl:
+          `/admin/slot?date=${encodeURIComponent(date)}` +
+          `&slot=${encodeURIComponent(slot)}`,
+      });
+    }
+
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
     });
-  }
 
-  const reservationCount = await prisma.reservation.count({
-    where: {
+    if (!doctor) {
+      req.session.doctorId = null;
+
+      return res.redirect("/admin/doctors");
+    }
+
+    /*
+     * 管理画面で変更した休診・定員を含む設定
+     */
+    const slotSetting = await getSlotSetting(date, slot, doctorId);
+
+    if (!slotSetting.isOpen) {
+      return res.render("error", {
+        title: "患者検索",
+        heading: "休診です",
+        message: "この予約枠は休診に設定されています。",
+        detail: "",
+        backUrl:
+          `/admin/slot?date=${encodeURIComponent(date)}` +
+          `&slot=${encodeURIComponent(slot)}`,
+      });
+    }
+
+    const reservationCount = await prisma.reservation.count({
+      where: {
+        doctorId,
+        date,
+        slot,
+      },
+    });
+
+    if (reservationCount >= slotSetting.capacity) {
+      return res.render("error", {
+        title: "患者検索",
+        heading: "満員です",
+        message: "この予約枠はすでに満員です。",
+        detail: "",
+        backUrl:
+          `/admin/slot?date=${encodeURIComponent(date)}` +
+          `&slot=${encodeURIComponent(slot)}`,
+      });
+    }
+
+    let patients = [];
+
+    if (keyword) {
+      const today = new Date().toLocaleDateString("sv-SE", {
+        timeZone: "Asia/Tokyo",
+      });
+
+      patients = await prisma.patient.findMany({
+        where: {
+          OR: [
+            {
+              patientNumber: {
+                contains: keyword,
+              },
+            },
+            {
+              name: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
+
+        include: {
+          reservations: {
+            where: {
+              date: {
+                gte: today,
+              },
+            },
+
+            include: {
+              doctor: true,
+            },
+
+            orderBy: [
+              {
+                date: "asc",
+              },
+              {
+                slot: "asc",
+              },
+            ],
+
+            take: 1,
+          },
+        },
+
+        orderBy: {
+          patientNumber: "asc",
+        },
+
+        take: 50,
+      });
+    }
+
+    return res.render("admin-slot-patient-search", {
+      title: "患者検索",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+
+      doctor,
       doctorId,
       date,
       slot,
-    },
-  });
 
-  const capacity = config.getCapacityForSlot(date, slot, doctorId);
+      slotLabel: config.getSlotLabel(slot, doctorId),
 
-  if (reservationCount >= capacity) {
-    return res.render("error", {
-      title: "患者検索",
-      heading: "満員です",
-      message: "この予約枠はすでに満員です。",
+      keyword,
+      patients,
+
+      getSlotLabel: config.getSlotLabel,
+    });
+  } catch (error) {
+    console.error("患者検索画面表示エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "患者検索エラー",
+      heading: "エラーが発生しました",
+      message: "患者検索画面の表示中にエラーが発生しました。",
       detail: "",
-      backUrl: `/admin/slot?date=${date}` + `&slot=${encodeURIComponent(slot)}`,
+      backUrl: "/admin/reservations",
     });
   }
-
-  let patients = [];
-
-  if (keyword) {
-    patients = await prisma.patient.findMany({
-      where: {
-        OR: [
-          {
-            patientNumber: {
-              contains: keyword,
-            },
-          },
-          {
-            name: {
-              contains: keyword,
-              mode: "insensitive",
-            },
-          },
-        ],
-      },
-      orderBy: {
-        patientNumber: "asc",
-      },
-      take: 50,
-    });
-  }
-
-  return res.render("admin-slot-patient-search", {
-    title: "患者検索",
-    doctor,
-    doctorId,
-    date,
-    slot,
-    slotLabel: config.getSlotLabel(slot, doctorId),
-    keyword,
-    patients,
-  });
 });
 
 app.get("/admin/slot/confirm", requireAdminLogin, async (req, res) => {
@@ -2304,6 +2420,7 @@ app.get("/admin/slot/confirm", requireAdminLogin, async (req, res) => {
     slot,
     slotLabel: config.getSlotLabel(slot, doctorId),
     patient,
+    formatJapaneseDateShort,
   });
 });
 
@@ -2488,6 +2605,7 @@ app.post("/admin/slot/complete", requireAdminLogin, async (req, res) => {
     slotLabel: config.getSlotLabel(slot, doctorId),
     patient,
     reservationCode,
+    formatJapaneseDateShort,
   });
 });
 
@@ -2587,6 +2705,7 @@ app.post("/admin/edit/:id/confirm", requireAdminLogin, async (req, res) => {
     slot,
     slotLabel: config.getSlotLabel(slot, doctorId),
     getSlotLabel: config.getSlotLabel,
+    formatJapaneseDateShort,
   });
 });
 
