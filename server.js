@@ -373,6 +373,13 @@ app.use((req, res, next) => {
   return next();
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/", (req, res) => {
   res.redirect("/psychiatry");
 });
@@ -818,19 +825,6 @@ app.get("/reserve", async (req, res) => {
       }),
     );
 
-    const agreed = req.body.agreed === "true";
-
-    if (!agreed) {
-      return res.status(400).render("error", {
-        title: "予約確認",
-        heading: "利用規約への同意が必要です",
-        message:
-          "利用規約およびプライバシーポリシーを確認し、同意してください。",
-        detail: "",
-        backUrl: "javascript:history.back()",
-      });
-    }
-
     const nextWeekStart = new Date(todayDate);
 
     nextWeekStart.setDate(todayDate.getDate() + (week + 1) * 7);
@@ -947,7 +941,17 @@ app.post("/reserve", async (req, res) => {
   const date = req.body.date;
   const slot = req.body.slot;
   const changeReservationId = req.session.changeReservationId;
+  const agreed = req.body.agreed === "true";
 
+  if (!agreed) {
+    return res.status(400).render("error", {
+      title: "予約確認",
+      heading: "利用規約への同意が必要です",
+      message: "利用規約およびプライバシーポリシーを確認し、同意してください。",
+      detail: "",
+      backUrl: "javascript:history.back()",
+    });
+  }
   if (
     !isValidDoctorId(doctorId) ||
     !isValidPatientNumber(patientNumber) ||
