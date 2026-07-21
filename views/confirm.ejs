@@ -1,15 +1,23 @@
-<%- include("partials/header", { title: isChangeMode ? "予約変更確認" : "予約確認" }) %>
+<%- include("partials/header", {
+  title: isChangeMode ? "予約変更確認" : "予約確認"
+}) %>
+
 <%- include("partials/progress", {
   step: 3
 }) %>
+
 <div class="clinic-page">
   <div class="clinic-card confirm-box">
 
-    <h1><%= isChangeMode ? "予約変更確認" : "予約確認" %></h1>
+    <header class="clinic-page-header">
+      <h1>
+        <%= isChangeMode ? "予約変更確認" : "予約確認" %>
+      </h1>
 
-    <p class="confirm-warning">
-      以下の内容でよろしければ、予約を確定してください。
-    </p>
+      <p class="confirm-warning">
+        以下の内容をご確認ください。
+      </p>
+    </header>
 
     <section class="confirm-section">
       <h2>ご予約内容</h2>
@@ -17,72 +25,191 @@
       <div class="confirm-table">
 
         <div class="confirm-row">
-          <div class="confirm-label">予約日</div>
-          <div class="confirm-value"><%= date %></div>
+          <div class="confirm-label">
+            予約日
+          </div>
+
+          <div class="confirm-value">
+            <%= date %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">時間</div>
-          <div class="confirm-value"><%= slot %></div>
+          <div class="confirm-label">
+            時間
+          </div>
+
+          <div class="confirm-value">
+            <%= slot %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">診療科</div>
-          <div class="confirm-value">心療内科</div>
+          <div class="confirm-label">
+            診療科
+          </div>
+
+          <div class="confirm-value">
+            心療内科
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">担当医</div>
-          <div class="confirm-value"><%= doctor.displayName || doctor.name %></div>
+          <div class="confirm-label">
+            担当医
+          </div>
+
+          <div class="confirm-value">
+            <%= doctor.displayName || doctor.name %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">患者番号</div>
-          <div class="confirm-value"><%= patient.patientNumber %></div>
+          <div class="confirm-label">
+            患者番号
+          </div>
+
+          <div class="confirm-value">
+            <%= patient.patientNumber %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">氏名</div>
-          <div class="confirm-value"><%= patient.name %> 様</div>
+          <div class="confirm-label">
+            氏名
+          </div>
+
+          <div class="confirm-value">
+            <%= patient.name %> 様
+          </div>
         </div>
 
       </div>
     </section>
 
     <section class="confirm-section">
-      <h2>キャンセルについて</h2>
+      <h2>変更・キャンセルについて</h2>
+
       <div class="confirm-note-box">
-        予約のキャンセル・変更はマイページから行えます。<br>
-        期限を過ぎた変更・キャンセルは、お電話にて医院までご連絡ください。
+        <p>
+          予約の変更・キャンセルは、
+          <strong>予約日前日の23:59まで</strong>
+          マイページから行えます。
+        </p>
+
+        <p>
+          期限を過ぎた場合は、医院までお電話でご連絡ください。
+        </p>
+
+        <% if (isChangeMode) { %>
+          <p>
+            新しい予約が確定するまでは、現在の予約が保持されます。
+          </p>
+        <% } %>
       </div>
     </section>
 
     <section class="confirm-section">
       <h2>診療に関する確認事項</h2>
+
       <div class="confirm-note-box">
-        予約時間に遅れる場合や、体調に変化がある場合は医院までご連絡ください。<br>
-        発熱・咳などの症状がある場合は、来院前にお電話ください。
+        <p>
+          予約時間に遅れる場合や、体調に変化がある場合は、
+          医院までご連絡ください。
+        </p>
+
+        <p>
+          発熱や咳などの症状がある場合は、
+          来院前にお電話でご相談ください。
+        </p>
       </div>
     </section>
 
-    <div class="terms-area">
-      <a href="/terms" target="_blank">利用規約</a>
-      <span>｜</span>
-      <a href="/privacy" target="_blank">プライバシーポリシー</a>
-    </div>
+    <form
+      action="/reserve"
+      method="POST"
+      class="confirm-form"
+    >
+      <input
+        type="hidden"
+        name="date"
+        value="<%= date %>"
+      >
 
-    <form action="/reserve" method="POST" class="clinic-actions">
-        <input type="hidden" name="date" value="<%= date %>">
-        <input type="hidden" name="slot" value="<%= slot %>">
-        <input type="hidden" name="doctorId" value="<%= doctor.id %>">
-        <button type="submit" class="clinic-main-button confirm-submit-button">
-        <span>上記に同意の上</span>
-        <strong><%= isChangeMode ? "予約を変更する" : "予約を確定する" %></strong>
-      </button>
+      <input
+        type="hidden"
+        name="slot"
+        value="<%= slot %>"
+      >
 
-      <a class="clinic-sub-button" href="<%= isChangeMode ? '/change' : '/reserve?doctorId=' + doctor.id %>">
-        入力内容を変更する
-      </a>
+      <input
+        type="hidden"
+        name="doctorId"
+        value="<%= doctor.id %>"
+      >
+
+      <input
+        type="hidden"
+        name="isChangeMode"
+        value="<%= isChangeMode ? "true" : "false" %>"
+      >
+
+      <div class="terms-area">
+
+        <label class="terms-agreement">
+          <input
+            type="checkbox"
+            name="agreed"
+            value="true"
+            required
+          >
+
+          <span>
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              利用規約
+            </a>
+
+            および
+
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              プライバシーポリシー
+            </a>
+
+            を確認し、同意します。
+          </span>
+        </label>
+
+      </div>
+
+      <div class="clinic-actions">
+
+        <button
+          type="submit"
+          class="clinic-main-button confirm-submit-button"
+        >
+          <%= isChangeMode ? "予約を変更する" : "予約を確定する" %>
+        </button>
+
+        <a
+          class="clinic-sub-button"
+          href="<%=
+            isChangeMode
+              ? "/change"
+              : "/reserve?doctorId=" + encodeURIComponent(doctor.id)
+          %>"
+        >
+          日時を選び直す
+        </a>
+
+      </div>
     </form>
 
   </div>

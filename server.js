@@ -681,6 +681,18 @@ app.get("/change", async (req, res) => {
   res.redirect("/select-doctor");
 });
 
+app.get("/terms", (req, res) => {
+  res.render("terms", {
+    title: "利用規約",
+  });
+});
+
+app.get("/privacy", (req, res) => {
+  res.render("privacy", {
+    title: "プライバシーポリシー",
+  });
+});
+
 app.get("/reserve", async (req, res) => {
   try {
     const patientNumber = req.session.patientNumber;
@@ -805,6 +817,19 @@ app.get("/reserve", async (req, res) => {
         });
       }),
     );
+
+    const agreed = req.body.agreed === "true";
+
+    if (!agreed) {
+      return res.status(400).render("error", {
+        title: "予約確認",
+        heading: "利用規約への同意が必要です",
+        message:
+          "利用規約およびプライバシーポリシーを確認し、同意してください。",
+        detail: "",
+        backUrl: "javascript:history.back()",
+      });
+    }
 
     const nextWeekStart = new Date(todayDate);
 
