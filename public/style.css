@@ -4003,3 +4003,124 @@ small,
     font-size: 11px;
   }
 }
+
+/* =========================
+   患者側予約表・幅調整
+========================= */
+
+.reservation-calendar-card {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.reservation-calendar-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reservation-calendar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.reservation-calendar th,
+.reservation-calendar td {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reservation-time-heading,
+.reservation-time-cell {
+  width: 14%;
+}
+
+.reservation-slot-cell,
+.reservation-date-heading {
+  width: calc(86% / 7);
+}
+
+.reservation-time-cell {
+  padding: 4px 2px;
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.reservation-time-start,
+.reservation-time-separator,
+.reservation-time-end {
+  display: block;
+  white-space: nowrap;
+}
+
+.reservation-time-separator {
+  margin: 1px 0;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.reservation-date-heading {
+  padding: 5px 1px;
+}
+
+.reservation-date-label {
+  display: block;
+  font-size: 12px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.reservation-slot-link,
+.reservation-slot-disabled {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.reservation-slot-symbol {
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .reservation-calendar-card {
+    width: 100%;
+    max-width: 100%;
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .reservation-time-heading,
+  .reservation-time-cell {
+    width: 16%;
+  }
+
+  .reservation-slot-cell,
+  .reservation-date-heading {
+    width: calc(84% / 7);
+  }
+
+  .reservation-calendar th,
+  .reservation-calendar td {
+    height: 52px;
+  }
+
+  .reservation-calendar thead th {
+    font-size: 11px;
+  }
+
+  .reservation-time-cell {
+    font-size: 11px;
+  }
+
+  .reservation-slot-symbol {
+    font-size: 18px;
+  }
+}
