@@ -1,36 +1,100 @@
 <%- include("partials/header", {
-  title: "患者検索",
+  title: "患者管理",
   isAdminPage: true,
-  isAdminLoggedIn: true
+  isAdminLoggedIn: true,
+  doctorId,
+  doctor,
+  doctors,
+  path
 }) %>
+
+<%
+  const getDoctorColorClass = (
+    reservation
+  ) => {
+    if (
+      !reservation ||
+      !reservation.doctor
+    ) {
+      return "";
+    }
+
+    /*
+     * 医師IDで判定する場合
+     * 医師AがID 1、医師BがID 2という前提
+     */
+    if (reservation.doctor.id === 1) {
+      return "color_A";
+    }
+
+    if (reservation.doctor.id === 2) {
+      return "color_B";
+    }
+
+    return "";
+  };
+
+  const getReservationDateTime = (
+    reservation
+  ) => {
+    if (!reservation) {
+      return "予約なし";
+    }
+
+    const dateLabel =
+      formatJapaneseDateShort(
+        reservation.date
+      );
+
+    return `${dateLabel} ${reservation.slot}`;
+  };
+%>
 
 <div class="admin-page">
   <div class="admin-card">
 
-    <div class="admin-header">
+    <header class="admin-page-header">
+
       <div>
-        <h1>患者管理</h1>
-        <p>患者番号または氏名で検索してください。</p>
+        <p class="admin-page-eyebrow">
+          患者管理
+        </p>
+
+        <h1>
+          患者管理
+        </h1>
+
+        <p class="admin-page-description">
+          患者番号または氏名で検索してください。
+        </p>
       </div>
 
       <a
-        class="clinic-main-button admin-add-button"
+        class="admin-primary-button"
         href="/admin/patients/add"
       >
-        ＋ 患者登録
+        ＋ 新規登録
       </a>
-    </div>
 
-    <section class="admin-section">
-      <h2>患者検索</h2>
+    </header>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        患者検索
+      </h2>
 
       <form
         class="admin-search-form"
         action="/admin/patients"
-        method="GET"
+        method="get"
       >
+
         <label class="admin-search-field">
-          <span>患者番号または氏名</span>
+
+          <span>
+            患者番号または氏名
+          </span>
 
           <input
             type="search"
@@ -39,26 +103,34 @@
             placeholder="例：12345 または 山田"
             autocomplete="off"
           >
+
         </label>
 
         <button
-          class="clinic-main-button"
+          class="admin-primary-button"
           type="submit"
         >
           検索
         </button>
+
       </form>
+
     </section>
 
     <% if (keyword) { %>
 
-      <section class="admin-section">
-        <div class="admin-section-header">
-          <h2>検索結果</h2>
+      <section class="admin-panel">
+
+        <div class="admin-section-title-row">
+
+          <h2 class="admin-panel-title">
+            検索結果
+          </h2>
 
           <span class="admin-result-count">
             <%= patients.length %>件
           </span>
+
         </div>
 
         <% if (patients.length === 0) { %>
@@ -70,56 +142,100 @@
         <% } else { %>
 
           <div class="admin-table-wrapper">
-            <table class="admin-table">
 
-              <thead>
-                <tr>
-                  <th>患者番号</th>
-                  <th>氏名</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
+  <table class="admin-table admin-patient-table">
 
-              <tbody>
-                <% patients.forEach((patient) => { %>
+    <thead>
+      <tr>
+        <th>患者番号</th>
+        <th>患者名</th>
+        <th>現在の予約日時</th>
+        <th>操作</th>
+      </tr>
+    </thead>
 
-                  <tr>
-                    <td>
-                      <strong><%= patient.patientNumber %></strong>
-                    </td>
+    <tbody>
 
-                    <td>
-                      <%= patient.name %>
-                    </td>
+      <% patients.forEach((patient) => { %>
 
-                    <td>
-                      <div class="admin-action-buttons">
+        <%
+          const reservation =
+            patient.reservations?.[0] || null;
 
-                        <a
-                          class="admin-small-button"
-                          href="/admin/patients/edit/<%= patient.id %>"
-                        >
-                          編集
-                        </a>
+          let doctorClass = "";
 
-                        <a
-                          class="admin-danger-button-outline"
-                          href="/admin/patients/delete/<%= patient.id %>"
-                        >
-                          削除
-                        </a>
+          if (reservation) {
+            if (reservation.doctorId === 1) {
+              doctorClass = "color_A";
+            } else if (reservation.doctorId === 2) {
+              doctorClass = "color_B";
+            }
+          }
+        %>
 
-                      </div>
-                    </td>
-                  </tr>
+        <tr>
 
-                <% }) %>
-              </tbody>
+          <td>
+            <strong>
+              <%= patient.patientNumber %>
+            </strong>
+          </td>
 
-            </table>
-          </div>
+          <td>
+            <%= patient.name %>
+          </td>
+
+          <td>
+
+            <% if (reservation) { %>
+
+              <div class="admin-patient-reservation">
+
+                <span
+                  class="admin-doctor-dot <%= doctorClass %>"
+                  aria-hidden="true"
+                ></span>
+
+                <span>
+                  <%= formatJapaneseDateShort(reservation.date) %>
+                  <%= reservation.slot %>
+                </span>
+
+              </div>
+
+            <% } else { %>
+
+              <span class="admin-no-reservation">
+                予約なし
+              </span>
+
+            <% } %>
+
+          </td>
+
+          <td>
+
+            <a
+              class="admin-row-button"
+              href="/admin/patients/edit/<%= patient.id %>"
+            >
+              編集
+            </a>
+
+          </td>
+
+        </tr>
+
+      <% }) %>
+
+    </tbody>
+
+  </table>
+
+</div>
 
         <% } %>
+
       </section>
 
     <% } else { %>
@@ -130,16 +246,10 @@
 
     <% } %>
 
-    <div class="clinic-actions">
-      <a
-        class="clinic-sub-button"
-        href="/admin"
-      >
-        管理画面へ戻る
-      </a>
-    </div>
-
   </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>

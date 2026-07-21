@@ -11,7 +11,10 @@
 
   <title><%= title %></title>
 
-  <link rel="stylesheet" href="/style.css">
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
 </head>
 
 <body>
@@ -19,18 +22,19 @@
 <%
   const adminPage =
     typeof isAdminPage !== "undefined" &&
-    isAdminPage;
+    Boolean(isAdminPage);
 
   const adminLoggedIn =
     typeof isAdminLoggedIn !== "undefined" &&
-    isAdminLoggedIn;
+    Boolean(isAdminLoggedIn);
 
   const patientLoggedIn =
     typeof isPatientLoggedIn !== "undefined" &&
-    isPatientLoggedIn;
+    Boolean(isPatientLoggedIn);
 
   const selectedDoctor =
-    typeof doctor !== "undefined"
+    typeof doctor !== "undefined" &&
+    doctor
       ? doctor
       : null;
 
@@ -39,6 +43,28 @@
     Array.isArray(doctors)
       ? doctors
       : [];
+
+  const adminDoctorId =
+    typeof doctorId !== "undefined" &&
+    Number.isInteger(Number(doctorId))
+      ? Number(doctorId)
+      : selectedDoctor
+        ? selectedDoctor.id
+        : "";
+
+  const adminCurrentPath =
+    typeof path !== "undefined"
+      ? String(path)
+      : "";
+
+  const adminSelectedDate =
+    typeof selectedDate !== "undefined" &&
+    selectedDate
+      ? String(selectedDate)
+      : typeof date !== "undefined" &&
+          date
+        ? String(date)
+        : "";
 
   const currentDateTime =
     new Intl.DateTimeFormat("ja-JP", {
@@ -49,7 +75,35 @@
       weekday: "short",
       hour: "2-digit",
       minute: "2-digit",
-    }).format(new Date());
+      hour12: false
+    })
+      .format(new Date())
+      .replace("24:", "00:");
+
+  const buildDoctorSwitchUrl = (
+    doctorItemId
+  ) => {
+    const params =
+      new URLSearchParams();
+
+    params.set(
+      "doctorId",
+      String(doctorItemId)
+    );
+
+    if (
+      /^\d{4}-\d{2}-\d{2}$/.test(
+        adminSelectedDate
+      )
+    ) {
+      params.set(
+        "date",
+        adminSelectedDate
+      );
+    }
+
+    return `/admin?${params.toString()}`;
+  };
 %>
 
 <header
@@ -63,14 +117,19 @@
 
     <a
       class="site-brand"
-      href="<%= adminPage ? '/admin' : '/psychiatry' %>"
+      href="<%= adminPage
+        ? '/admin'
+        : '/psychiatry'
+      %>"
     >
 
       <div class="site-logo">
+
         <img
           src="/images/icon.png"
           alt="今村医院"
         >
+
       </div>
 
       <div class="site-brand-text">
@@ -90,7 +149,10 @@
 
     </a>
 
-    <% if (adminPage && adminLoggedIn) { %>
+    <% if (
+      adminPage &&
+      adminLoggedIn
+    ) { %>
 
       <div class="admin-header-actions">
 
@@ -124,10 +186,12 @@
 
             <div class="doctor-selector-menu">
 
-              <% availableDoctors.forEach((doctorItem) => { %>
+              <% availableDoctors.forEach(
+                (doctorItem) => {
+              %>
 
                 <a
-                  href="/admin?doctorId=<%= doctorItem.id %>"
+                  href="<%= buildDoctorSwitchUrl(doctorItem.id) %>"
                   class="doctor-selector-item <%= doctorItem.id === selectedDoctor.id
                     ? 'is-selected'
                     : ''
@@ -140,7 +204,10 @@
                     %>
                   </span>
 
-                  <% if (doctorItem.id === selectedDoctor.id) { %>
+                  <% if (
+                    doctorItem.id ===
+                    selectedDoctor.id
+                  ) { %>
 
                     <span
                       class="doctor-selector-check"
@@ -179,20 +246,19 @@
 
       </div>
 
-    <% } else if (!adminPage && patientLoggedIn) { %>
+    <% } else if (
+      !adminPage &&
+      patientLoggedIn
+    ) { %>
 
-      <nav class="site-nav patient-site-nav">
+      <nav
+        class="site-nav patient-site-nav"
+        aria-label="患者メニュー"
+      >
 
         <a href="/mypage">
           マイページ
         </a>
-
-        <a
-  class="header-primary-link"
-  href="/admin/add"
->
-  ＋予約追加
-</a>
 
       </nav>
 
@@ -202,95 +268,20 @@
 
 </header>
 
-<% if (adminPage && adminLoggedIn) { %>
+<% if (
+  adminPage &&
+  adminLoggedIn
+) { %>
 
   <div class="admin-layout">
 
-    <aside class="admin-sidebar">
-
-      <nav class="admin-sidebar-nav">
-
-        <div class="admin-sidebar-group">
-
-          <p class="admin-sidebar-label">
-            予約管理
-          </p>
-
-          <a
-            href="/admin"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">⌂</span>
-            <span>ダッシュボード</span>
-          </a>
-
-          <a
-            href="/admin/reservations"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">▦</span>
-            <span>予約スケジュール</span>
-          </a>
-          <a
-            href="/admin/search"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">⌕</span>
-            <span>予約検索</span>
-          </a>
-
-          <a
-            href="/admin/add"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">＋</span>
-            <span>予約追加</span>
-          </a>
-
-        </div>
-
-        <div class="admin-sidebar-group">
-
-          <p class="admin-sidebar-label">
-            患者管理
-          </p>
-
-          <a
-            href="/admin/patients"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">♙</span>
-            <span>患者管理</span>
-          </a>
-
-        </div>
-
-        <div class="admin-sidebar-group">
-
-          <p class="admin-sidebar-label">
-            その他
-          </p>
-
-          <a
-            href="/admin/logs"
-            class="admin-sidebar-link"
-          >
-            <span class="admin-sidebar-icon">☷</span>
-            <span>操作ログ</span>
-          </a>
-          <a
-  href="/admin-logout"
-  class="admin-sidebar-link"
->
-  <span class="admin-sidebar-icon">⇦</span>
-  <span>ログアウト</span>
-</a>
-
-        </div>
-
-      </nav>
-
-    </aside>
+    <%- include("admin-side-menu", {
+      doctorId: adminDoctorId,
+      doctor: selectedDoctor,
+      doctors: availableDoctors,
+      path: adminCurrentPath,
+      date: adminSelectedDate
+    }) %>
 
     <main class="admin-main">
 
@@ -301,11 +292,24 @@
 <% } %>
 
 <script>
-  document.addEventListener("click", (event) => {
-    document.querySelectorAll(".doctor-selector[open]").forEach((selector) => {
-      if (!selector.contains(event.target)) {
-        selector.removeAttribute("open");
-      }
-    });
-  });
+  document.addEventListener(
+    "click",
+    (event) => {
+      document
+        .querySelectorAll(
+          ".doctor-selector[open]"
+        )
+        .forEach((selector) => {
+          if (
+            !selector.contains(
+              event.target
+            )
+          ) {
+            selector.removeAttribute(
+              "open"
+            );
+          }
+        });
+    }
+  );
 </script>

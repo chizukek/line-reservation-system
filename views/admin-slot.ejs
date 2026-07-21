@@ -1,555 +1,476 @@
 <%- include("partials/header", {
-title: "予約枠詳細",
-isAdminPage: true,
-isAdminLoggedIn
+  title: "予約枠詳細",
+  isAdminPage: true,
+  isAdminLoggedIn
 }) %>
 
 <div class="admin-page admin-slot-page">
   <div class="admin-card">
 
-
-<header class="admin-page-header">
-
-  <div>
-
-    <p class="admin-page-eyebrow">
-      予約管理
-    </p>
-
-    <h1>
-      予約枠詳細
-    </h1>
-
-    <p class="admin-page-description">
-      <%= formatJapaneseDateShort(date) %>
-      ・
-      <%= slotLabel %>
-      ・
-      <strong>
-        <%= doctor.displayName || doctor.name %>
-      </strong>
-    </p>
-
-  </div>
-
-  <% if (!isPast && isOpen && !isFull) { %>
-
-    <a
-      class="admin-primary-button"
-      href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-    >
-      予約を追加
-    </a>
-
-  <% } else if (isPast) { %>
-
-    <span class="admin-status is-closed">
-      受付終了
-    </span>
-
-  <% } else if (!isOpen) { %>
-
-    <span class="admin-status is-closed">
-      休診
-    </span>
-
-  <% } else { %>
-
-    <span class="admin-status is-full">
-      満員
-    </span>
-
-  <% } %>
-
-</header>
-
-<% if (success === "status") { %>
-
-  <div
-    class="admin-success-message"
-    role="status"
-  >
-    診療ステータスを変更しました。
-  </div>
-
-<% } else if (success === "capacity") { %>
-
-  <div
-    class="admin-success-message"
-    role="status"
-  >
-    予約枠の定員を変更しました。
-  </div>
-
-<% } else if (success === "setting") { %>
-
-  <div
-    class="admin-success-message"
-    role="status"
-  >
-    予約枠の設定を保存しました。
-  </div>
-
-<% } %>
-
-<% if (isPast) { %>
-
-  <div
-    class="admin-notice"
-    role="status"
-  >
-    この予約枠は受付終了しています。内容の確認のみできます。
-  </div>
-
-<% } %>
-
-<section class="admin-panel">
-
-  <div class="admin-list-table-shell">
-
-    <table class="admin-list-table admin-info-table">
-
-      <thead>
-        <tr>
-          <th>予約日</th>
-          <th>時間</th>
-          <th>担当医</th>
-          <th>診療状態</th>
-          <th>予約状況</th>
-          <th>患者番号</th>
-          <th>患者氏名</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <% if (!isOpen) { %>
-
-          <tr>
-
-            <td>
-              <%= formatJapaneseDateShort(date) %>
-            </td>
-
-            <td>
-              <%= slotLabel %>
-            </td>
-
-            <td>
-              <%= doctor.displayName || doctor.name %>
-            </td>
-
-            <td>
-              <strong>
-                休診
-              </strong>
-            </td>
-
-            <td>
-              受付なし
-            </td>
-
-            <td>
-              −
-            </td>
-
-            <td>
-              −
-            </td>
-
-            <td>
-              −
-            </td>
-
-          </tr>
-
-        <% } else { %>
-
-          <% reservations.forEach((reservation) => { %>
-
-            <tr>
-
-              <td>
-                <%= formatJapaneseDateShort(date) %>
-              </td>
-
-              <td>
-                <%= slotLabel %>
-              </td>
-
-              <td>
-                <%= doctor.displayName || doctor.name %>
-              </td>
-
-              <td>
-                <strong>
-                  診療
-                </strong>
-              </td>
-
-              <td>
-                <%= reservations.length %>
-                /
-                <%= capacity %>人
-              </td>
-
-              <td>
-                <%= reservation.patientNumber %>
-              </td>
-
-              <td>
-                <strong>
-                  <%= reservation.patient.name %>
-                </strong>
-              </td>
-
-              <td>
-
-                <% if (!isPast) { %>
-
-                  <div class="admin-row-actions">
-
-                    <a
-  class="admin-row-button"
-  href="/admin/reservations?editReservationId=<%= reservation.id %>"
->
-  変更
-</a>
-
-                    <a
-                      class="admin-row-button is-danger"
-                      href="/admin/cancel-confirm/<%= reservation.id %>"
-                    >
-                      キャンセル
-                    </a>
-
-                  </div>
-
-                <% } else { %>
-
-                  <span class="admin-status is-closed">
-                    受付終了
-                  </span>
-
-                <% } %>
-
-              </td>
-
-            </tr>
-
-          <% }) %>
-
-          <%
-            const remainingCapacity =
-              Math.max(
-                0,
-                capacity - reservations.length
-              );
-          %>
-
-          <% for (
-            let index = 0;
-            index < remainingCapacity;
-            index++
-          ) { %>
-
-            <tr class="admin-empty-slot-row">
-
-              <td>
-                <%= formatJapaneseDateShort(date) %>
-              </td>
-
-              <td>
-                <%= slotLabel %>
-              </td>
-
-              <td>
-                <%= doctor.displayName || doctor.name %>
-              </td>
-
-              <td>
-                <strong>
-                  診療
-                </strong>
-              </td>
-
-              <td>
-                <%= reservations.length %>
-                /
-                <%= capacity %>人
-              </td>
-
-              <td>
-                −
-              </td>
-
-              <td>
-                <span class="admin-empty-slot-label">
-                  −
-                </span>
-              </td>
-
-              <td>
-
-                <% if (!isPast) { %>
-
-                  <a
-                    class="admin-row-button is-add"
-                    href="/admin/slot/patient-search?doctorId=<%= doctorId %>&date=<%= date %>&slot=<%= encodeURIComponent(slot) %>"
-                  >
-                    予約追加
-                  </a>
-
-                <% } else { %>
-
-                  <span class="admin-status is-closed">
-                    受付終了
-                  </span>
-
-                <% } %>
-
-              </td>
-
-            </tr>
-
-          <% } %>
-
-          <% if (
-            reservations.length === 0 &&
-            capacity === 0
-          ) { %>
-
-            <tr>
-
-              <td>
-                <%= formatJapaneseDateShort(date) %>
-              </td>
-
-              <td>
-                <%= slotLabel %>
-              </td>
-
-              <td>
-                <%= doctor.displayName || doctor.name %>
-              </td>
-
-              <td>
-                診療
-              </td>
-
-              <td>
-                0 / 0人
-              </td>
-
-              <td>
-                −
-              </td>
-
-              <td>
-                −
-              </td>
-
-              <td>
-                −
-              </td>
-
-            </tr>
-
-          <% } %>
-
-        <% } %>
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-  <% if (isOpen && reservations.length >= capacity) { %>
-
-    <div class="admin-slot-full-message">
-      この予約枠は満員です。
-    </div>
-
-  <% } %>
-
-</section>
-
-<% if (!isPast) { %>
-
-  <section class="admin-panel">
-
-    <h2 class="admin-panel-title">
-      この枠の診療設定
-    </h2>
-
-    <form
-      class="admin-form-card"
-      method="post"
-      action="/admin/slot/settings"
-    >
-
-      <input
-        type="hidden"
-        name="date"
-        value="<%= date %>"
-      >
-
-      <input
-        type="hidden"
-        name="slot"
-        value="<%= slot %>"
-      >
-
-      <label>
-
-        <span>
-          診療状態
+    <header class="admin-page-header">
+
+      <div>
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          <%= formatJapaneseDateShort(date) %>
+          <%= slotLabel %>
+        </h1>
+
+        <p class="admin-page-description">
+          担当医：
+          <strong>
+            <%= doctor.displayName || doctor.name %>
+          </strong>
+        </p>
+      </div>
+
+      <% if (isPast) { %>
+
+        <span class="admin-status is-closed">
+          受付終了
         </span>
 
-        <select
-          name="isOpen"
-          <%= reservations.length > 0
-            ? "disabled"
-            : ""
-          %>
-        >
+      <% } else if (!isOpen) { %>
 
-          <option
-            value="true"
-            <%= isOpen
-              ? "selected"
-              : ""
-            %>
-          >
-            診療
-          </option>
+        <span class="admin-status is-closed">
+          休診
+        </span>
 
-          <option
-            value="false"
-            <%= !isOpen
-              ? "selected"
-              : ""
-            %>
-          >
-            休診
-          </option>
+      <% } else if (isFull) { %>
 
-        </select>
-
-      </label>
-
-      <% if (reservations.length > 0) { %>
-
-        <input
-          type="hidden"
-          name="isOpen"
-          value="true"
-        >
-
-        <p class="admin-form-help">
-          予約が入っているため、休診には変更できません。
-        </p>
+        <span class="admin-status is-full">
+          満員
+        </span>
 
       <% } %>
 
-      <label>
+    </header>
 
-        <span>
-          定員
-        </span>
+    <% if (success === "status") { %>
 
-        <select
-          name="capacity"
-          required
+      <div class="admin-success-message" role="status">
+        診療ステータスを変更しました。
+      </div>
+
+    <% } else if (success === "capacity") { %>
+
+      <div class="admin-success-message" role="status">
+        予約枠の定員を変更しました。
+      </div>
+
+    <% } else if (success === "setting") { %>
+
+      <div class="admin-success-message" role="status">
+        予約枠の設定を保存しました。
+      </div>
+
+    <% } else if (success === "added") { %>
+
+      <div class="admin-success-message" role="status">
+        予約を追加しました。
+      </div>
+
+    <% } else if (success === "changed") { %>
+
+      <div class="admin-success-message" role="status">
+        予約を変更しました。
+      </div>
+
+    <% } else if (success === "cancelled") { %>
+
+      <div class="admin-success-message" role="status">
+        予約をキャンセルしました。
+      </div>
+
+    <% } %>
+
+    <% if (isPast) { %>
+
+      <div class="admin-notice" role="status">
+        この予約枠は受付終了しています。内容の確認のみできます。
+      </div>
+
+    <% } %>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        診療設定
+      </h2>
+
+      <form
+        method="post"
+        action="/admin/slot/settings"
+      >
+
+        <input
+          type="hidden"
+          name="date"
+          value="<%= date %>"
         >
 
-          <%
-            const minimumCapacity =
-              Math.max(
-                1,
-                reservations.length
-              );
+        <input
+          type="hidden"
+          name="slot"
+          value="<%= slot %>"
+        >
 
-            const maximumCapacity = 5;
-          %>
+        <div class="admin-list-table-shell">
 
-          <% for (
-            let number = minimumCapacity;
-            number <= maximumCapacity;
-            number++
-          ) { %>
+          <table class="admin-info-table">
 
-            <option
-              value="<%= number %>"
-              <%= number === capacity
-                ? "selected"
-                : ""
-              %>
-            >
-              <%= number %>人
-            </option>
+            <thead>
+              <tr>
+                <th>予約日</th>
+                <th>時間</th>
+                <th>担当医</th>
+                <th>診療状態</th>
+                <th>定員</th>
+                <th>予約数</th>
+                <th>操作</th>
+              </tr>
+            </thead>
 
-          <% } %>
+            <tbody>
+              <tr>
 
-        </select>
+                <td>
+                  <%= formatJapaneseDateShort(date) %>
+                </td>
 
-      </label>
+                <td>
+                  <%= slotLabel %>
+                </td>
 
-      <p class="admin-form-help">
-        現在の予約数：
-        <%= reservations.length %>人
-      </p>
+                <td>
+                  <%= doctor.displayName || doctor.name %>
+                </td>
 
-      <% if (reservations.length > 0) { %>
+                <td>
+
+                  <% if (!isPast) { %>
+
+                    <select
+                      name="isOpen"
+                      <%= reservations.length > 0 ? "disabled" : "" %>
+                    >
+
+                      <option
+                        value="true"
+                        <%= isOpen ? "selected" : "" %>
+                      >
+                        診療
+                      </option>
+
+                      <option
+                        value="false"
+                        <%= !isOpen ? "selected" : "" %>
+                      >
+                        休診
+                      </option>
+
+                    </select>
+
+                    <% if (reservations.length > 0) { %>
+
+                      <input
+                        type="hidden"
+                        name="isOpen"
+                        value="true"
+                      >
+
+                    <% } %>
+
+                  <% } else { %>
+
+                    <%= isOpen ? "診療" : "休診" %>
+
+                  <% } %>
+
+                </td>
+
+                <td>
+
+                  <% if (!isPast) { %>
+
+                    <%
+                      const minimumCapacity = Math.max(
+                        1,
+                        reservations.length
+                      );
+
+                      const maximumCapacity = 5;
+                    %>
+
+                    <select
+                      name="capacity"
+                      required
+                    >
+
+                      <% for (
+                        let number = minimumCapacity;
+                        number <= maximumCapacity;
+                        number++
+                      ) { %>
+
+                        <option
+                          value="<%= number %>"
+                          <%= number === capacity ? "selected" : "" %>
+                        >
+                          <%= number %>人
+                        </option>
+
+                      <% } %>
+
+                    </select>
+
+                  <% } else { %>
+
+                    <%= capacity %>人
+
+                  <% } %>
+
+                </td>
+
+                <td>
+                  <strong>
+                    <%= reservations.length %>/<%= capacity %>人
+                  </strong>
+
+                  <% if (isFull) { %>
+
+                    <span class="admin-status is-full">
+                      満員
+                    </span>
+
+                  <% } %>
+                </td>
+
+                <td>
+
+                  <% if (!isPast) { %>
+
+                    <button
+                      type="submit"
+                      class="admin-primary-button"
+                    >
+                      保存
+                    </button>
+
+                  <% } else { %>
+
+                    <span class="admin-status is-closed">
+                      受付終了
+                    </span>
+
+                  <% } %>
+
+                </td>
+
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </form>
+
+      <% if (!isPast && reservations.length > 0) { %>
 
         <p class="admin-form-help">
+          予約が入っているため休診には変更できません。
           定員は現在の予約数以上に設定してください。
         </p>
 
       <% } %>
 
-      <div class="admin-form-actions">
+    </section>
 
-        <button
-          type="submit"
-          class="admin-primary-button"
-        >
-          設定を保存
-        </button>
+    <section class="admin-panel">
+
+      <div class="admin-section-title-row">
+        <h2 class="admin-panel-title">
+          予約一覧
+        </h2>
+      </div>
+
+      <div class="admin-list-table-shell">
+
+        <table class="admin-info-table">
+
+          <thead>
+            <tr>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+              <th>担当医</th>
+              <th>予約日</th>
+              <th>時間</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <% reservations.forEach((reservation) => { %>
+
+              <tr>
+
+                <td>
+                  <%= reservation.patientNumber %>
+                </td>
+
+                <td>
+                  <strong>
+                    <%= reservation.patient.name %>
+                  </strong>
+                </td>
+
+                <td>
+                  <%= doctor.displayName || doctor.name %>
+                </td>
+
+                <td>
+                  <%= formatJapaneseDateShort(date) %>
+                </td>
+
+                <td>
+                  <%= slotLabel %>
+                </td>
+
+                <td>
+
+                  <% if (!isPast) { %>
+
+                    <div class="admin-row-actions">
+
+                      <a
+                        class="admin-row-button"
+                        href="/admin/edit/<%= reservation.id %>"
+                      >
+                        変更
+                      </a>
+
+                      <a
+                        class="admin-row-button is-danger"
+                        href="/admin/cancel-confirm/<%= reservation.id %>"
+                      >
+                        キャンセル
+                      </a>
+
+                    </div>
+
+                  <% } else { %>
+
+                    <span class="admin-status is-closed">
+                      受付終了
+                    </span>
+
+                  <% } %>
+
+                </td>
+
+              </tr>
+
+            <% }) %>
+
+            <% if (
+              !isPast &&
+              isOpen &&
+              reservations.length < capacity
+            ) { %>
+
+              <%
+                const remainingCapacity = Math.max(
+                  0,
+                  capacity - reservations.length
+                );
+              %>
+
+              <% for (
+                let index = 0;
+                index < remainingCapacity;
+                index++
+              ) { %>
+
+                <tr class="admin-empty-slot-row">
+
+                  <td>
+                    −
+                  </td>
+
+                  <td>
+                    <strong>
+                      空き
+                    </strong>
+                  </td>
+
+                  <td>
+                    <%= doctor.displayName || doctor.name %>
+                  </td>
+
+                  <td>
+                    <%= formatJapaneseDateShort(date) %>
+                  </td>
+
+                  <td>
+                    <%= slotLabel %>
+                  </td>
+
+                  <td>
+                    <a
+                      class="admin-row-button is-add"
+                      href="/admin/patients?mode=reservation&doctorId=<%= doctorId %>&date=<%= encodeURIComponent(date) %>&slot=<%= encodeURIComponent(slot) %>"
+                    >
+                      予約追加
+                    </a>
+                  </td>
+
+                </tr>
+
+              <% } %>
+
+            <% } %>
+
+            <% if (
+              reservations.length === 0 &&
+              !isOpen
+            ) { %>
+
+              <tr>
+                <td colspan="6">
+                  この予約枠は休診です。
+                </td>
+              </tr>
+
+            <% } else if (
+              reservations.length === 0 &&
+              isPast
+            ) { %>
+
+              <tr>
+                <td colspan="6">
+                  この予約枠に予約はありません。
+                </td>
+              </tr>
+
+            <% } %>
+
+          </tbody>
+
+        </table>
 
       </div>
 
-    </form>
-
-  </section>
-
-<% } %>
-
-<div class="admin-slot-footer-actions">
-
-  <a
-    class="admin-week-button"
-    href="/admin/reservations"
-  >
-    予約スケジュールへ戻る
-  </a>
-
-  <a
-    class="admin-week-button"
-    href="/admin"
-  >
-    本日の予約へ戻る
-  </a>
-
-</div>
-
+    </section>
 
   </div>
 </div>
 
 <%- include("partials/footer", {
-isAdminPage: true,
-isAdminLoggedIn
+  isAdminPage: true,
+  isAdminLoggedIn
 }) %>

@@ -465,42 +465,74 @@ app.get("/complete", (req, res) => {
 });
 
 app.get("/mypage", async (req, res) => {
-  const patientNumber = req.session.patientNumber;
+  try {
+    const patientNumber = req.session.patientNumber;
 
-  if (!patientNumber) {
-    return res.redirect("/psychiatry");
-  }
+    if (!patientNumber) {
+      return res.redirect("/psychiatry");
+    }
 
-  const today = new Date().toLocaleDateString("sv-SE");
+    const today = new Date().toLocaleDateString("sv-SE", {
+      timeZone: "Asia/Tokyo",
+    });
 
-  const patient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
-  });
-
-  const reservation = await prisma.reservation.findFirst({
-    where: {
-      patientNumber,
-      date: {
-        gt: today,
+    const patient = await prisma.patient.findUnique({
+      where: {
+        patientNumber,
       },
-    },
-    include: {
-      doctor: true,
-    },
-    orderBy: [{ date: "asc" }, { slot: "asc" }],
-  });
+    });
 
-  if (!reservation) {
-    req.session.changeReservationId = null;
+    if (!patient) {
+      req.session.patientNumber = null;
+      req.session.changeReservationId = null;
+
+      return res.redirect("/psychiatry");
+    }
+
+    const reservation = await prisma.reservation.findFirst({
+      where: {
+        patientNumber,
+        date: {
+          gte: today,
+        },
+      },
+      include: {
+        doctor: true,
+      },
+      orderBy: [
+        {
+          date: "asc",
+        },
+        {
+          slot: "asc",
+        },
+      ],
+    });
+
+    if (!reservation) {
+      req.session.changeReservationId = null;
+    }
+
+    return res.render("mypage", {
+      title: "マイページ",
+      isPatientLoggedIn: true,
+      patient,
+      reservation,
+    });
+  } catch (error) {
+    console.error("マイページ表示エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "マイページ",
+      heading: "予約情報を取得できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
+      detail: "",
+      backUrl: "/psychiatry",
+      isAdminPage: false,
+      isAdminLoggedIn: false,
+      isPatientLoggedIn: true,
+    });
   }
-
-  res.render("mypage", {
-    title: "マイページ",
-    patient,
-    reservation,
-  });
 });
 
 app.get("/select-doctor", async (req, res) => {
@@ -1243,23 +1275,43 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
       timeZone: "Asia/Tokyo",
     });
 
+    /*
+     * URLの日付を取得
+     * 例：/admin?date=2026-07-22
+     */
+    const queryDate = String(req.query.date || "").trim();
+
+    /*
+     * 日付が正しければ指定日、
+     * 正しくなければ今日を表示
+     */
+    const selectedDate = isValidDateText(queryDate) ? queryDate : today;
+
     const reservations = await prisma.reservation.findMany({
       where: {
         doctorId,
-        date: today,
+        date: selectedDate,
       },
       include: {
         patient: true,
       },
-      orderBy: {
-        slot: "asc",
-      },
+      orderBy: [
+        {
+          slot: "asc",
+        },
+        {
+          createdAt: "asc",
+        },
+      ],
     });
 
-    const slots = config.getSlotsForDate(today, doctorId);
+    /*
+     * 指定日の診療枠を取得
+     */
+    const slots = config.getSlotsForDate(selectedDate, doctorId);
 
-    res.render("admin-dashboard", {
-      title: "予約管理",
+    return res.render("admin-dashboard", {
+      title: "日毎スケジュール",
 
       isAdminPage: true,
       isAdminLoggedIn: true,
@@ -1267,9 +1319,16 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
       doctorId,
       doctor,
       doctors,
+
+      /*
+       * 今日の日付と、表示中の日付を分けて渡す
+       */
       today,
+      selectedDate,
+
       slots,
       reservations,
+
       formatJapaneseDateShort,
       getCapacityForSlot: config.getCapacityForSlot,
 
@@ -1278,7 +1337,16 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
   } catch (error) {
     console.error("管理ダッシュボード表示エラー:", error);
 
-    res.status(500).send("管理画面の表示中にエラーが発生しました。");
+    return res.status(500).render("error", {
+      title: "日毎スケジュール",
+      heading: "予約情報を取得できませんでした",
+      message: "管理画面の表示中にエラーが発生しました。",
+      detail: "",
+      backUrl: "/admin",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
   }
 });
 app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
@@ -2265,7 +2333,7 @@ app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
     }
 
     return res.render("admin-slot-patient-search", {
-      title: "患者検索",
+      title: "予約追加",
 
       isAdminPage: true,
       isAdminLoggedIn: true,
@@ -2279,7 +2347,18 @@ app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
 
       keyword,
       patients,
+      hasSearched: Boolean(keyword),
 
+      registerError: null,
+      registerSuccess: null,
+      confirmPatient: null,
+      registeredPatient: null,
+
+      newPatientNumber: String(req.query.newPatientNumber || ""),
+
+      newPatientName: String(req.query.newPatientName || ""),
+
+      formatJapaneseDateShort,
       getSlotLabel: config.getSlotLabel,
     });
   } catch (error) {
@@ -2294,6 +2373,413 @@ app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
     });
   }
 });
+
+app.post(
+  "/admin/slot/patient-register-confirm",
+  requireAdminLogin,
+  async (req, res) => {
+    try {
+      const doctorId = Number(req.session.doctorId);
+      const date = String(req.body.date || "").trim();
+      const slot = String(req.body.slot || "").trim();
+
+      const patientNumber = String(req.body.patientNumber || "").trim();
+
+      const name = String(req.body.name || "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+      if (!isValidDoctorId(doctorId)) {
+        return res.redirect("/admin/doctors");
+      }
+
+      if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
+        return res.redirect("/admin/reservations");
+      }
+
+      if (isPastReservationSlot(date, slot)) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "受付終了しています",
+          message: "過去の予約枠には患者を登録できません。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      const doctor = await prisma.doctor.findFirst({
+        where: {
+          id: doctorId,
+          isActive: true,
+        },
+      });
+
+      if (!doctor) {
+        req.session.doctorId = null;
+
+        return res.redirect("/admin/doctors");
+      }
+
+      const slotSetting = await getSlotSetting(date, slot, doctorId);
+
+      if (!slotSetting.isOpen) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "休診です",
+          message: "この予約枠は休診に設定されています。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      const reservationCount = await prisma.reservation.count({
+        where: {
+          doctorId,
+          date,
+          slot,
+        },
+      });
+
+      if (reservationCount >= slotSetting.capacity) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "満員です",
+          message: "この予約枠はすでに満員です。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      let registerError = null;
+
+      if (!patientNumber) {
+        registerError = "患者番号を入力してください。";
+      } else if (patientNumber.length > 50) {
+        registerError = "患者番号は50文字以内で入力してください。";
+      } else if (!name) {
+        registerError = "患者氏名を入力してください。";
+      } else if (name.length > 100) {
+        registerError = "患者氏名は100文字以内で入力してください。";
+      }
+
+      if (!registerError) {
+        const existingPatient = await prisma.patient.findUnique({
+          where: {
+            patientNumber,
+          },
+        });
+
+        if (existingPatient) {
+          registerError =
+            "この患者番号はすでに登録されています。患者検索から選択してください。";
+        }
+      }
+
+      if (registerError) {
+        return res.status(400).render("admin-slot-patient-search", {
+          title: "予約追加",
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+
+          doctor,
+          doctorId,
+          date,
+          slot,
+
+          slotLabel: config.getSlotLabel(slot, doctorId),
+
+          keyword: "",
+          patients: [],
+          hasSearched: false,
+
+          registerError,
+          registerSuccess: null,
+          confirmPatient: null,
+          registeredPatient: null,
+
+          newPatientNumber: patientNumber,
+          newPatientName: name,
+
+          formatJapaneseDateShort,
+          getSlotLabel: config.getSlotLabel,
+        });
+      }
+
+      return res.render("admin-slot-patient-search", {
+        title: "予約追加",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+
+        doctor,
+        doctorId,
+        date,
+        slot,
+
+        slotLabel: config.getSlotLabel(slot, doctorId),
+
+        keyword: "",
+        patients: [],
+        hasSearched: false,
+
+        registerError: null,
+        registerSuccess: null,
+
+        confirmPatient: {
+          patientNumber,
+          name,
+        },
+
+        registeredPatient: null,
+
+        newPatientNumber: patientNumber,
+        newPatientName: name,
+
+        formatJapaneseDateShort,
+        getSlotLabel: config.getSlotLabel,
+      });
+    } catch (error) {
+      console.error("患者登録確認エラー:", error);
+
+      return res.status(500).render("error", {
+        title: "患者登録確認エラー",
+        heading: "エラーが発生しました",
+        message: "患者登録内容の確認中にエラーが発生しました。",
+        detail: "",
+        backUrl: "/admin/reservations",
+      });
+    }
+  },
+);
+
+app.post(
+  "/admin/slot/patient-register",
+  requireAdminLogin,
+  async (req, res) => {
+    try {
+      const doctorId = Number(req.session.doctorId);
+      const date = String(req.body.date || "").trim();
+      const slot = String(req.body.slot || "").trim();
+
+      const patientNumber = String(req.body.patientNumber || "").trim();
+
+      const name = String(req.body.name || "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+      if (!isValidDoctorId(doctorId)) {
+        return res.redirect("/admin/doctors");
+      }
+
+      if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
+        return res.redirect("/admin/reservations");
+      }
+
+      if (isPastReservationSlot(date, slot)) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "受付終了しています",
+          message: "過去の予約枠には患者を登録できません。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      const doctor = await prisma.doctor.findFirst({
+        where: {
+          id: doctorId,
+          isActive: true,
+        },
+      });
+
+      if (!doctor) {
+        req.session.doctorId = null;
+
+        return res.redirect("/admin/doctors");
+      }
+
+      const slotSetting = await getSlotSetting(date, slot, doctorId);
+
+      if (!slotSetting.isOpen) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "休診です",
+          message: "この予約枠は休診に設定されています。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      const reservationCount = await prisma.reservation.count({
+        where: {
+          doctorId,
+          date,
+          slot,
+        },
+      });
+
+      if (reservationCount >= slotSetting.capacity) {
+        return res.render("error", {
+          title: "患者登録",
+          heading: "満員です",
+          message: "この予約枠はすでに満員です。",
+          detail: "",
+          backUrl:
+            `/admin/slot?date=${encodeURIComponent(date)}` +
+            `&slot=${encodeURIComponent(slot)}`,
+        });
+      }
+
+      let registerError = null;
+
+      if (!patientNumber) {
+        registerError = "患者番号を入力してください。";
+      } else if (patientNumber.length > 50) {
+        registerError = "患者番号は50文字以内で入力してください。";
+      } else if (!name) {
+        registerError = "患者氏名を入力してください。";
+      } else if (name.length > 100) {
+        registerError = "患者氏名は100文字以内で入力してください。";
+      }
+
+      if (registerError) {
+        return res.status(400).render("admin-slot-patient-search", {
+          title: "予約追加",
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+
+          doctor,
+          doctorId,
+          date,
+          slot,
+
+          slotLabel: config.getSlotLabel(slot, doctorId),
+
+          keyword: "",
+          patients: [],
+          hasSearched: false,
+
+          registerError,
+          registerSuccess: null,
+          confirmPatient: null,
+          registeredPatient: null,
+
+          newPatientNumber: patientNumber,
+          newPatientName: name,
+
+          formatJapaneseDateShort,
+          getSlotLabel: config.getSlotLabel,
+        });
+      }
+
+      let registeredPatient;
+
+      try {
+        registeredPatient = await prisma.patient.create({
+          data: {
+            patientNumber,
+            name,
+          },
+        });
+      } catch (error) {
+        if (error?.code === "P2002") {
+          return res.status(409).render("admin-slot-patient-search", {
+            title: "予約追加",
+
+            isAdminPage: true,
+            isAdminLoggedIn: true,
+
+            doctor,
+            doctorId,
+            date,
+            slot,
+
+            slotLabel: config.getSlotLabel(slot, doctorId),
+
+            keyword: "",
+            patients: [],
+            hasSearched: false,
+
+            registerError:
+              "この患者番号はすでに登録されています。患者検索から選択してください。",
+
+            registerSuccess: null,
+            confirmPatient: null,
+            registeredPatient: null,
+
+            newPatientNumber: patientNumber,
+            newPatientName: name,
+
+            formatJapaneseDateShort,
+            getSlotLabel: config.getSlotLabel,
+          });
+        }
+
+        throw error;
+      }
+
+      await createAuditLog("患者登録", patientNumber, `患者氏名: ${name}`);
+
+      return res.render("admin-slot-patient-search", {
+        title: "予約追加",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+
+        doctor,
+        doctorId,
+        date,
+        slot,
+
+        slotLabel: config.getSlotLabel(slot, doctorId),
+
+        keyword: "",
+        patients: [],
+        hasSearched: false,
+
+        registerError: null,
+
+        registerSuccess: "上記内容で患者を登録しました。",
+
+        confirmPatient: null,
+
+        registeredPatient: {
+          patientNumber: registeredPatient.patientNumber,
+
+          name: registeredPatient.name,
+        },
+
+        newPatientNumber: "",
+        newPatientName: "",
+
+        formatJapaneseDateShort,
+        getSlotLabel: config.getSlotLabel,
+      });
+    } catch (error) {
+      console.error("患者登録エラー:", error);
+
+      return res.status(500).render("error", {
+        title: "患者登録エラー",
+        heading: "エラーが発生しました",
+        message: "患者登録中にエラーが発生しました。",
+        detail: "",
+        backUrl: "/admin/reservations",
+      });
+    }
+  },
+);
 
 app.get("/admin/slot/confirm", requireAdminLogin, async (req, res) => {
   const doctorId = Number(req.session.doctorId);
@@ -2952,46 +3438,105 @@ app.post("/admin/edit/:id/complete", requireAdminLogin, async (req, res) => {
 
 app.get("/admin/patients", requireAdminLogin, async (req, res) => {
   try {
+    const doctorId = Number(req.session.doctorId);
+
     const keyword = String(req.query.keyword || "").trim();
 
-    let patients = [];
+    const today = new Date().toLocaleDateString("sv-SE", {
+      timeZone: "Asia/Tokyo",
+    });
 
-    if (keyword) {
-      patients = await prisma.patient.findMany({
-        where: {
-          OR: [
-            {
-              patientNumber: {
-                contains: keyword,
-                mode: "insensitive",
-              },
-            },
-            {
-              name: {
-                contains: keyword,
-                mode: "insensitive",
-              },
-            },
-          ],
-        },
-        orderBy: {
-          patientNumber: "asc",
-        },
-        take: 50,
-      });
-    }
+    const doctor = isValidDoctorId(doctorId)
+      ? await prisma.doctor.findFirst({
+          where: {
+            id: doctorId,
+            isActive: true,
+          },
+        })
+      : null;
 
-    res.render("admin-patients", {
-      title: "患者検索",
+    const doctors = await prisma.doctor.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    const patients = keyword
+      ? await prisma.patient.findMany({
+          where: {
+            OR: [
+              {
+                patientNumber: {
+                  contains: keyword,
+                },
+              },
+              {
+                name: {
+                  contains: keyword,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+
+          include: {
+            reservations: {
+              include: {
+                doctor: true,
+              },
+              orderBy: [
+                {
+                  date: "asc",
+                },
+                {
+                  slot: "asc",
+                },
+              ],
+              take: 1,
+            },
+          },
+
+          orderBy: {
+            patientNumber: "asc",
+          },
+
+          take: 50,
+        })
+      : [];
+
+    return res.render("admin-patients", {
+      title: "患者管理",
+
       isAdminPage: true,
       isAdminLoggedIn: true,
+
+      path: req.path,
+
+      doctorId,
+      doctor,
+      doctors,
+
       keyword,
       patients,
+
+      formatJapaneseDateShort,
     });
   } catch (error) {
     console.error("患者検索エラー:", error);
 
-    res.status(500).send("患者情報の検索中にエラーが発生しました。");
+    return res.status(500).render("error", {
+      title: "患者管理",
+      heading: "患者情報を取得できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
+      detail: "",
+      backUrl: "/admin/patients",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
   }
 });
 
@@ -3061,7 +3606,7 @@ app.post("/admin/patients/add", async (req, res) => {
   return res.render("admin-complete", {
     title: "患者登録完了",
     message: "患者情報を登録しました。",
-    buttonText: "患者一覧へ戻る",
+    buttonText: "患者管理へ戻る",
     buttonLink: "/admin/patients",
   });
 });

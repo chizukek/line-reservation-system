@@ -1,41 +1,232 @@
-<%- include("partials/header", { title: "患者編集確認" }) %>
+
+<%- include("partials/header", {
+  title: "患者編集確認",
+  isAdminPage: true,
+  isAdminLoggedIn: true,
+  doctor:
+    typeof doctor !== "undefined"
+      ? doctor
+      : null,
+  doctors:
+    typeof doctors !== "undefined"
+      ? doctors
+      : [],
+  doctorId:
+    typeof doctorId !== "undefined"
+      ? doctorId
+      : null,
+  path:
+    typeof path !== "undefined"
+      ? path
+      : ""
+}) %>
+
+<%
+  const formatBirthDate = (birthDate) => {
+    if (!birthDate) {
+      return "未登録";
+    }
+
+    let dateText = "";
+
+    if (birthDate instanceof Date) {
+      dateText =
+        birthDate
+          .toISOString()
+          .slice(0, 10);
+    } else {
+      dateText =
+        String(birthDate)
+          .slice(0, 10);
+    }
+
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(
+        dateText
+      )
+    ) {
+      return "未登録";
+    }
+
+    const [
+      year,
+      month,
+      day
+    ] = dateText
+      .split("-")
+      .map(Number);
+
+    return `${year}年${month}月${day}日`;
+  };
+%>
 
 <div class="admin-page">
   <div class="admin-card">
 
-    <h1>この内容で変更しますか？</h1>
+    <header class="admin-page-header">
 
-    <div class="confirm-box">
-      <h2>変更前</h2>
-      <p><strong>患者番号：</strong><%= patient.patientNumber %></p>
-      <p><strong>氏名：</strong><%= patient.name %></p>
-      <p><strong>生年月日：</strong><%= formatJapaneseDate(patient.birthDate) %></p>
-    </div>
+      <div>
+        <p class="admin-page-eyebrow">
+          患者管理
+        </p>
 
-    <div class="confirm-box">
-      <h2>変更後</h2>
-      <p><strong>患者番号：</strong><%= newPatient.patientNumber %></p>
-      <p><strong>氏名：</strong><%= newPatient.name %></p>
-      <p><strong>生年月日：</strong><%= formatJapaneseDate(newPatient.birthDateText) %></p>
-    </div>
+        <h1>
+          患者編集確認
+        </h1>
 
-    <form method="POST" action="/admin/patients/edit/<%= newPatient.id %>/complete">
-      <input type="hidden" name="patientNumber" value="<%= newPatient.patientNumber %>">
-      <input type="hidden" name="name" value="<%= newPatient.name %>">
-      <input type="hidden" name="birthDate" value="<%= newPatient.birthDateText %>">
+        <p class="admin-page-description">
+          この内容で患者情報を変更しますか？
+        </p>
+      </div>
 
-      <div class="clinic-actions">
-        <button type="submit" class="clinic-main-button">
+    </header>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        変更前
+      </h2>
+
+      <div class="admin-confirm-box">
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            患者番号
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= patient.patientNumber %>
+          </div>
+
+        </div>
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            氏名
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= patient.name %>
+          </div>
+
+        </div>
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            生年月日
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= formatBirthDate(patient.birthDate) %>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        変更後
+      </h2>
+
+      <div class="admin-confirm-box">
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            患者番号
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= newPatient.patientNumber %>
+          </div>
+
+        </div>
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            氏名
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= newPatient.name %>
+          </div>
+
+        </div>
+
+        <div class="admin-confirm-row">
+
+          <div class="admin-confirm-label">
+            生年月日
+          </div>
+
+          <div class="admin-confirm-value">
+            <%= formatBirthDate(
+              newPatient.birthDateText
+            ) %>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <form
+      method="post"
+      action="/admin/patients/edit/<%= newPatient.id %>/complete"
+    >
+
+      <input
+        type="hidden"
+        name="patientNumber"
+        value="<%= newPatient.patientNumber %>"
+      >
+
+      <input
+        type="hidden"
+        name="name"
+        value="<%= newPatient.name %>"
+      >
+
+      <input
+        type="hidden"
+        name="birthDate"
+        value="<%= newPatient.birthDateText || "" %>"
+      >
+
+      <div class="admin-confirm-actions">
+
+        <button
+          type="submit"
+          class="admin-primary-button"
+        >
           変更する
         </button>
 
-        <a class="clinic-sub-button" href="/admin/patients/edit/<%= newPatient.id %>">
+        <a
+          class="admin-secondary-button"
+          href="/admin/patients/edit/<%= newPatient.id %>"
+        >
           戻る
         </a>
+
       </div>
+
     </form>
 
   </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>
+

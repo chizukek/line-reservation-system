@@ -2,30 +2,48 @@
 
   <div class="admin-side-card">
 
-    <h2 class="admin-side-title">
-      メニュー
-    </h2>
+    <nav
+      class="admin-side-nav"
+      aria-label="管理画面メニュー"
+    >
 
-    <nav class="admin-side-nav">
+      <a
+        class="admin-side-link"
+        href="/admin?doctorId=<%= doctorId %>"
+      >
+        <span>日毎スケジュール</span>
+        <span aria-hidden="true">›</span>
+      </a>
 
       <a
         class="admin-side-link"
         href="/admin/reservations?doctorId=<%= doctorId %>"
       >
-        <span>予約スケジュール</span>
+        <span>週毎スケジュール</span>
         <span aria-hidden="true">›</span>
       </a>
 
       <a
         class="admin-side-link"
-        href="/admin/search"
+        href="/admin/patients"
       >
-        <span>検索</span>
+        <span>患者を検索・登録</span>
         <span aria-hidden="true">›</span>
       </a>
 
+    </nav>
+
+  </div>
+
+  <div class="admin-side-card admin-side-sub-card">
+
+    <nav
+      class="admin-side-nav"
+      aria-label="その他の管理メニュー"
+    >
+
       <a
-        class="admin-side-link"
+        class="admin-side-link is-secondary"
         href="/admin/logs"
       >
         <span>操作ログ</span>
