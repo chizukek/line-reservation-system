@@ -1957,7 +1957,16 @@ app.post("/admin/edit/:id", requireAdminLogin, async (req, res) => {
 
 app.get("/admin/slot", requireAdminLogin, async (req, res) => {
   try {
-    const doctorId = Number(req.session.doctorId);
+    const queryDoctorId = Number(req.query.doctorId);
+    const sessionDoctorId = Number(req.session.doctorId);
+
+    const doctorId = isValidDoctorId(queryDoctorId)
+      ? queryDoctorId
+      : sessionDoctorId;
+
+    if (isValidDoctorId(queryDoctorId)) {
+      req.session.doctorId = queryDoctorId;
+    }
     const date = String(req.query.date || "");
     const slot = String(req.query.slot || "");
     const success = String(req.query.success || "");
@@ -2750,15 +2759,14 @@ app.post(
         hasSearched: false,
 
         registerError: null,
-
-        registerSuccess: "上記内容で患者を登録しました。",
+        registerSuccess: "以下の患者情報を登録しました。",
 
         confirmPatient: null,
 
         registeredPatient: {
           patientNumber: registeredPatient.patientNumber,
-
           name: registeredPatient.name,
+          reservations: [],
         },
 
         newPatientNumber: "",
