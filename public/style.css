@@ -1948,7 +1948,7 @@ small,
   .reservation-calendar td,
   .reservation-slot-link,
   .reservation-slot-disabled {
-    height: 74px;
+    height: 64px;
   }
 
   .reservation-calendar thead th {
@@ -3952,7 +3952,7 @@ small,
   .reservation-calendar td,
   .reservation-slot-link,
   .reservation-slot-disabled {
-    height: 74px;
+    height: 64px;
   }
 
   .reservation-calendar thead th {
@@ -4122,5 +4122,123 @@ small,
 
   .reservation-slot-symbol {
     font-size: 18px;
+  }
+}
+
+/* ==============================
+   予約確認画面
+============================== */
+
+.clinic-phone-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
+.clinic-phone-label {
+  font-weight: 700;
+}
+
+.clinic-phone-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #39745c;
+  border-radius: 8px;
+  color: #245c46;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  background: #ffffff;
+}
+
+.clinic-phone-link:hover,
+.clinic-phone-link:focus-visible {
+  background: #eef7f2;
+}
+
+.terms-area {
+  margin-top: 28px;
+}
+
+.terms-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  border: 2px solid #b8c7c0;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.terms-checkbox-label:hover {
+  background: #f7faf8;
+}
+
+.terms-checkbox-label:focus-within {
+  border-color: #39745c;
+  outline: 3px solid rgba(57, 116, 92, 0.18);
+}
+
+.terms-checkbox {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  accent-color: #39745c;
+  cursor: pointer;
+}
+
+.terms-checkbox-text {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.terms-checkbox-text a {
+  font-weight: 700;
+  color: #245c46;
+  text-decoration: underline;
+}
+
+.terms-error-message {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #c83c3c;
+  border-radius: 8px;
+  color: #9e2525;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+  background: #fff3f3;
+}
+
+.terms-error-message[hidden] {
+  display: none;
+}
+
+.terms-checkbox[aria-invalid="true"] {
+  outline: 3px solid rgba(200, 60, 60, 0.25);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .terms-checkbox-label {
+    padding: 16px;
+  }
+
+  .terms-checkbox {
+    width: 30px;
+    height: 30px;
+  }
+
+  .clinic-phone-area {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

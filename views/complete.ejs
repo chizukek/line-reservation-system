@@ -1,95 +1,201 @@
-<%- include("partials/header", { title: title || "予約完了" }) %>
+
+<%- include("partials/header", {
+  title: title || "予約完了"
+}) %>
+
 <%- include("partials/progress", {
   step: 4
 }) %>
 
-<% const r = reservation || {}; %>
-<% const p = r.patient || {}; %>
+<%
+  const r = reservation || {};
+  const p = patient || {};
+
+  let formattedDate = "";
+
+  if (r.date) {
+    const dateParts = String(r.date).split("-");
+
+    const reservationDate = new Date(
+      Number(dateParts[0]),
+      Number(dateParts[1]) - 1,
+      Number(dateParts[2])
+    );
+
+    const weekdayLabels = [
+      "㈰",
+      "㈪",
+      "㈫",
+      "㈬",
+      "㈭",
+      "㈮",
+      "㈯"
+    ];
+
+    formattedDate =
+      `${reservationDate.getFullYear()}年` +
+      `${reservationDate.getMonth() + 1}月` +
+      `${reservationDate.getDate()}日` +
+      `${weekdayLabels[reservationDate.getDay()]}`;
+  }
+%>
 
 <div class="clinic-page">
   <div class="clinic-card complete-box">
 
-    <h1><%= heading || "予約が完了しました" %></h1>
+    <header class="clinic-page-header">
+      <h1>
+        <%= heading || "予約が完了しました" %>
+      </h1>
+
+      <p class="confirm-warning">
+        <%= message || "ご予約ありがとうございました。" %>
+      </p>
+    </header>
 
     <div class="complete-message">
-      <strong><%= message || "ご予約ありがとうございました。" %></strong><br>
       ご指定の日時にご来院ください。
     </div>
 
-    <section class="clinic-section">
+    <section class="confirm-section">
       <h2>ご予約内容</h2>
 
       <div class="confirm-table">
 
         <% if (r.reservationCode) { %>
           <div class="confirm-row">
-            <div class="confirm-label">予約番号</div>
-            <div class="confirm-value"><%= r.reservationCode %></div>
+            <div class="confirm-label">
+              予約番号
+            </div>
+
+            <div class="confirm-value">
+              <%= r.reservationCode %>
+            </div>
           </div>
         <% } %>
 
         <div class="confirm-row">
-          <div class="confirm-label">予約日</div>
-          <div class="confirm-value"><%= formatJapaneseDate(r.date) %></div>
+          <div class="confirm-label">
+            予約日
+          </div>
+
+          <div class="confirm-value">
+            <%= formattedDate || "―" %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">時間</div>
-          <div class="confirm-value"><%= r.slot %></div>
+          <div class="confirm-label">
+            時間
+          </div>
+
+          <div class="confirm-value">
+            <%= r.slot || "―" %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">診療科</div>
-          <div class="confirm-value">心療内科</div>
+          <div class="confirm-label">
+            診療科
+          </div>
+
+          <div class="confirm-value">
+            心療内科
+          </div>
         </div>
 
-                <% if (r.doctor) { %>
+        <% if (r.doctor) { %>
           <div class="confirm-row">
-            <div class="confirm-label">担当医</div>
-            <div class="confirm-value"><%= r.doctor.name %></div>
+            <div class="confirm-label">
+              担当医
+            </div>
+
+            <div class="confirm-value">
+              <%= r.doctor.displayName || r.doctor.name %>
+            </div>
           </div>
         <% } %>
 
-      </div>
-    </section>
-
-    <section class="clinic-section">
-      <h2>患者様情報</h2>
-
-      <div class="confirm-table">
         <div class="confirm-row">
-          <div class="confirm-label">患者番号</div>
-          <div class="confirm-value"><%= p.patientNumber %></div>
+          <div class="confirm-label">
+            患者番号
+          </div>
+
+          <div class="confirm-value">
+            <%= p.patientNumber || r.patientNumber || "―" %>
+          </div>
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">氏名</div>
-          <div class="confirm-value"><%= p.name %> 様</div>
+          <div class="confirm-label">
+            氏名
+          </div>
+
+          <div class="confirm-value">
+            <%= p.name || "―" %>
+            <% if (p.name) { %>
+              様
+            <% } %>
+          </div>
         </div>
+
       </div>
     </section>
 
-    <section class="clinic-section">
+    <section class="confirm-section">
+      <h2>変更・キャンセルについて</h2>
+
+      <div class="confirm-note-box">
+        <p>
+          予約の変更・キャンセルは、
+          <strong>予約日前日の23:59まで</strong>
+          マイページから行えます。
+        </p>
+
+        <p>
+          期限を過ぎた場合は、医院までお電話でご連絡ください。
+        </p>
+
+        <p class="clinic-phone-area">
+          <span class="clinic-phone-label">
+            医院電話番号
+          </span>
+
+          <a
+            class="clinic-phone-link"
+            href="tel:0000000000"
+          >
+            00-0000-0000
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <section class="confirm-section">
       <h2>ご来院に関するお願い</h2>
 
       <div class="confirm-note-box">
-        ・予約時間の5分前を目安にご来院ください。<br>
-        ・遅れる場合や体調に変化がある場合は、医院までご連絡ください。<br>
-        ・発熱・咳などの症状がある場合は、来院前にお電話ください。
-      </div>
-    </section>
+        <p>
+          予約時間の5分前を目安にご来院ください。
+        </p>
 
-    <section class="clinic-section">
-      <h2>キャンセル・変更について</h2>
+        <p>
+          予約時間に遅れる場合や、体調に変化がある場合は、
+          医院までご連絡ください。
+        </p>
 
-      <div class="confirm-note-box">
-        予約の変更・キャンセルは、マイページからお手続きいただけます。<br>
-        期限を過ぎた場合は、お電話にて医院までご連絡ください。
+        <p>
+          発熱や咳などの症状がある場合は、
+          来院前にお電話でご相談ください。
+        </p>
       </div>
     </section>
 
     <div class="clinic-actions">
-      <a class="clinic-main-button" href="<%= backUrl || '/mypage' %>">
+      <a
+        class="clinic-main-button"
+        href="<%= backUrl || "/mypage" %>"
+      >
         <%= backLabel || "マイページへ戻る" %>
       </a>
     </div>

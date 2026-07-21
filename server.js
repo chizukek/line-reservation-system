@@ -946,8 +946,9 @@ app.post("/reserve", async (req, res) => {
   if (!agreed) {
     return res.status(400).render("error", {
       title: "予約確認",
-      heading: "利用規約への同意が必要です",
-      message: "利用規約およびプライバシーポリシーを確認し、同意してください。",
+      heading: "同意が必要です",
+      message:
+        "予約を確定するには、利用規約およびプライバシーポリシーへの同意が必要です。",
       detail: "",
       backUrl: "javascript:history.back()",
     });
