@@ -87,15 +87,9 @@ step: 2
 
   </div>
 
-  <div
-    class="reservation-status-guide"
-    aria-label="予約状況"
-  >
-    <span>○ 予約できます</span>
-    <span>満 予約できません</span>
-    <span>休 休診</span>
-    <span>− 診療時間外</span>
-  </div>
+  <p class="reservation-status-guide">
+  ○がついている枠のみ選択できます。
+</p>
 
   <div class="reservation-calendar-wrapper">
 
@@ -252,7 +246,7 @@ step: 2
                     statusLabel = "満";
                   } else {
                     status = "open";
-                    statusLabel = "○";
+                    statusLabel = "〇";
                   }
                 }
 
@@ -289,7 +283,7 @@ step: 2
                     aria-label="<%= dateItem.label %> <%= slotLabel %>を選択"
                   >
                     <span class="reservation-slot-symbol">
-                      ○
+                      〇
                     </span>
                   </a>
 
