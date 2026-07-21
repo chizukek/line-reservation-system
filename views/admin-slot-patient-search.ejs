@@ -232,110 +232,101 @@
 
               <tbody>
 
-                <% patientList.forEach((patient) => { %>
+<% patientList.forEach((patient) => { %>
 
-                  <%
-                    const currentReservation =
-                      Array.isArray(patient.reservations) &&
-                      patient.reservations.length > 0
-                        ? patient.reservations[0]
-                        : null;
+  <%
+    const currentReservation =
+      Array.isArray(patient.reservations) &&
+      patient.reservations.length > 0
+        ? patient.reservations[0]
+        : null;
 
-                    const reservationDoctor =
-                      currentReservation &&
-                      currentReservation.doctor
-                        ? currentReservation.doctor
-                        : null;
-                  %>
+    const reservationDoctor =
+      currentReservation &&
+      currentReservation.doctor
+        ? currentReservation.doctor
+        : null;
+  %>
 
-                  <tr>
+  <tr>
 
-                    <td>
-                      <%= patient.patientNumber %>
-                    </td>
+    <td>
+      <%= patient.patientNumber %>
+    </td>
 
-                    <td>
-                      <strong>
-                        <%= patient.name %>
-                      </strong>
-                    </td>
+    <td>
+      <strong>
+        <%= patient.name %>
+      </strong>
+    </td>
 
-                    <td>
+    <td>
 
-                      <% if (currentReservation) { %>
+      <% if (currentReservation) { %>
 
-                        <div class="admin-current-reservation">
+        <div>
+          <%= formatJapaneseDateShort(currentReservation.date) %>
+        </div>
 
-                          <div class="admin-current-reservation-date">
-                            <%= formatJapaneseDateShort(
-                              currentReservation.date
-                            ) %>
-                          </div>
+        <div>
+          <%= reservationDoctor
+            ? (reservationDoctor.displayName || reservationDoctor.name)
+            : "" %>
+         　
+          <%= getSlotLabel(
+            currentReservation.slot,
+            currentReservation.doctorId
+          ) %>
+        </div>
 
-                          <div class="admin-current-reservation-meta">
+      <% } else { %>
 
-                            <% if (reservationDoctor) { %>
+        予約なし
 
-                              <span>
-                                <%= reservationDoctor.displayName
-                                  || reservationDoctor.name
-                                %>
-                              </span>
+      <% } %>
 
-                              <span aria-hidden="true">
-                                ・
-                              </span>
+    </td>
 
-                            <% } %>
+    <td>
 
-                            <span>
-                              <%= getSlotLabel(
-                                currentReservation.slot,
-                                currentReservation.doctorId
-                              ) %>
-                            </span>
+      <% if (currentReservation) { %>
 
-                          </div>
+        <div class="admin-row-actions">
 
-                        </div>
+          <a
+            class="admin-row-button"
+            href="/admin/slot?doctorId=<%= currentReservation.doctorId %>&date=<%= encodeURIComponent(currentReservation.date) %>&slot=<%= encodeURIComponent(currentReservation.slot) %>"
+          >
+            詳細
+          </a>
 
-                      <% } else { %>
+          <a
+            class="admin-row-button is-add"
+            href="/admin/slot/confirm?doctorId=<%= doctorId %>&date=<%= encodeURIComponent(date) %>&slot=<%= encodeURIComponent(slot) %>&patientNumber=<%= encodeURIComponent(patient.patientNumber) %>"
+          >
+            この患者を予約
+          </a>
 
-                        −
+        </div>
 
-                      <% } %>
+      <% } else { %>
 
-                    </td>
+        <a
+          class="admin-row-button is-add"
+          href="/admin/slot/confirm?doctorId=<%= doctorId %>&date=<%= encodeURIComponent(date) %>&slot=<%= encodeURIComponent(slot) %>&patientNumber=<%= encodeURIComponent(patient.patientNumber) %>"
+        >
+          この患者を予約
+        </a>
 
-                    <td>
+      <% } %>
 
-                      <% if (currentReservation) { %>
+    </td>
 
-                        <a
-                          class="admin-row-button"
-                          href="/admin/slot?doctorId=<%= currentReservation.doctorId %>&date=<%= encodeURIComponent(currentReservation.date) %>&slot=<%= encodeURIComponent(currentReservation.slot) %>"
-                        >
-                          詳細
-                        </a>
+  </tr>
 
-                      <% } else { %>
+<% }) %>
 
-                        <a
-                          class="admin-row-button is-add"
-                          href="/admin/slot/confirm?doctorId=<%= doctorId %>&date=<%= encodeURIComponent(date) %>&slot=<%= encodeURIComponent(slot) %>&patientNumber=<%= encodeURIComponent(patient.patientNumber) %>"
-                        >
-                          この患者を選択
-                        </a>
-
-                      <% } %>
-
-                    </td>
-
-                  </tr>
-
-                <% }) %>
-
-              </tbody>
+</tbody>
 
             </table>
 
