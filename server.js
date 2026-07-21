@@ -3,13 +3,44 @@ require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const session = require("express-session");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const connectPgSimple = require("connect-pg-simple");
+const { Pool } = require("pg");
 const line = require("@line/bot-sdk");
 const config = require("./config");
 
 const prisma = new PrismaClient();
 const app = express();
+const PgSession = connectPgSimple(session);
+
+const sessionPool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+
+  /*
+   * Render PostgreSQLへ外部接続するときのSSL設定です。
+   * ローカル開発からRender DBへ接続する場合にも必要です。
+   */
+  ssl:
+    process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost")
+      ? {
+          rejectUnauthorized: false,
+        }
+      : false,
+
+  max: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
+
+sessionPool.on("error", (error) => {
+  console.error("セッションDB接続エラー:", error);
+});
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PORT = process.env.PORT || 3000;
 
 const lineConfig = {
@@ -25,12 +56,24 @@ const lineClient = new line.messagingApi.MessagingApiClient({
    必須環境変数
 ========================= */
 
-if (!process.env.SESSION_SECRET) {
-  throw new Error("SESSION_SECRETが設定されていません。");
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+  throw new Error("SESSION_SECRETは32文字以上で設定してください。");
 }
 
-if (!ADMIN_PASSWORD) {
-  throw new Error("ADMIN_PASSWORDが設定されていません。");
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URLが設定されていません。");
+}
+
+if (!ADMIN_PASSWORD_HASH && !ADMIN_PASSWORD) {
+  throw new Error(
+    "ADMIN_PASSWORD_HASHまたはADMIN_PASSWORDが設定されていません。",
+  );
+}
+
+if (process.env.NODE_ENV === "production" && !ADMIN_PASSWORD_HASH) {
+  throw new Error(
+    "本番環境ではADMIN_PASSWORDではなくADMIN_PASSWORD_HASHを設定してください。",
+  );
 }
 
 /* =========================
@@ -46,9 +89,127 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static("public"));
+/* =========================
+   セキュリティヘッダー
+========================= */
+
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        formAction: ["'self'"],
+
+        /*
+         * 現在のEJS内にインラインJavaScriptやstyle属性が
+         * 存在しても画面が壊れない設定です。
+         */
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+
+        imgSrc: ["'self'", "data:", "https:"],
+        fontSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+
+        upgradeInsecureRequests:
+          process.env.NODE_ENV === "production" ? [] : null,
+      },
+    },
+
+    referrerPolicy: {
+      policy: "strict-origin-when-cross-origin",
+    },
+  }),
+);
+
+/* =========================
+   アクセス回数制限
+========================= */
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 500,
+
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+
+  skip: (req) => {
+    return req.path === "/health" || req.path === "/line/webhook";
+  },
+
+  message: "アクセスが集中しています。時間をおいて、もう一度お試しください。",
+});
+
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+
+  message: "ログイン試行回数が多すぎます。15分後に、もう一度お試しください。",
+});
+
+const patientVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+
+  message:
+    "本人確認の試行回数が多すぎます。時間をおいて、もう一度お試しください。",
+});
+
+app.use(globalLimiter);
+
+/* =========================
+   リクエスト本文
+========================= */
+
+app.use(
+  express.urlencoded({
+    extended: false,
+    limit: "100kb",
+    parameterLimit: 100,
+  }),
+);
+
+/*
+ * LINE WebhookはLINE SDKが生データを検証するため、
+ * 通常のexpress.json()から除外します。
+ */
+app.use((req, res, next) => {
+  if (req.path === "/line/webhook") {
+    return next();
+  }
+
+  return express.json({
+    limit: "100kb",
+  })(req, res, next);
+});
+
+/* =========================
+   静的ファイル
+========================= */
+
+app.use(
+  express.static("public", {
+    etag: true,
+    maxAge: process.env.NODE_ENV === "production" ? "1d" : 0,
+
+    setHeaders: (res) => {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+    },
+  }),
+);
 
 /* =========================
    セッション
@@ -60,6 +221,18 @@ app.use(
 
     secret: process.env.SESSION_SECRET,
 
+    /*
+     * Renderの再起動でログイン状態が壊れないよう、
+     * PostgreSQLにセッションを保存します。
+     */
+    store: new PgSession({
+      pool: sessionPool,
+      createTableIfMissing: true,
+      tableName: "user_sessions",
+      ttl: 30 * 60,
+      pruneSessionInterval: 15 * 60,
+    }),
+
     resave: false,
     saveUninitialized: false,
     rolling: true,
@@ -69,9 +242,71 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 30 * 60 * 1000,
+      path: "/",
     },
   }),
 );
+
+/* =========================
+   CSRF対策
+========================= */
+
+/*
+ * POSTなどの更新リクエストについて、
+ * 自分の予約サイトから送られたものか確認します。
+ *
+ * LINE WebhookはLINE SDKによる署名検証があるため除外します。
+ */
+app.use((req, res, next) => {
+  const protectedMethods = ["POST", "PUT", "PATCH", "DELETE"];
+
+  if (!protectedMethods.includes(req.method)) {
+    return next();
+  }
+
+  if (req.path === "/line/webhook") {
+    return next();
+  }
+
+  const origin = req.get("origin");
+  const referer = req.get("referer");
+  const host = req.get("host");
+  const protocol = req.protocol;
+
+  const currentOrigin = `${protocol}://${host}`;
+
+  let configuredOrigin = null;
+
+  try {
+    if (process.env.APP_URL) {
+      configuredOrigin = new URL(process.env.APP_URL).origin;
+    }
+  } catch (error) {
+    console.error("APP_URLの形式が不正です:", error);
+  }
+
+  const allowedOrigins = new Set(
+    [currentOrigin, configuredOrigin].filter(Boolean),
+  );
+
+  let sourceOrigin = null;
+
+  try {
+    if (origin) {
+      sourceOrigin = new URL(origin).origin;
+    } else if (referer) {
+      sourceOrigin = new URL(referer).origin;
+    }
+  } catch {
+    sourceOrigin = null;
+  }
+
+  if (!sourceOrigin || !allowedOrigins.has(sourceOrigin)) {
+    return res.status(403).send("不正な送信元からのリクエストです。");
+  }
+
+  return next();
+});
 
 /* =========================
    キャッシュ禁止
@@ -92,7 +327,7 @@ app.use((req, res, next) => {
 
   if (isSensitivePage) {
     res.set({
-      "Cache-Control": "no-store",
+      "Cache-Control": "no-store, no-cache, must-revalidate, private",
       Pragma: "no-cache",
       Expires: "0",
     });
@@ -295,6 +530,35 @@ function getWeekParam(value) {
 /* =========================
    管理者認証
 ========================= */
+async function verifyAdminPassword(password) {
+  if (typeof password !== "string" || password.length === 0) {
+    return false;
+  }
+
+  /*
+   * 本番環境ではbcryptハッシュを照合します。
+   */
+  if (ADMIN_PASSWORD_HASH) {
+    return bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+  }
+
+  /*
+   * 開発環境で一時的にADMIN_PASSWORDを使う場合も、
+   * 単純な !== 比較は行いません。
+   */
+  const inputBuffer = Buffer.from(password);
+  const expectedBuffer = Buffer.from(ADMIN_PASSWORD || "");
+
+  if (inputBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(inputBuffer, expectedBuffer);
+}
+
+function createReservationCode() {
+  return crypto.randomBytes(5).toString("hex").toUpperCase();
+}
 
 function requireAdminLogin(req, res, next) {
   if (!req.session.isAdmin) {
@@ -400,7 +664,7 @@ app.get("/verify", (req, res) => {
   });
 });
 
-app.post("/mypage", async (req, res) => {
+app.post("/mypage", patientVerifyLimiter, async (req, res) => {
   const { patientNumber, birthYear, birthMonth, birthDay } = req.body;
 
   const birthDate = `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`;
@@ -1067,10 +1331,7 @@ app.post("/reserve", async (req, res) => {
           );
         }
 
-        reservationCode = Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase();
+        reservationCode = createReservationCode();
 
         await tx.reservation.create({
           data: {
@@ -1164,17 +1425,25 @@ app.get("/admin-login", (req, res) => {
   });
 });
 
-app.post("/admin-login", (req, res) => {
+app.post("/admin-login", adminLoginLimiter, async (req, res) => {
   const password =
     typeof req.body.password === "string" ? req.body.password : "";
 
-  if (password !== ADMIN_PASSWORD) {
+  const passwordIsValid = await verifyAdminPassword(password);
+
+  if (!passwordIsValid) {
+    await createAuditLog("管理者ログイン失敗", null, req.ip);
+
     return res.status(401).render("admin-login", {
       title: "管理者ログイン",
       error: "パスワードが違います。",
     });
   }
 
+  /*
+   * ログイン前後でセッションIDを変更して、
+   * セッション固定攻撃を防ぎます。
+   */
   req.session.regenerate((regenerateError) => {
     if (regenerateError) {
       console.error(
@@ -1542,11 +1811,7 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
   }
 });
 
-app.get("/admin/logs", async (req, res) => {
-  if (!req.session.isAdmin) {
-    return res.redirect("/admin-login");
-  }
-
+app.get("/admin/logs", requireAdminLogin, async (req, res) => {
   const logs = await prisma.auditLog.findMany({
     orderBy: {
       createdAt: "desc",
@@ -1554,7 +1819,7 @@ app.get("/admin/logs", async (req, res) => {
     take: 100,
   });
 
-  res.render("admin-logs", {
+  return res.render("admin-logs", {
     title: "操作ログ",
     logs,
   });
@@ -1765,10 +2030,7 @@ app.post("/admin/add/complete", requireAdminLogin, async (req, res) => {
           throw new Error("FULL");
         }
 
-        reservationCode = Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase();
+        reservationCode = createReservationCode();
 
         await tx.reservation.create({
           data: {
@@ -3063,10 +3325,7 @@ app.post("/admin/slot/complete", requireAdminLogin, async (req, res) => {
           );
         }
 
-        reservationCode = Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase();
+        reservationCode = createReservationCode();
 
         await tx.reservation.create({
           data: {
@@ -4193,6 +4452,82 @@ async function handleLineEvent(event) {
   });
 }
 
-app.listen(PORT, () => {
+/* =========================
+   404エラー
+========================= */
+
+app.use((req, res) => {
+  return res.status(404).render("error", {
+    title: "ページが見つかりません",
+    heading: "ページが見つかりません",
+    message: "指定されたページは存在しないか、移動した可能性があります。",
+    detail: "",
+    backUrl: "/",
+  });
+});
+
+/* =========================
+   共通エラー処理
+========================= */
+
+app.use((error, req, res, next) => {
+  console.error("未処理エラー:", error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  return res.status(500).render("error", {
+    title: "エラー",
+    heading: "エラーが発生しました",
+    message: "時間をおいて、もう一度お試しください。",
+    detail: "",
+    backUrl: "/",
+  });
+});
+
+/* =========================
+   サーバー起動
+========================= */
+
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+/* =========================
+   安全な終了処理
+========================= */
+
+async function shutdown(signal) {
+  console.log(`${signal}を受信しました。終了処理を開始します。`);
+
+  server.close(async () => {
+    try {
+      await prisma.$disconnect();
+      await sessionPool.end();
+
+      console.log("終了処理が完了しました。");
+
+      process.exit(0);
+    } catch (error) {
+      console.error("終了処理エラー:", error);
+
+      process.exit(1);
+    }
+  });
+
+  /*
+   * 接続が残って終了できない場合の保険です。
+   */
+  setTimeout(() => {
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on("SIGTERM", () => {
+  shutdown("SIGTERM");
+});
+
+process.on("SIGINT", () => {
+  shutdown("SIGINT");
 });

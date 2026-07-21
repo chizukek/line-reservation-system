@@ -1,56 +1,210 @@
-<%- include("partials/header", { title: "予約キャンセル完了" }) %>
+<%- include("partials/header", {
+  title: "予約キャンセル完了"
+}) %>
+
+<%
+  const r =
+    typeof reservation !== "undefined" &&
+    reservation
+      ? reservation
+      : {};
+
+  const doctor =
+    r.doctor
+      ? r.doctor
+      : {};
+
+  const patient =
+    r.patient
+      ? r.patient
+      : {};
+
+  const dateParts =
+    String(r.date || "").split("-");
+
+  const reservationDate =
+    dateParts.length === 3
+      ? new Date(
+          Number(dateParts[0]),
+          Number(dateParts[1]) - 1,
+          Number(dateParts[2])
+        )
+      : null;
+
+  const weekdayLabels = [
+    "㈰",
+    "㈪",
+    "㈫",
+    "㈬",
+    "㈭",
+    "㈮",
+    "㈯"
+  ];
+
+  const formattedDate =
+    reservationDate &&
+    !Number.isNaN(reservationDate.getTime())
+      ? `${reservationDate.getFullYear()}年` +
+        `${reservationDate.getMonth() + 1}月` +
+        `${reservationDate.getDate()}日` +
+        `${weekdayLabels[reservationDate.getDay()]}`
+      : String(r.date || "");
+%>
 
 <div class="clinic-page">
+
   <div class="clinic-card complete-box">
 
-    <h1>予約をキャンセルしました</h1>
+    <header class="clinic-page-header">
 
-    <div class="complete-message">
-      ご予約のキャンセルが完了しました。
-    </div>
+      <h1>
+        予約をキャンセルしました
+      </h1>
 
-    <section class="clinic-section">
-      <h2>キャンセル内容</h2>
+      <p class="confirm-warning">
+        ご予約のキャンセルが完了しました。
+      </p>
+
+    </header>
+
+    <section class="confirm-section">
+
+      <h2>
+        キャンセル内容
+      </h2>
 
       <div class="confirm-table">
 
         <div class="confirm-row">
-          <div class="confirm-label">予約日</div>
-          <div class="confirm-value">
-            <%= formatJapaneseDate(reservation.date) %>
+
+          <div class="confirm-label">
+            予約日
           </div>
+
+          <div class="confirm-value">
+            <%= formattedDate %>
+          </div>
+
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">時間</div>
-          <div class="confirm-value">
-            <%= reservation.slot %>
+
+          <div class="confirm-label">
+            時間
           </div>
+
+          <div class="confirm-value">
+            <%= r.slot || "" %>
+          </div>
+
         </div>
 
         <div class="confirm-row">
-          <div class="confirm-label">診療科</div>
+
+          <div class="confirm-label">
+            診療科
+          </div>
+
           <div class="confirm-value">
             心療内科
           </div>
+
         </div>
 
+        <% if (doctor.displayName || doctor.name) { %>
+
+          <div class="confirm-row">
+
+            <div class="confirm-label">
+              担当医
+            </div>
+
+            <div class="confirm-value">
+              <%= doctor.displayName || doctor.name %>
+            </div>
+
+          </div>
+
+        <% } %>
+
+        <% if (r.patientNumber || patient.patientNumber) { %>
+
+          <div class="confirm-row">
+
+            <div class="confirm-label">
+              患者番号
+            </div>
+
+            <div class="confirm-value">
+              <%= r.patientNumber || patient.patientNumber %>
+            </div>
+
+          </div>
+
+        <% } %>
+
+        <% if (patient.name) { %>
+
+          <div class="confirm-row">
+
+            <div class="confirm-label">
+              氏名
+            </div>
+
+            <div class="confirm-value">
+              <%= patient.name %> 様
+            </div>
+
+          </div>
+
+        <% } %>
+
       </div>
+
+    </section>
+
+    <section class="confirm-section">
+
+      <h2>
+        再予約について
+      </h2>
+
+      <div class="confirm-note-box">
+
+        <p>
+          別の日時を希望する場合は、
+          下のボタンから新しい予約をお取りください。
+        </p>
+
+        <p>
+          予約状況によっては、
+          ご希望の日時を選択できない場合があります。
+        </p>
+
+      </div>
+
     </section>
 
     <div class="clinic-actions">
 
-      <a class="clinic-main-button" href="/mypage">
-        マイページへ戻る
+      <a
+        class="clinic-main-button"
+        href="/new"
+      >
+        新しい予約を取る
       </a>
 
-      <a class="clinic-sub-button" href="/new">
-        日時を変えて再予約する
+      <a
+        class="clinic-sub-button"
+        href="/mypage"
+      >
+        マイページへ戻る
       </a>
 
     </div>
 
   </div>
+
 </div>
 
 <%- include("partials/footer") %>

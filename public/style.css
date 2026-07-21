@@ -15,2011 +15,7 @@
   --danger-soft: #fff1f1;
   --warning: #9a6300;
   --warning-soft: #fff8e8;
-  --color_A:#2f80c9;
-  --color_B: #e07a32;
-  --radius: 6px;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-}
-
-body {
-  margin: 0;
-  color: var(--text);
-  background: var(--white);
-  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-a {
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-h1,
-h2,
-h3,
-p {
-  margin-top: 0;
-}
-
-h1 {
-  margin-bottom: 20px;
-  color: var(--text);
-  font-size: 28px;
-  line-height: 1.35;
-}
-
-h2,
-.admin-panel-title,
-.admin-section-title-row h2 {
-  margin: 0 0 18px;
-  padding-left: 12px;
-
-  color: var(--text);
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.3;
-
-  border-left: 5px solid var(--primary);
-}
-
-.admin-section {
-  margin-top: 32px;
-}
-
-h3 {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-small,
-.site-subtitle,
-.admin-page-eyebrow,
-.admin-page-description,
-.admin-panel-description,
-.admin-updated-at,
-.admin-form-help,
-.admin-result-text,
-.admin-schedule-note,
-.admin-calendar-count,
-.today-patient-number {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.container {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 18px 14px;
-}
-
-/* =========================
-   共通ヘッダー
-========================= */
-
-.site-header,
-.admin-header-bar {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-}
-
-.site-header-inner {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.site-brand {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: inherit;
-}
-
-.site-logo img {
-  width: 46px;
-  height: 46px;
-  display: block;
-  object-fit: contain;
-}
-
-.site-brand-text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.site-name {
-  color: var(--primary);
-  font-size: 23px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.site-subtitle {
-  font-weight: 600;
-}
-
-.site-nav,
-.admin-header-actions,
-.admin-page-header-actions,
-.admin-row-actions,
-.admin-detail-actions,
-.admin-confirm-actions,
-.admin-form-actions,
-.admin-update-row,
-.admin-week-navigation {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.site-nav {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-/* =========================
-   共通ボタン
-========================= */
-
-.main-button,
-.sub-button,
-.clinic-main-button,
-.clinic-sub-button,
-.clinic-danger-button,
-.cancel-link,
-.admin-primary-button,
-.admin-secondary-button,
-.admin-danger-outline-button,
-.admin-refresh-button,
-.admin-week-button,
-.admin-row-button,
-.header-primary-link,
-.doctor-selector-button,
-.reservation-week-button {
-  width: auto;
-  min-height: 42px;
-  padding: 8px 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.main-button,
-.clinic-main-button,
-.admin-primary-button,
-.header-primary-link {
-  color: var(--white);
-  background: var(--primary);
-  border: 1px solid var(--primary);
-}
-
-.main-button:hover,
-.clinic-main-button:hover,
-.admin-primary-button:hover,
-.header-primary-link:hover {
-  color: var(--white);
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
-  text-decoration: none;
-}
-
-.sub-button,
-.clinic-sub-button,
-.admin-secondary-button,
-.admin-refresh-button,
-.admin-week-button,
-.admin-row-button,
-.cancel-link,
-.reservation-week-button,
-.doctor-selector-button {
-  color: var(--primary);
-  background: var(--white);
-  border: 1px solid var(--border-strong);
-}
-
-.sub-button:hover,
-.clinic-sub-button:hover,
-.admin-secondary-button:hover,
-.admin-refresh-button:hover,
-.admin-week-button:hover,
-.admin-row-button:hover,
-.cancel-link:hover,
-.reservation-week-button:hover,
-.doctor-selector-button:hover {
-  color: var(--primary);
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  text-decoration: none;
-}
-
-.clinic-danger-button,
-.admin-danger-outline-button,
-.admin-row-button.is-danger {
-  color: var(--danger);
-  background: var(--white);
-  border: 1px solid #d7a3a3;
-}
-
-.clinic-danger-button:hover,
-.admin-danger-outline-button:hover,
-.admin-row-button.is-danger:hover {
-  color: var(--danger-dark);
-  background: var(--danger-soft);
-  border-color: var(--danger);
-  text-decoration: none;
-}
-
-.admin-week-button.is-primary {
-  color: var(--white);
-  background: var(--primary);
-  border-color: var(--primary);
-}
-
-.admin-week-button.is-primary:hover {
-  color: var(--white);
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
-}
-
-.admin-week-button.is-disabled,
-.reservation-week-button.is-disabled {
-  color: #9aa39e;
-  background: var(--surface-muted);
-  border-color: var(--border);
-  pointer-events: none;
-}
-
-.admin-row-button {
-  min-width: 72px;
-  min-height: 36px;
-  padding: 6px 10px;
-  font-size: 14px;
-}
-
-.admin-refresh-button {
-  min-height: 38px;
-}
-
-/* =========================
-   患者側
-========================= */
-
-.clinic-page {
-  min-height: calc(100vh - 74px);
-  padding: 34px 14px;
-  display: flex;
-  justify-content: center;
-  background: var(--white);
-}
-
-.clinic-card {
-  width: 100%;
-  max-width: 760px;
-  padding: 34px 38px;
-}
-
-.clinic-lead {
-  margin-bottom: 24px;
-  font-weight: 600;
-}
-
-.clinic-form,
-.admin-form-card,
-.admin-setting-field {
-  display: grid;
-}
-
-.clinic-form {
-  gap: 22px;
-}
-
-.clinic-form label,
-.admin-search-form label,
-.admin-form-card label,
-.admin-setting-field label {
-  display: grid;
-  gap: 6px;
-  color: var(--text);
-  font-weight: 700;
-}
-
-.clinic-form input,
-.clinic-form select,
-.admin-search-form input,
-.admin-search-form select,
-.admin-form-card input,
-.admin-form-card select,
-.admin-form-card textarea,
-.admin-setting-field select {
-  width: 100%;
-  min-height: 44px;
-  padding: 9px 11px;
-  color: var(--text);
-  background: var(--white);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-}
-
-.clinic-form input,
-.clinic-form select {
-  min-height: 50px;
-  padding: 12px 14px;
-  font-size: 17px;
-}
-
-.clinic-form input:focus,
-.clinic-form select:focus,
-.admin-search-form input:focus,
-.admin-search-form select:focus,
-.admin-form-card input:focus,
-.admin-form-card select:focus,
-.admin-form-card textarea:focus,
-.admin-setting-field select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(8, 123, 53, 0.12);
-}
-
-.clinic-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.clinic-actions form,
-.admin-row-actions form,
-.admin-detail-actions form,
-.admin-confirm-actions form,
-.admin-form-actions form {
-  margin: 0;
-}
-
-.clinic-note {
-  margin-top: 22px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.clinic-section,
-.confirm-section {
-  margin-top: 28px;
-}
-
-.info-box,
-.reservation-box,
-.confirm-table,
-.admin-detail-box,
-.admin-confirm-box {
-  overflow: hidden;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-.info-box,
-.reservation-box {
-  padding: 18px 20px;
-}
-
-.info-row,
-.confirm-row,
-.admin-detail-row,
-.admin-confirm-row {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  border-bottom: 1px solid var(--border);
-}
-
-.info-row {
-  padding: 12px 0;
-}
-
-.info-row:last-child,
-.confirm-row:last-child,
-.admin-detail-row:last-child,
-.admin-confirm-row:last-child {
-  border-bottom: 0;
-}
-
-.confirm-label,
-.admin-detail-label,
-.admin-confirm-label {
-  padding: 11px 12px;
-  color: var(--muted);
-  background: var(--surface-muted);
-  font-weight: 700;
-}
-
-.confirm-value,
-.admin-detail-value,
-.admin-confirm-value {
-  min-width: 0;
-  padding: 11px 13px;
-  background: var(--white);
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.confirm-note-box {
-  padding: 14px 16px;
-  border-left: 4px solid var(--border-strong);
-}
-
-.terms-area {
-  margin: 24px 0 10px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.complete-message {
-  margin-bottom: 24px;
-  padding: 14px 16px;
-  color: var(--primary-dark);
-  background: var(--primary-soft);
-  border-left: 4px solid var(--primary);
-  font-weight: 700;
-  text-align: center;
-}
-
-.birth-select {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 10px;
-}
-
-.doctor-list {
-  margin-top: 22px;
-  display: grid;
-  gap: 10px;
-}
-
-.doctor-card {
-  width: 100%;
-  max-width: 320px;
-  min-height: 60px;
-  padding: 0 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--text);
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-}
-
-.doctor-card:hover {
-  color: var(--primary);
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-/* =========================
-   メッセージ
-========================= */
-
-.clinic-error,
-.notice-warning,
-.admin-form-error,
-.admin-error,
-.admin-success,
-.admin-success-message {
-  margin: 0 0 14px;
-  padding: 20px 12px;
-  font-weight: 700;
-}
-
-.clinic-error,
-.admin-form-error,
-.admin-error {
-  color: #8d2020;
-  background: var(--danger-soft);
-  border-color: var(--danger);
-}
-
-.notice-warning {
-  color: #774d00;
-  background: var(--warning-soft);
-  border-color: var(--warning);
-}
-
-.admin-success,
-.admin-success-message {
-  color: var(--primary-dark);
-  background: var(--primary-soft);
-  border-color: var(--primary);
-}
-
-.error,
-.confirm-warning {
-  color: var(--danger);
-  font-weight: 700;
-}
-
-.success {
-  color: var(--primary);
-  font-weight: 700;
-}
-
-/* =========================
-   患者側予約カレンダー
-========================= */
-
-.reservation-calendar-header {
-  margin-bottom: 12px;
-}
-
-.reservation-calendar-navigation {
-  display: grid;
-  grid-template-columns: minmax(92px, auto) minmax(0, 1fr) minmax(92px, auto);
-  align-items: center;
-  gap: 10px;
-}
-
-.reservation-calendar-period {
-  min-width: 0;
-  font-size: 19px;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.reservation-status-guide,
-.admin-status-guide {
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.reservation-calendar-wrapper,
-.admin-calendar-shell,
-.admin-table-wrapper,
-.admin-list-table-shell {
-  width: 100%;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-.reservation-calendar,
-.admin-calendar-table,
-.today-reservation-table,
-.admin-table,
-.admin-list-table,
-.admin-info-table,
-.admin-slot-detail-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--white);
-}
-
-.reservation-calendar,
-.admin-calendar-table,
-.today-reservation-table,
-.admin-list-table {
-  table-layout: fixed;
-}
-
-.reservation-calendar th,
-.reservation-calendar td,
-.admin-calendar-table th,
-.admin-calendar-table td,
-.today-reservation-table th,
-.today-reservation-table td,
-.admin-table th,
-.admin-table td,
-.admin-list-table th,
-.admin-list-table td,
-.admin-info-table th,
-.admin-info-table td,
-.admin-slot-detail-table th,
-.admin-slot-detail-table td {
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-
-.reservation-calendar tr > *:last-child,
-.admin-calendar-table tr > *:last-child,
-.today-reservation-table tr > *:last-child,
-.admin-table tr > *:last-child,
-.admin-list-table tr > *:last-child,
-.admin-info-table tr > *:last-child,
-.admin-slot-detail-table tr > *:last-child {
-  border-right: 0;
-}
-
-.reservation-calendar tbody tr:last-child > *,
-.admin-calendar-table tbody tr:last-child > *,
-.today-reservation-table tbody tr:last-child > *,
-.admin-table tbody tr:last-child > *,
-.admin-list-table tbody tr:last-child > *,
-.admin-info-table tbody tr:last-child > *,
-.admin-slot-detail-table tbody tr:last-child > * {
-  border-bottom: 0;
-}
-
-.reservation-calendar th,
-.admin-calendar-table th,
-.today-reservation-table th,
-.admin-table th,
-.admin-list-table th,
-.admin-info-table th,
-.admin-slot-detail-table th {
-  color: var(--text);
-  background: var(--surface-muted);
-  font-weight: 700;
-}
-
-.reservation-calendar th,
-.reservation-calendar td {
-  height: 48px;
-  padding: 3px 1px;
-  text-align: center;
-}
-
-.reservation-calendar thead th {
-  height: 56px;
-  font-size: 14px;
-}
-
-.reservation-calendar thead th.is-saturday,
-.admin-calendar-date-head.is-saturday {
-  color: #2d5f9f;
-}
-
-.reservation-calendar thead th.is-sunday,
-.admin-calendar-date-head.is-sunday {
-  color: var(--danger);
-}
-
-.reservation-time-heading,
-.reservation-time-cell {
-  width: 13%;
-}
-
-.reservation-time-cell {
-  background: var(--surface-muted);
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.reservation-slot-cell {
-  width: calc(87% / 7);
-  padding: 0 !important;
-}
-
-.reservation-slot-link,
-.reservation-slot-disabled {
-  width: 100%;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.reservation-slot-link {
-  color: inherit;
-}
-
-.reservation-slot-link:hover {
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-.reservation-slot-symbol {
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.reservation-slot-open {
-  color: var(--primary);
-}
-
-.reservation-slot-full {
-  color: #626a66;
-  background: #eef0ef;
-}
-
-.reservation-slot-closed {
-  color: #9aa29e;
-  background: #f5f6f5;
-}
-
-/* =========================
-   進捗表示
-========================= */
-
-.progress {
-  max-width: 760px;
-  margin: 16px auto 24px;
-  display: flex;
-  align-items: flex-start;
-}
-
-.progress-step {
-  flex: 0 0 auto;
-  color: #8a9690;
-  font-weight: 700;
-  text-align: center;
-}
-
-.progress-step .circle {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5f6963;
-  background: #d9dedb;
-  border-radius: 50%;
-  font-size: 14px;
-}
-
-.progress-step .label {
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.progress-step.active {
-  color: var(--primary);
-}
-
-.progress-step.active .circle,
-.progress .line.active {
-  color: var(--white);
-  background: var(--primary);
-}
-
-.progress .line {
-  flex: 1;
-  height: 3px;
-  margin: 15px 6px 0;
-  background: #d9dedb;
-}
-
-/* =========================
-   管理画面レイアウト
-========================= */
-
-.admin-header-bar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  min-width: 1024px;
-  height: 64px;
-}
-
-.admin-header-bar .site-header-inner {
-  width: 1024px;
-  max-width: 1024px;
-  height: 100%;
-  padding: 0 16px;
-}
-
-.admin-header-bar .site-logo img {
-  width: 38px;
-  height: 38px;
-}
-
-.admin-header-bar .site-name {
-  font-size: 19px;
-}
-
-.admin-current-datetime {
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.doctor-selector {
-  position: relative;
-}
-
-.doctor-selector summary {
-  list-style: none;
-}
-
-.doctor-selector summary::-webkit-details-marker {
-  display: none;
-}
-
-.doctor-selector-button {
-  min-width: 132px;
-}
-
-.doctor-selector-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 1100;
-  width: 210px;
-  padding: 6px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 10px 24px rgba(29, 45, 36, 0.14);
-}
-
-.doctor-selector-item {
-  min-height: 42px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.doctor-selector-item:hover,
-.doctor-selector-item.is-selected {
-  color: var(--primary);
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-/* =========================
-   管理画面レイアウト
-========================= */
-
-.admin-layout {
-  width: 1024px;
-  min-height: calc(100vh - 64px);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  background: var(--page-bg);
-}
-
-.admin-main {
-  min-width: 0;
-  width: 100%;
-  padding: 16px;
-  background: var(--page-bg);
-}
-
-/* =========================
-   サイドメニュー
-========================= */
-
-.admin-side {
-  width: 220px;
-  min-height: calc(100vh - 64px);
-  padding: 16px 12px;
-  background: var(--white);
-  border-right: 1px solid var(--border);
-}
-
-.admin-side-card {
-  width: 100%;
-  overflow: hidden;
-  background: var(--white);
-  /*border: 1px solid var(--border);*/
-  border-radius: var(--radius);
-}
-
-.admin-side-card + .admin-side-card {
-  margin-top: 14px;
-}
-
-.admin-side-nav {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-side-link {
-  width: 100%;
-  min-height: 48px;
-  padding: 11px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--text);
-  background: var(--white);
-  /*border-bottom: 1px solid var(--border);*/
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.admin-side-link:last-child {
-  border-bottom: 0;
-}
-
-.admin-side-link:hover {
-  color: var(--primary);
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-.admin-side-link.is-current {
-  color: var(--primary-dark);
-  background: var(--primary-soft);
-  box-shadow: inset 4px 0 0 var(--primary);
-}
-
-.admin-side-link.is-secondary {
-  color: var(--muted);
-}
-
-.admin-side-link > span:first-child {
-  min-width: 0;
-  flex: 1;
-}
-
-.admin-side-link > span:last-child {
-  flex-shrink: 0;
-  color: var(--muted);
-  font-size: 20px;
-  line-height: 1;
-}
-
-.admin-side-sub-card .admin-side-link {
-  min-height: 44px;
-  font-size: 14px;
-}
-
-.admin-page,
-.admin-card {
-  width: 100%;
-  padding: 0;
-  background: transparent;
-}
-
-.admin-card {
-  border: 0;
-}
-
-.admin-page-header {
-  min-height: 48px;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.admin-page-header h1 {
-  margin: 0;
-  font-size: 23px;
-}
-
-.admin-page-eyebrow {
-  margin-bottom: 1px;
-}
-
-.admin-page-description {
-  margin: 3px 0 0;
-}
-
-.admin-panel {
-  width: 100%;
-  margin: 0 0 18px;
-}
-
-.admin-panel-description {
-  margin: -4px 0 10px;
-}
-
-/* =========================
-   管理画面ダッシュボード
-========================= */
-
-.admin-dashboard-heading {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.admin-dashboard-doctor {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.admin-summary-row {
-  margin-bottom: 14px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.admin-summary-item {
-  min-height: 62px;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border-right: 1px solid var(--border);
-}
-
-.admin-summary-item:last-child {
-  border-right: 0;
-}
-
-.admin-summary-label {
-  margin-right: auto;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.admin-summary-value {
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.admin-summary-unit {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.today-reservation-table th,
-.admin-table th,
-.admin-list-table th,
-.admin-info-table th,
-.admin-slot-detail-table th {
-  padding: 9px 10px;
-  text-align: left;
-  font-size: 14px;
-}
-
-.today-reservation-table td,
-.admin-table td,
-.admin-list-table td,
-.admin-info-table td,
-.admin-slot-detail-table td {
-  padding: 9px 10px;
-  color: var(--text);
-  font-size: 14px;
-}
-
-.today-reservation-table td {
-  padding: 0;
-}
-
-.today-time-column,
-.today-reservation-table .time-cell {
-  width: 104px;
-}
-
-.today-time-link,
-.today-slot-link {
-  width: 100%;
-  min-height: 52px;
-  padding: 9px 12px;
-  display: flex;
-  align-items: center;
-  color: inherit;
-}
-
-.today-time-link {
-  justify-content: center;
-  font-weight: 700;
-}
-
-.today-slot-link {
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.today-time-link:hover,
-.today-slot-link:hover {
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-.today-patient-name {
-  min-width: 0;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-}
-
-.today-patient-number {
-  display: block;
-}
-
-.today-empty-label {
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.today-cell-arrow {
-  color: #929b96;
-  font-size: 18px;
-}
-
-.empty-patient-cell,
-.admin-empty-slot-row {
-  background: #fbfcfb;
-}
-
-.unavailable-patient-cell,
-.today-reservation-table tr.is-past-slot-row th,
-.today-reservation-table tr.is-past-slot-row td,
-.reception-ended-patient-cell {
-  color: #666 !important;
-  background: #e8eaed;
-}
-
-.today-reservation-table tr.is-past-slot-row a:hover,
-.today-reservation-table tr.is-past-slot-row a:focus-visible {
-  background: #dde1df;
-}
-
-.admin-empty-message,
-.admin-empty-state,
-.admin-empty {
-  padding: 24px 12px !important;
-  color: var(--muted);
-  text-align: center;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-/* =========================
-   週表示
-========================= */
-
-.admin-schedule-toolbar {
-  margin-bottom: 12px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 16px;
-}
-
-.admin-toolbar-left {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.admin-toolbar-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.admin-toolbar-right {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.status-dot {
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-}
-
-.status-dot.is-open,
-.admin-calendar-slot.is-open {
-  color: var(--primary);
-}
-
-.status-dot.is-few,
-.admin-calendar-slot.is-few {
-  color: var(--warning);
-}
-
-.status-dot.is-full,
-.status-dot.is-closed,
-.admin-calendar-slot.is-full,
-.admin-calendar-slot.is-closed {
-  color: #737c77;
-}
-
-.admin-calendar-time-head,
-.admin-calendar-time-cell {
-  width: 78px;
-}
-
-.admin-calendar-time-head,
-.admin-calendar-date-head,
-.admin-calendar-time-cell,
-.admin-calendar-slot {
-  height: 56px;
-  text-align: center;
-}
-
-.admin-calendar-date-head.is-today {
-  background: var(--primary-soft);
-  box-shadow: inset 0 3px 0 var(--primary);
-}
-
-.admin-calendar-date,
-.admin-calendar-weekday {
-  display: block;
-}
-
-.admin-calendar-date {
-  font-weight: 700;
-}
-
-.admin-today-badge {
-  display: inline-block;
-  margin-top: 2px;
-  padding: 1px 5px;
-  color: var(--white);
-  background: var(--primary);
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-.admin-calendar-slot {
-  padding: 0;
-}
-
-.admin-calendar-slot-link,
-.admin-calendar-slot-disabled {
-  width: 100%;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.admin-calendar-slot-link {
-  color: inherit;
-}
-
-.admin-calendar-slot-link:hover {
-  background: var(--primary-soft);
-  text-decoration: none;
-}
-
-.admin-calendar-slot.is-full {
-  background: #eef0ef;
-}
-
-.admin-calendar-slot.is-closed {
-  background: #f4f5f4;
-}
-
-.admin-calendar-status {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-/* =========================
-   管理画面フォーム・一覧
-========================= */
-
-.admin-search-form {
-  display: grid;
-  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
-  gap: 9px;
-  align-items: end;
-}
-
-.admin-form-card {
-  gap: 12px;
-}
-
-.admin-form-card textarea {
-  min-height: 96px;
-  resize: vertical;
-}
-
-.admin-form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.admin-filter-links {
-  margin-top: 8px;
-  display: flex;
-  gap: 12px;
-  font-size: 14px;
-}
-
-.admin-result-text {
-  margin: 8px 0 0;
-}
-
-.admin-list-table tbody tr:hover td,
-.admin-table tbody tr:hover td {
-  background: #fbfdfc;
-}
-
-.admin-login-card,
-.complete-card {
-  width: 100%;
-  margin: 40px auto 0;
-  padding: 26px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-.admin-login-card {
-  max-width: 440px;
-}
-
-.complete-card {
-  max-width: 640px;
-  text-align: center;
-}
-
-.admin-login-card h1,
-.complete-card h1 {
-  margin-bottom: 10px;
-  font-size: 23px;
-}
-
-/* =========================
-   予約枠詳細・診療設定
-========================= */
-
-.admin-slot-state {
-  min-width: 104px;
-  min-height: 42px;
-  padding: 7px 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.admin-slot-state.is-full {
-  color: #941f1f;
-  background: var(--danger-soft);
-  border-color: #d8a5a5;
-}
-
-.admin-slot-state.is-closed,
-.admin-slot-state.is-ended {
-  color: #555;
-  background: var(--surface-muted);
-}
-
-.admin-slot-detail-table th,
-.admin-slot-detail-table td,
-.admin-info-table th,
-.admin-info-table td {
-  text-align: center;
-  white-space: nowrap;
-}
-
-.admin-info-table th:last-child,
-.admin-info-table td:last-child {
-  width: 160px;
-}
-
-.admin-info-table td:nth-child(7) {
-  min-width: 140px;
-}
-
-.admin-empty-slot-label {
-  color: var(--primary-dark);
-  font-weight: 700;
-}
-
-.admin-slot-setting-form {
-  display: grid;
-  grid-template-columns:
-    minmax(130px, 1fr)
-    minmax(110px, 0.8fr)
-    minmax(120px, 0.9fr)
-    minmax(100px, 0.8fr)
-    auto;
-  gap: 12px;
-  align-items: end;
-}
-
-.admin-setting-field {
-  gap: 6px;
-}
-
-.admin-setting-summary {
-  min-height: 44px;
-  padding: 7px 10px;
-  display: grid;
-  align-content: center;
-  border-bottom: 1px solid var(--border);
-}
-
-.admin-setting-summary span {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.admin-setting-summary strong {
-  font-size: 17px;
-}
-
-/* =========================
-   レスポンシブ
-========================= */
-
-@media (max-width: 900px) {
-  .admin-slot-setting-form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .admin-slot-setting-form .admin-primary-button {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-}
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 24px;
-  }
-
-  h2 {
-    font-size: 18px;
-  }
-
-  .container {
-    max-width: none;
-    padding: 0;
-  }
-
-  .site-header-inner {
-    padding: 10px;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .site-logo img {
-    width: 42px;
-    height: 42px;
-  }
-
-  .site-name {
-    font-size: 19px;
-  }
-
-  .clinic-page {
-    padding: 18px 10px;
-  }
-
-  .clinic-card {
-    padding: 20px 12px;
-  }
-
-  .clinic-actions,
-  .admin-detail-actions,
-  .admin-confirm-actions,
-  .admin-form-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .clinic-actions > *,
-  .admin-detail-actions > *,
-  .admin-confirm-actions > *,
-  .admin-form-actions > * {
-    width: 100%;
-  }
-
-  .main-button,
-  .sub-button,
-  .clinic-main-button,
-  .clinic-sub-button,
-  .clinic-danger-button,
-  .cancel-link {
-    width: 100%;
-    max-width: none;
-  }
-
-  .birth-select,
-  .admin-form-row,
-  .admin-search-form {
-    grid-template-columns: 1fr;
-  }
-
-  .info-row,
-  .confirm-row,
-  .admin-detail-row,
-  .admin-confirm-row {
-    grid-template-columns: 120px minmax(0, 1fr);
-  }
-
-  .reservation-calendar-navigation {
-    grid-template-columns: 92px minmax(0, 1fr) 92px;
-    gap: 6px;
-  }
-
-  .reservation-calendar-period {
-    font-size: 16px;
-  }
-
-  .reservation-week-button {
-    min-width: 0;
-    padding: 6px 7px;
-    font-size: 13px;
-  }
-
-  .reservation-calendar thead th,
-  .reservation-time-cell {
-    font-size: 12px;
-  }
-
-  .reservation-time-heading,
-  .reservation-time-cell {
-    width: 15%;
-  }
-
-  .reservation-slot-cell {
-    width: calc(85% / 7);
-  }
-
-  .progress {
-    margin: 10px auto 18px;
-  }
-
-  .progress-step .circle {
-    width: 30px;
-    height: 30px;
-  }
-
-  .progress .line {
-    margin: 14px 3px 0;
-  }
-
-  .admin-row-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .admin-row-button {
-    width: 100%;
-  }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-  .clinic-page {
-    padding: 8px;
-  }
-
-  .clinic-card {
-    max-width: none;
-    padding: 14px;
-  }
-
-  .reservation-calendar-navigation {
-    grid-template-columns: 110px minmax(0, 1fr) 110px;
-  }
-
-  .reservation-calendar-period {
-    font-size: 18px;
-  }
-
-  .reservation-calendar th,
-  .reservation-calendar td,
-  .reservation-slot-link,
-  .reservation-slot-disabled {
-    height: 63px;
-  }
-}
-/* =========================
-   患者管理テーブル
-========================= */
-
-.admin-patient-table th:nth-child(1),
-.admin-patient-table td:nth-child(1) {
-  width: 130px;
-}
-
-.admin-patient-table th:nth-child(2),
-.admin-patient-table td:nth-child(2) {
-  width: 180px;
-}
-
-.admin-patient-table th:nth-child(3),
-.admin-patient-table td:nth-child(3) {
-  min-width: 220px;
-}
-
-.admin-patient-table th:last-child,
-.admin-patient-table td:last-child {
-  width: 190px;
-}
-
-.admin-patient-reservation {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.admin-doctor-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.admin-doctor-dot.color_A {
-  background: var(--color_A);
-}
-
-.admin-doctor-dot.color_B {
-  background: var(--color_B);
-}
-
-.admin-no-reservation {
-  color: var(--muted);
-}
-
-/* =========================
-   患者側：進捗表示・予約表 改善版
-   ※既存指定を上書き
-========================= */
-
-/* progress が画面幅からはみ出さないようにする */
-.progress {
-  width: calc(100% - 28px);
-  max-width: 760px;
-  margin: 16px auto 24px;
-  padding: 0 4px;
-  display: flex;
-  align-items: flex-start;
-  overflow: hidden;
-}
-
-.progress-step {
-  min-width: 0;
-  flex: 0 1 auto;
-}
-
-.progress-step .label {
-  display: block;
-  max-width: 92px;
-  font-size: 14px;
-  line-height: 1.35;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.progress .line {
-  min-width: 10px;
-  flex: 1 1 36px;
-  margin: 15px 4px 0;
-}
-
-/* 患者側予約画面のカード幅を広げ、表を見やすくする */
-.clinic-page:has(.reservation-calendar) .clinic-card {
-  max-width: 920px;
-  padding-left: 24px;
-  padding-right: 24px;
-}
-
-.reservation-calendar-header {
-  margin-bottom: 16px;
-}
-
-.reservation-calendar-navigation {
-  grid-template-columns: 112px minmax(0, 1fr) 112px;
-  gap: 12px;
-}
-
-.reservation-calendar-period {
-  font-size: 20px;
-  line-height: 1.35;
-}
-
-.reservation-week-button {
-  min-height: 44px;
-  padding: 8px 12px;
-  font-size: 15px;
-}
-
-.reservation-status-guide {
-  margin: 0 0 12px;
-  padding: 8px 10px;
-  color: var(--text);
-  background: var(--surface-muted);
-  border-radius: var(--radius);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.reservation-calendar-wrapper {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-
-.reservation-calendar {
-  min-width: 700px;
-}
-
-.reservation-calendar th,
-.reservation-calendar td {
-  height: 58px;
-  padding: 4px 2px;
-}
-
-.reservation-calendar thead th {
-  height: 64px;
-  padding: 7px 2px;
-  font-size: 15px;
-  line-height: 1.25;
-}
-
-.reservation-calendar thead th.is-saturday {
-  color: #1f5f9f;
-  background: #eef5fc;
-}
-
-.reservation-calendar thead th.is-sunday {
-  color: #b3261e;
-  background: #fff1f0;
-}
-
-.reservation-time-heading,
-.reservation-time-cell {
-  width: 96px;
-}
-
-.reservation-time-cell {
-  font-size: 15px;
-  color: var(--text);
-  background: #eef1ef;
-}
-
-.reservation-slot-cell {
-  width: auto;
-}
-
-.reservation-slot-link,
-.reservation-slot-disabled {
-  min-height: 58px;
-  height: 100%;
-}
-
-.reservation-slot-link {
-  color: var(--primary-dark);
-  background: #ffffff;
-}
-
-.reservation-slot-link:hover,
-.reservation-slot-link:focus-visible {
-  background: var(--primary-soft);
-  outline: 2px solid var(--primary);
-  outline-offset: -2px;
-}
-
-.reservation-slot-symbol {
-  font-size: 24px;
-  line-height: 1;
-}
-
-.reservation-slot-open {
-  color: var(--primary-dark);
-  background: #f7fcf9;
-}
-
-.reservation-slot-full {
-  color: #555f59;
-  background: #e7eae8;
-}
-
-.reservation-slot-closed {
-  color: #7d8681;
-  background: #f3f4f3;
-}
-
-@media (max-width: 768px) {
-  .progress {
-    width: calc(100% - 16px);
-    margin: 10px auto 18px;
-    padding: 0;
-  }
-
-  .progress-step {
-    flex: 0 1 64px;
-  }
-
-  .progress-step .circle {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 5px;
-    font-size: 13px;
-  }
-
-  .progress-step .label {
-    max-width: 64px;
-    font-size: 12px;
-    line-height: 1.25;
-  }
-
-  .progress .line {
-    min-width: 6px;
-    margin: 13px 2px 0;
-  }
-
-  .clinic-page:has(.reservation-calendar) {
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-
-  .clinic-page:has(.reservation-calendar) .clinic-card {
-    padding: 16px 4px 22px;
-  }
-
-  .clinic-page:has(.reservation-calendar) .clinic-card > h1,
-  .clinic-page:has(.reservation-calendar) .clinic-card > p,
-  .clinic-page:has(.reservation-calendar) .reservation-calendar-header,
-  .clinic-page:has(.reservation-calendar) .reservation-status-guide {
-    margin-left: 6px;
-    margin-right: 6px;
-  }
-
-  .reservation-calendar-navigation {
-    grid-template-columns: 86px minmax(0, 1fr) 86px;
-    gap: 5px;
-  }
-
-  .reservation-calendar-period {
-    font-size: 15px;
-    white-space: normal;
-  }
-
-  .reservation-week-button {
-    min-height: 40px;
-    padding: 6px 5px;
-    font-size: 12px;
-  }
-
-  .reservation-status-guide {
-    justify-content: flex-start;
-    gap: 5px 12px;
-    padding: 8px;
-    font-size: 13px;
-  }
-
-  .reservation-calendar-wrapper {
-    border-left: 0;
-    border-right: 0;
-    border-radius: 0;
-  }
-
-  .reservation-calendar {
-    min-width: 680px;
-  }
-
-  .reservation-calendar th,
-  .reservation-calendar td,
-  .reservation-slot-link,
-  .reservation-slot-disabled {
-    height: 64px;
-  }
-
-  .reservation-calendar thead th {
-    height: 58px;
-    font-size: 13px;
-  }
-
-  .reservation-time-heading,
-  .reservation-time-cell {
-    width: 86px;
-  }
-
-  .reservation-time-cell {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    font-size: 13px;
-    box-shadow: 1px 0 0 var(--border);
-  }
-
-  .reservation-time-heading {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-    box-shadow: 1px 0 0 var(--border);
-  }
-
-  .reservation-slot-symbol {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 390px) {
-  .progress-step {
-    flex-basis: 56px;
-  }
-
-  .progress-step .label {
-    max-width: 56px;
-    font-size: 11px;
-  }
-
-  .reservation-calendar-navigation {
-    grid-template-columns: 78px minmax(0, 1fr) 78px;
-  }
-
-  .reservation-week-button {
-    font-size: 11px;
-  }
-}
-
-Library
-/
-style-complete.css
-:root {
-  --primary: #087b35;
-  --primary-dark: #055f28;
-  --primary-soft: #edf7f1;
-  --text: #202421;
-  --muted: #59635d;
-  --white: #ffffff;
-  --page-bg: #f5f6f5;
-  --surface-muted: #f1f3f2;
-  --border: #d4dad6;
-  --border-strong: #aeb8b2;
-  --danger: #c62828;
-  --danger-dark: #a91f1f;
-  --danger-soft: #fff1f1;
-  --warning: #9a6300;
-  --warning-soft: #fff8e8;
-  --color_A:#2f80c9;
+  --color_A: #2f80c9;
   --color_B: #e07a32;
   --radius: 6px;
 }
@@ -3509,7 +1505,7 @@ small,
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   h1 {
     font-size: 24px;
   }
@@ -3869,7 +1865,7 @@ small,
   background: #f3f4f3;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .progress {
     width: calc(100% - 16px);
     margin: 10px auto 18px;
@@ -4089,7 +2085,7 @@ small,
   font-size: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .reservation-calendar-card {
     width: 100%;
     max-width: 100%;
@@ -4240,5 +2236,2394 @@ small,
   .clinic-phone-area {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+
+/* =========================
+   古いiPad Safari互換
+   768px幅をスマホ扱いせず、操作ボタンを横並びに保つ
+========================= */
+
+.clinic-actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.clinic-actions > * {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 1 auto;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.clinic-actions > *:last-child {
+  margin-right: 0;
+}
+
+.clinic-actions .clinic-main-button,
+.clinic-actions .clinic-sub-button,
+.clinic-actions .clinic-danger-button,
+.clinic-actions .main-button,
+.clinic-actions .sub-button,
+.clinic-actions .cancel-link {
+  width: auto;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .clinic-actions {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+  }
+
+  .clinic-actions > * {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .clinic-actions .clinic-main-button,
+  .clinic-actions .clinic-sub-button,
+  .clinic-actions .clinic-danger-button,
+  .clinic-actions .main-button,
+  .clinic-actions .sub-button,
+  .clinic-actions .cancel-link {
+    width: 100%;
+  }
+}
+
+Library
+/
+style.css
+:root {
+  --primary: #087b35;
+  --primary-dark: #055f28;
+  --primary-soft: #edf7f1;
+  --text: #202421;
+  --muted: #59635d;
+  --white: #ffffff;
+  --page-bg: #f5f6f5;
+  --surface-muted: #f1f3f2;
+  --border: #d4dad6;
+  --border-strong: #aeb8b2;
+  --danger: #c62828;
+  --danger-dark: #a91f1f;
+  --danger-soft: #fff1f1;
+  --warning: #9a6300;
+  --warning-soft: #fff8e8;
+  --color_A: #2f80c9;
+  --color_B: #e07a32;
+  --radius: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--white);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+h2,
+.admin-panel-title,
+.admin-section-title-row h2 {
+  margin: 0 0 18px;
+  padding-left: 12px;
+
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+
+  border-left: 5px solid var(--primary);
+}
+
+.admin-section {
+  margin-top: 32px;
+}
+
+h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+small,
+.site-subtitle,
+.admin-page-eyebrow,
+.admin-page-description,
+.admin-panel-description,
+.admin-updated-at,
+.admin-form-help,
+.admin-result-text,
+.admin-schedule-note,
+.admin-calendar-count,
+.today-patient-number {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 18px 14px;
+}
+
+/* =========================
+   共通ヘッダー
+========================= */
+
+.site-header,
+.admin-header-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header-inner {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+}
+
+.site-logo img {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+}
+
+.site-brand-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-name {
+  color: var(--primary);
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.site-subtitle {
+  font-weight: 600;
+}
+
+.site-nav,
+.admin-header-actions,
+.admin-page-header-actions,
+.admin-row-actions,
+.admin-detail-actions,
+.admin-confirm-actions,
+.admin-form-actions,
+.admin-update-row,
+.admin-week-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* =========================
+   共通ボタン
+========================= */
+
+.main-button,
+.sub-button,
+.clinic-main-button,
+.clinic-sub-button,
+.clinic-danger-button,
+.cancel-link,
+.admin-primary-button,
+.admin-secondary-button,
+.admin-danger-outline-button,
+.admin-refresh-button,
+.admin-week-button,
+.admin-row-button,
+.header-primary-link,
+.doctor-selector-button,
+.reservation-week-button {
+  width: auto;
+  min-height: 42px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.main-button,
+.clinic-main-button,
+.admin-primary-button,
+.header-primary-link {
+  color: var(--white);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.main-button:hover,
+.clinic-main-button:hover,
+.admin-primary-button:hover,
+.header-primary-link:hover {
+  color: var(--white);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.sub-button,
+.clinic-sub-button,
+.admin-secondary-button,
+.admin-refresh-button,
+.admin-week-button,
+.admin-row-button,
+.cancel-link,
+.reservation-week-button,
+.doctor-selector-button {
+  color: var(--primary);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+}
+
+.sub-button:hover,
+.clinic-sub-button:hover,
+.admin-secondary-button:hover,
+.admin-refresh-button:hover,
+.admin-week-button:hover,
+.admin-row-button:hover,
+.cancel-link:hover,
+.reservation-week-button:hover,
+.doctor-selector-button:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
+.clinic-danger-button,
+.admin-danger-outline-button,
+.admin-row-button.is-danger {
+  color: var(--danger);
+  background: var(--white);
+  border: 1px solid #d7a3a3;
+}
+
+.clinic-danger-button:hover,
+.admin-danger-outline-button:hover,
+.admin-row-button.is-danger:hover {
+  color: var(--danger-dark);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  text-decoration: none;
+}
+
+.admin-week-button.is-primary {
+  color: var(--white);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.admin-week-button.is-primary:hover {
+  color: var(--white);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.admin-week-button.is-disabled,
+.reservation-week-button.is-disabled {
+  color: #9aa39e;
+  background: var(--surface-muted);
+  border-color: var(--border);
+  pointer-events: none;
+}
+
+.admin-row-button {
+  min-width: 72px;
+  min-height: 36px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.admin-refresh-button {
+  min-height: 38px;
+}
+
+/* =========================
+   患者側
+========================= */
+
+.clinic-page {
+  min-height: calc(100vh - 74px);
+  padding: 34px 14px;
+  display: flex;
+  justify-content: center;
+  background: var(--white);
+}
+
+.clinic-card {
+  width: 100%;
+  max-width: 760px;
+  padding: 34px 38px;
+}
+
+.clinic-lead {
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.clinic-form,
+.admin-form-card,
+.admin-setting-field {
+  display: grid;
+}
+
+.clinic-form {
+  gap: 22px;
+}
+
+.clinic-form label,
+.admin-search-form label,
+.admin-form-card label,
+.admin-setting-field label {
+  display: grid;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.clinic-form input,
+.clinic-form select,
+.admin-search-form input,
+.admin-search-form select,
+.admin-form-card input,
+.admin-form-card select,
+.admin-form-card textarea,
+.admin-setting-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 11px;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.clinic-form input,
+.clinic-form select {
+  min-height: 50px;
+  padding: 12px 14px;
+  font-size: 17px;
+}
+
+.clinic-form input:focus,
+.clinic-form select:focus,
+.admin-search-form input:focus,
+.admin-search-form select:focus,
+.admin-form-card input:focus,
+.admin-form-card select:focus,
+.admin-form-card textarea:focus,
+.admin-setting-field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(8, 123, 53, 0.12);
+}
+
+.clinic-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.clinic-actions form,
+.admin-row-actions form,
+.admin-detail-actions form,
+.admin-confirm-actions form,
+.admin-form-actions form {
+  margin: 0;
+}
+
+.clinic-note {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.clinic-section,
+.confirm-section {
+  margin-top: 28px;
+}
+
+.info-box,
+.reservation-box,
+.confirm-table,
+.admin-detail-box,
+.admin-confirm-box {
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.info-box,
+.reservation-box {
+  padding: 18px 20px;
+}
+
+.info-row,
+.confirm-row,
+.admin-detail-row,
+.admin-confirm-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row {
+  padding: 12px 0;
+}
+
+.info-row:last-child,
+.confirm-row:last-child,
+.admin-detail-row:last-child,
+.admin-confirm-row:last-child {
+  border-bottom: 0;
+}
+
+.confirm-label,
+.admin-detail-label,
+.admin-confirm-label {
+  padding: 11px 12px;
+  color: var(--muted);
+  background: var(--surface-muted);
+  font-weight: 700;
+}
+
+.confirm-value,
+.admin-detail-value,
+.admin-confirm-value {
+  min-width: 0;
+  padding: 11px 13px;
+  background: var(--white);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.confirm-note-box {
+  padding: 14px 16px;
+  border-left: 4px solid var(--border-strong);
+}
+
+.terms-area {
+  margin: 24px 0 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.complete-message {
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  border-left: 4px solid var(--primary);
+  font-weight: 700;
+  text-align: center;
+}
+
+.birth-select {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 10px;
+}
+
+.doctor-list {
+  margin-top: 22px;
+  display: grid;
+  gap: 10px;
+}
+
+.doctor-card {
+  width: 100%;
+  max-width: 320px;
+  min-height: 60px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+
+.doctor-card:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+/* =========================
+   メッセージ
+========================= */
+
+.clinic-error,
+.notice-warning,
+.admin-form-error,
+.admin-error,
+.admin-success,
+.admin-success-message {
+  margin: 0 0 14px;
+  padding: 20px 12px;
+  font-weight: 700;
+}
+
+.clinic-error,
+.admin-form-error,
+.admin-error {
+  color: #8d2020;
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+.notice-warning {
+  color: #774d00;
+  background: var(--warning-soft);
+  border-color: var(--warning);
+}
+
+.admin-success,
+.admin-success-message {
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.error,
+.confirm-warning {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.success {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* =========================
+   患者側予約カレンダー
+========================= */
+
+.reservation-calendar-header {
+  margin-bottom: 12px;
+}
+
+.reservation-calendar-navigation {
+  display: grid;
+  grid-template-columns: minmax(92px, auto) minmax(0, 1fr) minmax(92px, auto);
+  align-items: center;
+  gap: 10px;
+}
+
+.reservation-calendar-period {
+  min-width: 0;
+  font-size: 19px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.reservation-status-guide,
+.admin-status-guide {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.reservation-calendar-wrapper,
+.admin-calendar-shell,
+.admin-table-wrapper,
+.admin-list-table-shell {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.reservation-calendar,
+.admin-calendar-table,
+.today-reservation-table,
+.admin-table,
+.admin-list-table,
+.admin-info-table,
+.admin-slot-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+}
+
+.reservation-calendar,
+.admin-calendar-table,
+.today-reservation-table,
+.admin-list-table {
+  table-layout: fixed;
+}
+
+.reservation-calendar th,
+.reservation-calendar td,
+.admin-calendar-table th,
+.admin-calendar-table td,
+.today-reservation-table th,
+.today-reservation-table td,
+.admin-table th,
+.admin-table td,
+.admin-list-table th,
+.admin-list-table td,
+.admin-info-table th,
+.admin-info-table td,
+.admin-slot-detail-table th,
+.admin-slot-detail-table td {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.reservation-calendar tr > *:last-child,
+.admin-calendar-table tr > *:last-child,
+.today-reservation-table tr > *:last-child,
+.admin-table tr > *:last-child,
+.admin-list-table tr > *:last-child,
+.admin-info-table tr > *:last-child,
+.admin-slot-detail-table tr > *:last-child {
+  border-right: 0;
+}
+
+.reservation-calendar tbody tr:last-child > *,
+.admin-calendar-table tbody tr:last-child > *,
+.today-reservation-table tbody tr:last-child > *,
+.admin-table tbody tr:last-child > *,
+.admin-list-table tbody tr:last-child > *,
+.admin-info-table tbody tr:last-child > *,
+.admin-slot-detail-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.reservation-calendar th,
+.admin-calendar-table th,
+.today-reservation-table th,
+.admin-table th,
+.admin-list-table th,
+.admin-info-table th,
+.admin-slot-detail-table th {
+  color: var(--text);
+  background: var(--surface-muted);
+  font-weight: 700;
+}
+
+.reservation-calendar th,
+.reservation-calendar td {
+  height: 48px;
+  padding: 3px 1px;
+  text-align: center;
+}
+
+.reservation-calendar thead th {
+  height: 56px;
+  font-size: 14px;
+}
+
+.reservation-calendar thead th.is-saturday,
+.admin-calendar-date-head.is-saturday {
+  color: #2d5f9f;
+}
+
+.reservation-calendar thead th.is-sunday,
+.admin-calendar-date-head.is-sunday {
+  color: var(--danger);
+}
+
+.reservation-time-heading,
+.reservation-time-cell {
+  width: 13%;
+}
+
+.reservation-time-cell {
+  background: var(--surface-muted);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reservation-slot-cell {
+  width: calc(87% / 7);
+  padding: 0 !important;
+}
+
+.reservation-slot-link,
+.reservation-slot-disabled {
+  width: 100%;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.reservation-slot-link {
+  color: inherit;
+}
+
+.reservation-slot-link:hover {
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+.reservation-slot-symbol {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.reservation-slot-open {
+  color: var(--primary);
+}
+
+.reservation-slot-full {
+  color: #626a66;
+  background: #eef0ef;
+}
+
+.reservation-slot-closed {
+  color: #9aa29e;
+  background: #f5f6f5;
+}
+
+/* =========================
+   進捗表示
+========================= */
+
+.progress {
+  max-width: 760px;
+  margin: 16px auto 24px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.progress-step {
+  flex: 0 0 auto;
+  color: #8a9690;
+  font-weight: 700;
+  text-align: center;
+}
+
+.progress-step .circle {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6963;
+  background: #d9dedb;
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+.progress-step .label {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.progress-step.active {
+  color: var(--primary);
+}
+
+.progress-step.active .circle,
+.progress .line.active {
+  color: var(--white);
+  background: var(--primary);
+}
+
+.progress .line {
+  flex: 1;
+  height: 3px;
+  margin: 15px 6px 0;
+  background: #d9dedb;
+}
+
+/* =========================
+   管理画面レイアウト
+========================= */
+
+.admin-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-width: 1024px;
+  height: 64px;
+}
+
+.admin-header-bar .site-header-inner {
+  width: 1024px;
+  max-width: 1024px;
+  height: 100%;
+  padding: 0 16px;
+}
+
+.admin-header-bar .site-logo img {
+  width: 38px;
+  height: 38px;
+}
+
+.admin-header-bar .site-name {
+  font-size: 19px;
+}
+
+.admin-current-datetime {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.doctor-selector {
+  position: relative;
+}
+
+.doctor-selector summary {
+  list-style: none;
+}
+
+.doctor-selector summary::-webkit-details-marker {
+  display: none;
+}
+
+.doctor-selector-button {
+  min-width: 132px;
+}
+
+.doctor-selector-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1100;
+  width: 210px;
+  padding: 6px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(29, 45, 36, 0.14);
+}
+
+.doctor-selector-item {
+  min-height: 42px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.doctor-selector-item:hover,
+.doctor-selector-item.is-selected {
+  color: var(--primary);
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+/* =========================
+   管理画面レイアウト
+========================= */
+
+.admin-layout {
+  width: 1024px;
+  min-height: calc(100vh - 64px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  background: var(--page-bg);
+}
+
+.admin-main {
+  min-width: 0;
+  width: 100%;
+  padding: 16px;
+  background: var(--page-bg);
+}
+
+/* =========================
+   サイドメニュー
+========================= */
+
+.admin-side {
+  width: 220px;
+  min-height: calc(100vh - 64px);
+  padding: 16px 12px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+}
+
+.admin-side-card {
+  width: 100%;
+  overflow: hidden;
+  background: var(--white);
+  /*border: 1px solid var(--border);*/
+  border-radius: var(--radius);
+}
+
+.admin-side-card + .admin-side-card {
+  margin-top: 14px;
+}
+
+.admin-side-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-side-link {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+  background: var(--white);
+  /*border-bottom: 1px solid var(--border);*/
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-side-link:last-child {
+  border-bottom: 0;
+}
+
+.admin-side-link:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+.admin-side-link.is-current {
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  box-shadow: inset 4px 0 0 var(--primary);
+}
+
+.admin-side-link.is-secondary {
+  color: var(--muted);
+}
+
+.admin-side-link > span:first-child {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-side-link > span:last-child {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.admin-side-sub-card .admin-side-link {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.admin-page,
+.admin-card {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+.admin-card {
+  border: 0;
+}
+
+.admin-page-header {
+  min-height: 48px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  font-size: 23px;
+}
+
+.admin-page-eyebrow {
+  margin-bottom: 1px;
+}
+
+.admin-page-description {
+  margin: 3px 0 0;
+}
+
+.admin-panel {
+  width: 100%;
+  margin: 0 0 18px;
+}
+
+.admin-panel-description {
+  margin: -4px 0 10px;
+}
+
+/* =========================
+   管理画面ダッシュボード
+========================= */
+
+.admin-dashboard-heading {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-dashboard-doctor {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.admin-summary-row {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-summary-item {
+  min-height: 62px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-right: 1px solid var(--border);
+}
+
+.admin-summary-item:last-child {
+  border-right: 0;
+}
+
+.admin-summary-label {
+  margin-right: auto;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.admin-summary-value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.admin-summary-unit {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.today-reservation-table th,
+.admin-table th,
+.admin-list-table th,
+.admin-info-table th,
+.admin-slot-detail-table th {
+  padding: 9px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.today-reservation-table td,
+.admin-table td,
+.admin-list-table td,
+.admin-info-table td,
+.admin-slot-detail-table td {
+  padding: 9px 10px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.today-reservation-table td {
+  padding: 0;
+}
+
+.today-time-column,
+.today-reservation-table .time-cell {
+  width: 104px;
+}
+
+.today-time-link,
+.today-slot-link {
+  width: 100%;
+  min-height: 52px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.today-time-link {
+  justify-content: center;
+  font-weight: 700;
+}
+
+.today-slot-link {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.today-time-link:hover,
+.today-slot-link:hover {
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+.today-patient-name {
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.today-patient-number {
+  display: block;
+}
+
+.today-empty-label {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.today-cell-arrow {
+  color: #929b96;
+  font-size: 18px;
+}
+
+.empty-patient-cell,
+.admin-empty-slot-row {
+  background: #fbfcfb;
+}
+
+.unavailable-patient-cell,
+.today-reservation-table tr.is-past-slot-row th,
+.today-reservation-table tr.is-past-slot-row td,
+.reception-ended-patient-cell {
+  color: #666 !important;
+  background: #e8eaed;
+}
+
+.today-reservation-table tr.is-past-slot-row a:hover,
+.today-reservation-table tr.is-past-slot-row a:focus-visible {
+  background: #dde1df;
+}
+
+.admin-empty-message,
+.admin-empty-state,
+.admin-empty {
+  padding: 24px 12px !important;
+  color: var(--muted);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* =========================
+   週表示
+========================= */
+
+.admin-schedule-toolbar {
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-toolbar-left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.admin-toolbar-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.admin-toolbar-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-dot {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.status-dot.is-open,
+.admin-calendar-slot.is-open {
+  color: var(--primary);
+}
+
+.status-dot.is-few,
+.admin-calendar-slot.is-few {
+  color: var(--warning);
+}
+
+.status-dot.is-full,
+.status-dot.is-closed,
+.admin-calendar-slot.is-full,
+.admin-calendar-slot.is-closed {
+  color: #737c77;
+}
+
+.admin-calendar-time-head,
+.admin-calendar-time-cell {
+  width: 78px;
+}
+
+.admin-calendar-time-head,
+.admin-calendar-date-head,
+.admin-calendar-time-cell,
+.admin-calendar-slot {
+  height: 56px;
+  text-align: center;
+}
+
+.admin-calendar-date-head.is-today {
+  background: var(--primary-soft);
+  box-shadow: inset 0 3px 0 var(--primary);
+}
+
+.admin-calendar-date,
+.admin-calendar-weekday {
+  display: block;
+}
+
+.admin-calendar-date {
+  font-weight: 700;
+}
+
+.admin-today-badge {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 5px;
+  color: var(--white);
+  background: var(--primary);
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.admin-calendar-slot {
+  padding: 0;
+}
+
+.admin-calendar-slot-link,
+.admin-calendar-slot-disabled {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.admin-calendar-slot-link {
+  color: inherit;
+}
+
+.admin-calendar-slot-link:hover {
+  background: var(--primary-soft);
+  text-decoration: none;
+}
+
+.admin-calendar-slot.is-full {
+  background: #eef0ef;
+}
+
+.admin-calendar-slot.is-closed {
+  background: #f4f5f4;
+}
+
+.admin-calendar-status {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* =========================
+   管理画面フォーム・一覧
+========================= */
+
+.admin-search-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
+  gap: 9px;
+  align-items: end;
+}
+
+.admin-form-card {
+  gap: 12px;
+}
+
+.admin-form-card textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-filter-links {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.admin-result-text {
+  margin: 8px 0 0;
+}
+
+.admin-list-table tbody tr:hover td,
+.admin-table tbody tr:hover td {
+  background: #fbfdfc;
+}
+
+.admin-login-card,
+.complete-card {
+  width: 100%;
+  margin: 40px auto 0;
+  padding: 26px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.admin-login-card {
+  max-width: 440px;
+}
+
+.complete-card {
+  max-width: 640px;
+  text-align: center;
+}
+
+.admin-login-card h1,
+.complete-card h1 {
+  margin-bottom: 10px;
+  font-size: 23px;
+}
+
+/* =========================
+   予約枠詳細・診療設定
+========================= */
+
+.admin-slot-state {
+  min-width: 104px;
+  min-height: 42px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-slot-state.is-full {
+  color: #941f1f;
+  background: var(--danger-soft);
+  border-color: #d8a5a5;
+}
+
+.admin-slot-state.is-closed,
+.admin-slot-state.is-ended {
+  color: #555;
+  background: var(--surface-muted);
+}
+
+.admin-slot-detail-table th,
+.admin-slot-detail-table td,
+.admin-info-table th,
+.admin-info-table td {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-info-table th:last-child,
+.admin-info-table td:last-child {
+  width: 160px;
+}
+
+.admin-info-table td:nth-child(7) {
+  min-width: 140px;
+}
+
+.admin-empty-slot-label {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.admin-slot-setting-form {
+  display: grid;
+  grid-template-columns:
+    minmax(130px, 1fr)
+    minmax(110px, 0.8fr)
+    minmax(120px, 0.9fr)
+    minmax(100px, 0.8fr)
+    auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.admin-setting-field {
+  gap: 6px;
+}
+
+.admin-setting-summary {
+  min-height: 44px;
+  padding: 7px 10px;
+  display: grid;
+  align-content: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-setting-summary span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-setting-summary strong {
+  font-size: 17px;
+}
+
+/* =========================
+   レスポンシブ
+========================= */
+
+@media (max-width: 900px) {
+  .admin-slot-setting-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-slot-setting-form .admin-primary-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .site-header-inner {
+    padding: 10px;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .site-logo img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .site-name {
+    font-size: 19px;
+  }
+
+  .clinic-page {
+    padding: 18px 10px;
+  }
+
+  .clinic-card {
+    padding: 20px 12px;
+  }
+
+  .clinic-actions,
+  .admin-detail-actions,
+  .admin-confirm-actions,
+  .admin-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .clinic-actions > *,
+  .admin-detail-actions > *,
+  .admin-confirm-actions > *,
+  .admin-form-actions > * {
+    width: 100%;
+  }
+
+  .main-button,
+  .sub-button,
+  .clinic-main-button,
+  .clinic-sub-button,
+  .clinic-danger-button,
+  .cancel-link {
+    width: 100%;
+    max-width: none;
+  }
+
+  .birth-select,
+  .admin-form-row,
+  .admin-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .info-row,
+  .confirm-row,
+  .admin-detail-row,
+  .admin-confirm-row {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .reservation-calendar-navigation {
+    grid-template-columns: 92px minmax(0, 1fr) 92px;
+    gap: 6px;
+  }
+
+  .reservation-calendar-period {
+    font-size: 16px;
+  }
+
+  .reservation-week-button {
+    min-width: 0;
+    padding: 6px 7px;
+    font-size: 13px;
+  }
+
+  .reservation-calendar thead th,
+  .reservation-time-cell {
+    font-size: 12px;
+  }
+
+  .reservation-time-heading,
+  .reservation-time-cell {
+    width: 15%;
+  }
+
+  .reservation-slot-cell {
+    width: calc(85% / 7);
+  }
+
+  .progress {
+    margin: 10px auto 18px;
+  }
+
+  .progress-step .circle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .progress .line {
+    margin: 14px 3px 0;
+  }
+
+  .admin-row-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-row-button {
+    width: 100%;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .clinic-page {
+    padding: 8px;
+  }
+
+  .clinic-card {
+    max-width: none;
+    padding: 14px;
+  }
+
+  .reservation-calendar-navigation {
+    grid-template-columns: 110px minmax(0, 1fr) 110px;
+  }
+
+  .reservation-calendar-period {
+    font-size: 18px;
+  }
+
+  .reservation-calendar th,
+  .reservation-calendar td,
+  .reservation-slot-link,
+  .reservation-slot-disabled {
+    height: 53px;
+  }
+}
+/* =========================
+   患者管理テーブル
+========================= */
+
+.admin-patient-table th:nth-child(1),
+.admin-patient-table td:nth-child(1) {
+  width: 130px;
+}
+
+.admin-patient-table th:nth-child(2),
+.admin-patient-table td:nth-child(2) {
+  width: 180px;
+}
+
+.admin-patient-table th:nth-child(3),
+.admin-patient-table td:nth-child(3) {
+  min-width: 220px;
+}
+
+.admin-patient-table th:last-child,
+.admin-patient-table td:last-child {
+  width: 190px;
+}
+
+.admin-patient-reservation {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-doctor-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.admin-doctor-dot.color_A {
+  background: var(--color_A);
+}
+
+.admin-doctor-dot.color_B {
+  background: var(--color_B);
+}
+
+.admin-no-reservation {
+  color: var(--muted);
+}
+
+/* =========================
+   患者側：進捗表示・予約表 改善版
+   ※既存指定を上書き
+========================= */
+
+/* progress が画面幅からはみ出さないようにする */
+.progress {
+  width: calc(100% - 28px);
+  max-width: 760px;
+  margin: 16px auto 24px;
+  padding: 0 4px;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.progress-step {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.progress-step .label {
+  display: block;
+  max-width: 92px;
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.progress .line {
+  min-width: 10px;
+  flex: 1 1 36px;
+  margin: 15px 4px 0;
+}
+
+/* 患者側予約画面のカード幅を広げ、表を見やすくする */
+.clinic-page:has(.reservation-calendar) .clinic-card {
+  max-width: 920px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.reservation-calendar-header {
+  margin-bottom: 16px;
+}
+
+.reservation-calendar-navigation {
+  grid-template-columns: 112px minmax(0, 1fr) 112px;
+  gap: 12px;
+}
+
+.reservation-calendar-period {
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.reservation-week-button {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 15px;
+}
+
+.reservation-status-guide {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.reservation-calendar-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reservation-calendar {
+  min-width: 700px;
+}
+
+.reservation-calendar th,
+.reservation-calendar td {
+  height: 58px;
+  padding: 4px 2px;
+}
+
+.reservation-calendar thead th {
+  height: 64px;
+  padding: 7px 2px;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.reservation-calendar thead th.is-saturday {
+  color: #1f5f9f;
+  background: #eef5fc;
+}
+
+.reservation-calendar thead th.is-sunday {
+  color: #b3261e;
+  background: #fff1f0;
+}
+
+.reservation-time-heading,
+.reservation-time-cell {
+  width: 96px;
+}
+
+.reservation-time-cell {
+  font-size: 15px;
+  color: var(--text);
+  background: #eef1ef;
+}
+
+.reservation-slot-cell {
+  width: auto;
+}
+
+.reservation-slot-link,
+.reservation-slot-disabled {
+  min-height: 58px;
+  height: 100%;
+}
+
+.reservation-slot-link {
+  color: var(--primary-dark);
+  background: #ffffff;
+}
+
+.reservation-slot-link:hover,
+.reservation-slot-link:focus-visible {
+  background: var(--primary-soft);
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.reservation-slot-symbol {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.reservation-slot-open {
+  color: var(--primary-dark);
+  background: #f7fcf9;
+}
+
+.reservation-slot-full {
+  color: #555f59;
+  background: #e7eae8;
+}
+
+.reservation-slot-closed {
+  color: #bbb;
+  background: #f3f4f3;
+}
+
+@media (max-width: 600px) {
+  .progress {
+    width: calc(100% - 16px);
+    margin: 10px auto 18px;
+    padding: 0;
+  }
+
+  .progress-step {
+    flex: 0 1 64px;
+  }
+
+  .progress-step .circle {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .progress-step .label {
+    max-width: 64px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .progress .line {
+    min-width: 6px;
+    margin: 13px 2px 0;
+  }
+
+  .clinic-page:has(.reservation-calendar) {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .clinic-page:has(.reservation-calendar) .clinic-card {
+    padding: 16px 4px 22px;
+  }
+
+  .clinic-page:has(.reservation-calendar) .clinic-card > h1,
+  .clinic-page:has(.reservation-calendar) .clinic-card > p,
+  .clinic-page:has(.reservation-calendar) .reservation-calendar-header,
+  .clinic-page:has(.reservation-calendar) .reservation-status-guide {
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  .reservation-calendar-navigation {
+    grid-template-columns: 86px minmax(0, 1fr) 86px;
+    gap: 5px;
+  }
+
+  .reservation-calendar-period {
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .reservation-week-button {
+    min-height: 40px;
+    padding: 6px 5px;
+    font-size: 12px;
+  }
+
+  .reservation-status-guide {
+    justify-content: flex-start;
+    gap: 5px 12px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .reservation-calendar-wrapper {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  .reservation-calendar {
+    min-width: 680px;
+  }
+
+  .reservation-calendar th,
+  .reservation-calendar td,
+  .reservation-slot-link,
+  .reservation-slot-disabled {
+    height: 64px;
+  }
+
+  .reservation-calendar thead th {
+    height: 58px;
+    font-size: 13px;
+  }
+
+  .reservation-time-heading,
+  .reservation-time-cell {
+    width: 86px;
+  }
+
+  .reservation-time-cell {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    font-size: 13px;
+    box-shadow: 1px 0 0 var(--border);
+  }
+
+  .reservation-time-heading {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    box-shadow: 1px 0 0 var(--border);
+  }
+
+  .reservation-slot-symbol {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 390px) {
+  .progress-step {
+    flex-basis: 56px;
+  }
+
+  .progress-step .label {
+    max-width: 56px;
+    font-size: 11px;
+  }
+
+  .reservation-calendar-navigation {
+    grid-template-columns: 78px minmax(0, 1fr) 78px;
+  }
+
+  .reservation-week-button {
+    font-size: 11px;
+  }
+}
+
+/* =========================
+   患者側予約表・幅調整
+========================= */
+
+.reservation-calendar-card {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.reservation-calendar-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reservation-calendar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.reservation-calendar th,
+.reservation-calendar td {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reservation-time-heading,
+.reservation-time-cell {
+  width: 14%;
+}
+
+.reservation-slot-cell,
+.reservation-date-heading {
+  width: calc(86% / 7);
+}
+
+.reservation-time-cell {
+  padding: 4px 2px;
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.reservation-time-start,
+.reservation-time-separator,
+.reservation-time-end {
+  display: block;
+  white-space: nowrap;
+}
+
+.reservation-time-separator {
+  margin: 1px 0;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.reservation-date-heading {
+  padding: 5px 1px;
+}
+
+.reservation-date-label {
+  display: block;
+  font-size: 12px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.reservation-slot-link,
+.reservation-slot-disabled {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.reservation-slot-symbol {
+  font-size: 20px;
+}
+
+@media (max-width: 600px) {
+  .reservation-calendar-card {
+    width: 100%;
+    max-width: 100%;
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .reservation-time-heading,
+  .reservation-time-cell {
+    width: 16%;
+  }
+
+  .reservation-slot-cell,
+  .reservation-date-heading {
+    width: calc(84% / 7);
+  }
+
+  .reservation-calendar th,
+  .reservation-calendar td {
+    height: 52px;
+  }
+
+  .reservation-calendar thead th {
+    font-size: 11px;
+  }
+
+  .reservation-time-cell {
+    font-size: 11px;
+  }
+
+  .reservation-slot-symbol {
+    font-size: 18px;
+  }
+}
+
+/* ==============================
+   予約確認画面
+============================== */
+
+.clinic-phone-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
+.clinic-phone-label {
+  font-weight: 700;
+}
+
+.clinic-phone-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #39745c;
+  border-radius: 8px;
+  color: #245c46;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  background: #ffffff;
+}
+
+.clinic-phone-link:hover,
+.clinic-phone-link:focus-visible {
+  background: #eef7f2;
+}
+
+.terms-area {
+  margin-top: 28px;
+}
+
+.terms-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  border: 2px solid #b8c7c0;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.terms-checkbox-label:hover {
+  background: #f7faf8;
+}
+
+.terms-checkbox-label:focus-within {
+  border-color: #39745c;
+  outline: 3px solid rgba(57, 116, 92, 0.18);
+}
+
+.terms-checkbox {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  accent-color: #39745c;
+  cursor: pointer;
+}
+
+.terms-checkbox-text {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.terms-checkbox-text a {
+  font-weight: 700;
+  color: #245c46;
+  text-decoration: underline;
+}
+
+.terms-error-message {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #c83c3c;
+  border-radius: 8px;
+  color: #9e2525;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+  background: #fff3f3;
+}
+
+.terms-error-message[hidden] {
+  display: none;
+}
+
+.terms-checkbox[aria-invalid="true"] {
+  outline: 3px solid rgba(200, 60, 60, 0.25);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .terms-checkbox-label {
+    padding: 16px;
+  }
+
+  .terms-checkbox {
+    width: 30px;
+    height: 30px;
+  }
+
+  .clinic-phone-area {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* =========================
+   古いiPad Safari互換
+   768px幅をスマホ扱いせず、操作ボタンを横並びに保つ
+========================= */
+
+.clinic-actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.clinic-actions > * {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 1 auto;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.clinic-actions > *:last-child {
+  margin-right: 0;
+}
+
+.clinic-actions .clinic-main-button,
+.clinic-actions .clinic-sub-button,
+.clinic-actions .clinic-danger-button,
+.clinic-actions .main-button,
+.clinic-actions .sub-button,
+.clinic-actions .cancel-link {
+  width: auto;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .clinic-actions {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+  }
+
+  .clinic-actions > * {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .clinic-actions .clinic-main-button,
+  .clinic-actions .clinic-sub-button,
+  .clinic-actions .clinic-danger-button,
+  .clinic-actions .main-button,
+  .clinic-actions .sub-button,
+  .clinic-actions .cancel-link {
+    width: 100%;
   }
 }

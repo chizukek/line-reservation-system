@@ -8,8 +8,15 @@
 }) %>
 
 <%
-  const r = reservation || {};
-  const p = patient || {};
+  const r =
+    typeof reservation !== "undefined" && reservation
+      ? reservation
+      : {};
+
+  const p =
+    r.patient
+      ? r.patient
+      : {};
 
   let formattedDate = "";
 
