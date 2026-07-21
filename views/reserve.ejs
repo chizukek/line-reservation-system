@@ -7,9 +7,9 @@ step: 2
 }) %>
 
 <div class="clinic-page">
-  <div class="clinic-card">
+  <div class="clinic-card reservation-calendar-card">
 
-<div class="clinic-header">
+<header class="clinic-header">
   <div>
     <h1>
       <%= isChangeMode
@@ -25,7 +25,7 @@ step: 2
       </strong>
     </p>
   </div>
-</div>
+</header>
 
 <section class="clinic-section">
 
@@ -41,7 +41,7 @@ step: 2
           aria-label="前の週を表示"
         >
           <span aria-hidden="true">＜</span>
-          前の週
+          <span>前の週</span>
         </a>
 
       <% } else { %>
@@ -56,9 +56,9 @@ step: 2
       <% } %>
 
       <strong class="reservation-calendar-period">
-        <%= dates[0].label %>
-        〜
-        <%= dates[dates.length - 1].label %>
+        <span><%= dates[0].label %></span>
+        <span aria-hidden="true">〜</span>
+        <span><%= dates[dates.length - 1].label %></span>
       </strong>
 
       <% if (canGoNextWeek) { %>
@@ -68,7 +68,7 @@ step: 2
           href="/reserve?doctorId=<%= doctorId %>&week=<%= week + 1 %>"
           aria-label="次の週を表示"
         >
-          次の週
+          <span>次の週</span>
           <span aria-hidden="true">＞</span>
         </a>
 
@@ -104,14 +104,19 @@ step: 2
       <thead>
         <tr>
 
-          <th class="reservation-time-heading">
+          <th
+            class="reservation-time-heading"
+            scope="col"
+          >
             時間
           </th>
 
           <% dates.forEach((dateItem) => { %>
 
             <th
+              scope="col"
               class="
+                reservation-date-heading
                 <%= dateItem.weekday === 0
                   ? 'is-sunday'
                   : ''
@@ -122,7 +127,9 @@ step: 2
                 %>
               "
             >
-              <%= dateItem.label %>
+              <span class="reservation-date-label">
+                <%= dateItem.label %>
+              </span>
             </th>
 
           <% }) %>
@@ -134,10 +141,52 @@ step: 2
 
         <% slots.forEach((slot) => { %>
 
+          <%
+            const slotLabel =
+              String(getSlotLabel(slot, doctorId) || slot);
+
+            const slotParts =
+              slotLabel.split(/[〜～~\-]/);
+
+            const slotStart =
+              String(slotParts[0] || slotLabel).trim();
+
+            const slotEnd =
+              slotParts.length > 1
+                ? String(slotParts[slotParts.length - 1]).trim()
+                : "";
+          %>
+
           <tr>
 
-            <th class="reservation-time-cell">
-              <%= getSlotLabel(slot, doctorId) %>
+            <th
+              class="reservation-time-cell"
+              scope="row"
+            >
+              <% if (slotEnd) { %>
+
+                <span class="reservation-time-start">
+                  <%= slotStart %>
+                </span>
+
+                <span
+                  class="reservation-time-separator"
+                  aria-hidden="true"
+                >
+                  〜
+                </span>
+
+                <span class="reservation-time-end">
+                  <%= slotEnd %>
+                </span>
+
+              <% } else { %>
+
+                <span class="reservation-time-start">
+                  <%= slotStart %>
+                </span>
+
+              <% } %>
             </th>
 
             <% dates.forEach((dateItem) => { %>
@@ -145,10 +194,6 @@ step: 2
               <%
                 const date = dateItem.value;
 
-                /*
-                 * server.jsから渡された、
-                 * 管理画面での変更を含む診療設定
-                 */
                 const settingKey =
                   `${date}_${slot}`;
 
@@ -177,7 +222,7 @@ step: 2
                   date <= maxReservableText;
 
                 /*
-                 * この日付・時間の予約人数
+                 * 日付・時間が一致する予約件数
                  */
                 const reservationCount =
                   reservations.filter((reservation) => {
@@ -192,13 +237,6 @@ step: 2
                   capacity > 0 &&
                   reservationCount >= capacity;
 
-                /*
-                 * 表示状態
-                 *
-                 * open   : 予約可能
-                 * full   : 満員
-                 * closed : 休診・診療時間外・期間外
-                 */
                 let status = "closed";
                 let statusLabel = "−";
 
@@ -219,7 +257,7 @@ step: 2
                 }
 
                 const confirmUrl =
-                  `/confirm?doctorId=${doctorId}` +
+                  `/confirm?doctorId=${encodeURIComponent(doctorId)}` +
                   `&date=${encodeURIComponent(date)}` +
                   `&slot=${encodeURIComponent(slot)}`;
               %>
@@ -248,7 +286,7 @@ step: 2
                   <a
                     class="reservation-slot-link"
                     href="<%= confirmUrl %>"
-                    aria-label="<%= dateItem.label %> <%= getSlotLabel(slot, doctorId) %>を選択"
+                    aria-label="<%= dateItem.label %> <%= slotLabel %>を選択"
                   >
                     <span class="reservation-slot-symbol">
                       ○
@@ -259,16 +297,17 @@ step: 2
 
                   <span
                     class="reservation-slot-disabled"
-                    aria-label="
-                      <%= statusLabel === '休'
+                    aria-label="<%=
+                      statusLabel === '休'
                         ? '休診'
                         : statusLabel === '満'
                           ? '満員'
                           : '予約不可'
-                      %>
-                    "
+                    %>"
                   >
-                    <%= statusLabel %>
+                    <span class="reservation-slot-symbol">
+                      <%= statusLabel %>
+                    </span>
                   </span>
 
                 <% } %>
@@ -300,6 +339,7 @@ step: 2
   </a>
 
 </div>
+
 
   </div>
 </div>
