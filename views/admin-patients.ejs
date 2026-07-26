@@ -9,44 +9,24 @@
 }) %>
 
 <%
-  const getDoctorColorClass = (
-    reservation
-  ) => {
-    if (
-      !reservation ||
-      !reservation.doctor
-    ) {
+  const getDoctorColorClass = (reservation) => {
+    if (!reservation) {
       return "";
     }
 
-    /*
-     * 医師IDで判定する場合
-     * 医師AがID 1、医師BがID 2という前提
-     */
-    if (reservation.doctor.id === 1) {
+    const reservationDoctorId =
+      reservation.doctorId ||
+      reservation.doctor?.id;
+
+    if (reservationDoctorId === 1) {
       return "color_A";
     }
 
-    if (reservation.doctor.id === 2) {
+    if (reservationDoctorId === 2) {
       return "color_B";
     }
 
     return "";
-  };
-
-  const getReservationDateTime = (
-    reservation
-  ) => {
-    if (!reservation) {
-      return "予約なし";
-    }
-
-    const dateLabel =
-      formatJapaneseDateShort(
-        reservation.date
-      );
-
-    return `${dateLabel} ${reservation.slot}`;
   };
 %>
 
@@ -143,96 +123,136 @@
 
           <div class="admin-table-wrapper">
 
-  <table class="admin-table admin-patient-table">
+            <table class="admin-table admin-patient-table">
 
-    <thead>
-      <tr>
-        <th>患者番号</th>
-        <th>患者名</th>
-        <th>現在の予約日時</th>
-        <th>操作</th>
-      </tr>
-    </thead>
+              <thead>
+                <tr>
+                  <th>患者番号</th>
+                  <th>患者名</th>
+                  <th>現在の予約日時</th>
+                  <th>予約操作</th>
+                  <th>患者情報</th>
+                </tr>
+              </thead>
 
-    <tbody>
+              <tbody>
 
-      <% patients.forEach((patient) => { %>
+                <% patients.forEach((patient) => { %>
 
-        <%
-          const reservation =
-            patient.reservations?.[0] || null;
+                  <%
+                    const reservation =
+                      patient.reservations?.[0] || null;
 
-          let doctorClass = "";
+                    const doctorClass =
+                      getDoctorColorClass(reservation);
+                  %>
 
-          if (reservation) {
-            if (reservation.doctorId === 1) {
-              doctorClass = "color_A";
-            } else if (reservation.doctorId === 2) {
-              doctorClass = "color_B";
-            }
-          }
-        %>
+                  <tr>
 
-        <tr>
+                    <td>
+                      <strong>
+                        <%= patient.patientNumber %>
+                      </strong>
+                    </td>
 
-          <td>
-            <strong>
-              <%= patient.patientNumber %>
-            </strong>
-          </td>
+                    <td>
+                      <%= patient.name %>
+                    </td>
 
-          <td>
-            <%= patient.name %>
-          </td>
+                    <td>
 
-          <td>
+                      <% if (reservation) { %>
 
-            <% if (reservation) { %>
+                        <a
+                          class="admin-reservation-link"
+                          href="/admin/slot?date=<%= encodeURIComponent(reservation.date) %>&slot=<%= encodeURIComponent(reservation.slot) %>"
+                          aria-label="予約枠詳細を表示"
+                        >
 
-              <div class="admin-patient-reservation">
+                          <span
+                            class="admin-doctor-dot <%= doctorClass %>"
+                            aria-hidden="true"
+                          ></span>
 
-                <span
-                  class="admin-doctor-dot <%= doctorClass %>"
-                  aria-hidden="true"
-                ></span>
+                          <span>
+                            <%= formatJapaneseDateShort(reservation.date) %>
+                            <%= reservation.slot %>
+                          </span>
 
-                <span>
-                  <%= formatJapaneseDateShort(reservation.date) %>
-                  <%= reservation.slot %>
-                </span>
+                        </a>
 
-              </div>
+                      <% } else { %>
 
-            <% } else { %>
+                        <span class="admin-no-reservation">
+                          予約なし
+                        </span>
 
-              <span class="admin-no-reservation">
-                予約なし
-              </span>
+                      <% } %>
 
-            <% } %>
+                    </td>
 
-          </td>
+                    <td>
 
-          <td>
+                      <div class="admin-table-actions">
 
-            <a
-              class="admin-row-button"
-              href="/admin/patients/edit/<%= patient.id %>"
-            >
-              編集
-            </a>
+                        <% if (reservation) { %>
 
-          </td>
+                          <a
+                            class="admin-row-button"
+                            href="/admin/edit/<%= reservation.id %>"
+                          >
+                            予約変更
+                          </a>
 
-        </tr>
+                          <form
+                            class="admin-inline-form"
+                            method="post"
+                            action="/admin/cancel/<%= reservation.id %>"
+                            onsubmit="return confirm('この予約をキャンセルしますか？');"
+                          >
+                            <button
+                              class="admin-danger-button"
+                              type="submit"
+                            >
+                              キャンセル
+                            </button>
+                          </form>
 
-      <% }) %>
+                        <% } else { %>
 
-    </tbody>
+                          <a
+                            class="admin-primary-button"
+                            href="/admin/reservations?patientNumber=<%= encodeURIComponent(patient.patientNumber) %>"
+                          >
+                            予約追加
+                          </a>
 
-  </table>
+                        <% } %>
 
-</div>
+                      </div>
+
+                    </td>
+
+                    <td>
+
+                      <a
+                        class="admin-row-button"
+                        href="/admin/patients/edit/<%= patient.id %>"
+                      >
+                        編集
+                      </a>
+
+                    </td>
+
+                  </tr>
+
+                <% }) %>
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         <% } %>
 
@@ -253,3 +273,4 @@
   isAdminPage: true,
   isAdminLoggedIn: true
 }) %>
+

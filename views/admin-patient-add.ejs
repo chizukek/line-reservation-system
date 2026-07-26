@@ -1,0 +1,270 @@
+<%- include("partials/header", {
+  title: "患者登録",
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>
+
+<%
+  const currentYear =
+    new Date().getFullYear();
+
+  const isReservationMode =
+    typeof mode !== "undefined" &&
+    mode === "reservation";
+
+  const inputPatientNumber =
+    typeof patientNumber !== "undefined"
+      ? String(patientNumber || "")
+      : "";
+
+  const inputName =
+    typeof name !== "undefined"
+      ? String(name || "")
+      : "";
+
+  const selectedBirthYear =
+    typeof birthYear !== "undefined" &&
+    String(birthYear || "") !== ""
+      ? Number(birthYear)
+      : 1990;
+
+  const selectedBirthMonth =
+    typeof birthMonth !== "undefined" &&
+    String(birthMonth || "") !== ""
+      ? Number(birthMonth)
+      : 1;
+
+  const selectedBirthDay =
+    typeof birthDay !== "undefined" &&
+    String(birthDay || "") !== ""
+      ? Number(birthDay)
+      : 1;
+
+  const formAction =
+    isReservationMode
+      ? "/admin/reservation-add/patient/new"
+      : "/admin/patients/add";
+
+  const backUrl =
+    isReservationMode
+      ? "/admin/reservation-add"
+      : "/admin/patients";
+%>
+
+<div class="admin-page admin-patient-add-page">
+
+  <div class="admin-card">
+
+    <header class="admin-page-header">
+
+      <div>
+
+        <p class="admin-page-eyebrow">
+          患者管理
+        </p>
+
+        <h1>
+          患者登録
+        </h1>
+
+        <p class="admin-page-description">
+
+          <% if (isReservationMode) { %>
+
+            新しい患者を登録したあと、予約日時を選択します。
+
+          <% } else { %>
+
+            新しい患者情報を登録します。
+
+          <% } %>
+
+        </p>
+
+      </div>
+
+    </header>
+
+    <% if (
+      typeof error !== "undefined" &&
+      error
+    ) { %>
+
+      <div
+        class="clinic-error"
+        role="alert"
+      >
+        <%= error %>
+      </div>
+
+    <% } %>
+
+    <form
+      action="<%= formAction %>"
+      method="post"
+      class="admin-form-card"
+    >
+
+      <label>
+
+        <span>
+          患者番号
+        </span>
+
+        <input
+          type="text"
+          name="patientNumber"
+          value="<%= inputPatientNumber %>"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="例：10001"
+          required
+        >
+
+      </label>
+
+      <label>
+
+        <span>
+          氏名
+        </span>
+
+        <input
+          type="text"
+          name="name"
+          value="<%= inputName %>"
+          autocomplete="name"
+          placeholder="例：山田 太郎"
+          required
+        >
+
+      </label>
+
+      <label>
+
+        <span>
+          生年月日
+        </span>
+
+        <div class="birth-select">
+
+          <select
+            name="birthYear"
+            aria-label="生年月日の年"
+            required
+          >
+
+            <% for (
+              let year = currentYear;
+              year >= 1900;
+              year--
+            ) { %>
+
+              <option
+                value="<%= year %>"
+                <%= year === selectedBirthYear
+                  ? "selected"
+                  : ""
+                %>
+              >
+                <%= year %>年
+              </option>
+
+            <% } %>
+
+          </select>
+
+          <select
+            name="birthMonth"
+            aria-label="生年月日の月"
+            required
+          >
+
+            <% for (
+              let month = 1;
+              month <= 12;
+              month++
+            ) { %>
+
+              <option
+                value="<%= month %>"
+                <%= month === selectedBirthMonth
+                  ? "selected"
+                  : ""
+                %>
+              >
+                <%= month %>月
+              </option>
+
+            <% } %>
+
+          </select>
+
+          <select
+            name="birthDay"
+            aria-label="生年月日の日"
+            required
+          >
+
+            <% for (
+              let day = 1;
+              day <= 31;
+              day++
+            ) { %>
+
+              <option
+                value="<%= day %>"
+                <%= day === selectedBirthDay
+                  ? "selected"
+                  : ""
+                %>
+              >
+                <%= day %>日
+              </option>
+
+            <% } %>
+
+          </select>
+
+        </div>
+
+      </label>
+
+      <div class="clinic-actions">
+
+        <button
+          class="clinic-main-button"
+          type="submit"
+        >
+
+          <% if (isReservationMode) { %>
+
+            登録して予約日時を選択
+
+          <% } else { %>
+
+            患者を登録する
+
+          <% } %>
+
+        </button>
+
+        <a
+          class="clinic-sub-button"
+          href="<%= backUrl %>"
+        >
+          戻る
+        </a>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>

@@ -1,0 +1,143 @@
+<%- include("partials/header", {
+  title: title || "患者登録完了",
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <header class="admin-page-header">
+      <div>
+        <p class="admin-page-eyebrow">
+          患者管理
+        </p>
+
+        <h1>
+          患者登録完了
+        </h1>
+
+        <p class="admin-page-description">
+          以下の患者情報を登録しました。
+        </p>
+      </div>
+    </header>
+
+    <section class="admin-section">
+
+      <div class="admin-table-wrapper">
+
+        <table class="admin-table">
+
+          <thead>
+            <tr>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+              <th>現在の予約日時</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+
+              <td>
+                <%= patient.patientNumber %>
+              </td>
+
+              <td>
+                <%= patient.name %>
+              </td>
+
+              <td>
+                <% if (reservation) { %>
+
+                  <a
+                    class="admin-reservation-link"
+                    href="/admin/slot?date=<%= encodeURIComponent(reservation.date) %>&slot=<%= encodeURIComponent(reservation.slot) %>"
+                  >
+                    <%= reservation.date %>
+                    <br>
+                    <%= reservation.slot %>
+                  </a>
+
+                <% } else { %>
+
+                  <span class="admin-empty-text">
+                    予約なし
+                  </span>
+
+                <% } %>
+              </td>
+
+              <td>
+                <div class="admin-table-actions">
+
+                  <% if (reservation) { %>
+
+                    <a
+                      class="admin-small-button"
+                      href="/admin/edit/<%= reservation.id %>"
+                    >
+                      予約変更
+                    </a>
+
+                    <form
+                      method="post"
+                      action="/admin/cancel/<%= reservation.id %>"
+                      class="admin-inline-form"
+                      onsubmit="return confirm('この予約をキャンセルしますか？');"
+                    >
+                      <button
+                        class="admin-danger-button"
+                        type="submit"
+                      >
+                        キャンセル
+                      </button>
+                    </form>
+
+                  <% } else { %>
+
+                    <a
+                      class="admin-primary-button"
+                      href="/admin/reservations?patientNumber=<%= encodeURIComponent(patient.patientNumber) %>"
+                    >
+                      予約追加
+                    </a>
+
+                  <% } %>
+
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <div class="admin-actions">
+
+      <a
+        class="admin-secondary-button"
+        href="/admin/patients/edit/<%= encodeURIComponent(patient.patientNumber) %>"
+      >
+        患者情報を編集
+      </a>
+
+      <a
+        class="admin-secondary-button"
+        href="/admin/patients"
+      >
+        患者管理へ戻る
+      </a>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

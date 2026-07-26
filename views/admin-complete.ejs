@@ -1,52 +1,180 @@
 <%- include("partials/header", {
-  title
+  title:
+    typeof title !== "undefined"
+      ? title
+      : "完了",
+  isAdminPage: true,
+  isAdminLoggedIn
 }) %>
+
+<%
+  const r =
+    typeof reservation !== "undefined" &&
+    reservation
+      ? reservation
+      : {};
+
+  const patient =
+    r.patient || {};
+
+  const doctor =
+    r.doctor || {};
+
+  const doctorName =
+    doctor.displayName ||
+    doctor.name ||
+    "";
+
+  const doctorColorClass =
+    Number(doctor.id) === 1
+      ? "is-doctor-one"
+      : "is-doctor-two";
+
+  const pageHeading =
+    typeof heading !== "undefined" &&
+    heading
+      ? heading
+      : title;
+
+  const pageMessage =
+    typeof message !== "undefined"
+      ? message
+      : "";
+
+  const hasReservation =
+    Boolean(
+      r &&
+      r.date &&
+      r.slot
+    );
+
+  const reservationSectionTitle =
+    typeof reservationTableTitle !== "undefined" &&
+    reservationTableTitle
+      ? reservationTableTitle
+      : "予約内容";
+%>
 
 <div class="admin-page admin-complete-page">
   <div class="admin-card">
 
-    <section class="admin-panel admin-complete-panel">
+    <header class="admin-page-header">
 
-      <div
-        class="admin-complete-icon"
-        aria-hidden="true"
+      <div>
+
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          <%= pageHeading %>
+        </h1>
+
+        <% if (pageMessage) { %>
+
+          <p class="admin-page-description">
+            <%= pageMessage %>
+          </p>
+
+        <% } %>
+
+      </div>
+
+    </header>
+
+    <% if (hasReservation) { %>
+
+      <section class="admin-panel">
+
+        <h2 class="admin-panel-title">
+          <%= reservationSectionTitle %>
+        </h2>
+
+        <div class="admin-list-table-shell">
+
+          <table class="admin-info-table">
+
+            <thead>
+              <tr>
+                <th>予約日</th>
+                <th>時間</th>
+                <th>担当医</th>
+                <th>患者番号</th>
+                <th>患者氏名</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+
+                <td>
+                  <%= formatJapaneseDateShort(r.date) %>
+                </td>
+
+                <td>
+                  <%= typeof getSlotLabel === "function"
+                    ? getSlotLabel(
+                        r.slot,
+                        r.doctorId
+                      )
+                    : r.slot
+                  %>
+                </td>
+
+                <td>
+
+                  <span
+                    class="admin-doctor-label"
+                    aria-label="担当医 <%= doctorName %>"
+                  >
+
+                    <span
+                      class="admin-doctor-dot <%= doctorColorClass %>"
+                      aria-hidden="true"
+                    ></span>
+
+                    <%= doctorName %>
+
+                  </span>
+
+                </td>
+
+                <td>
+                  <%= patient.patientNumber || "" %>
+                </td>
+
+                <td>
+                  <strong>
+                    <%= patient.name || "" %>
+                  </strong>
+                </td>
+
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    <% } %>
+
+    <div class="admin-complete-actions">
+
+      <a
+        class="admin-primary-button admin-complete-button"
+        href="/admin"
       >
-        ✓
-      </div>
+        本日の診療スケジュールに戻る
+      </a>
 
-      <p class="admin-page-eyebrow">
-        処理完了
-      </p>
-
-      <h1>
-        <%= title %>
-      </h1>
-
-      <p class="admin-complete-message">
-        <%= message %>
-      </p>
-
-      <div class="admin-complete-actions">
-
-        <a
-          class="admin-primary-button"
-          href="<%= buttonLink %>"
-        >
-          <%= buttonText %>
-        </a>
-
-        <a
-          class="admin-week-button"
-          href="/admin"
-        >
-          本日の予約へ
-        </a>
-
-      </div>
-
-    </section>
+    </div>
 
   </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>

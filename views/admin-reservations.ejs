@@ -1,5 +1,8 @@
 <%- include("partials/header", {
-  title: "予約スケジュール",
+  title:
+    typeof title !== "undefined"
+      ? title
+      : "予約スケジュール",
   isAdminPage: true,
   isAdminLoggedIn,
   doctor,
@@ -7,6 +10,12 @@
 }) %>
 
 <%
+  /*
+   * ==============================
+   * 表示モード
+   * ==============================
+   */
+
   const changeReservation =
     typeof editReservation !== "undefined"
       ? editReservation
@@ -21,9 +30,48 @@
     Number.isInteger(changeReservationId) &&
     changeReservationId > 0;
 
+  const reservationPatient =
+    typeof selectedPatient !== "undefined"
+      ? selectedPatient
+      : null;
+
+  const selectedPatientNumber =
+    reservationPatient
+      ? String(reservationPatient.patientNumber)
+      : "";
+
+  const isAddMode =
+    !isEditMode &&
+    Boolean(reservationPatient);
+
+  const isNormalMode =
+    !isEditMode &&
+    !isAddMode;
+
   /*
-   * 日付をYYYY-MM-DD形式にそろえる
+   * ==============================
+   * 担当医表示
+   * ==============================
    */
+
+  const currentDoctorName =
+    doctor.displayName ||
+    doctor.name ||
+    "";
+
+  const currentDoctorColorClass =
+    Number(doctor.id) === 1
+      ? "is-doctor-one"
+      : Number(doctor.id) === 2
+        ? "is-doctor-two"
+        : "";
+
+  /*
+   * ==============================
+   * 日付処理
+   * ==============================
+   */
+
   const getDateText = (value) => {
     if (!value) {
       return "";
@@ -50,9 +98,6 @@
     }).format(dateObject);
   };
 
-  /*
-   * 年なしの日付
-   */
   const formatShortDate = (value) => {
     const dateText = getDateText(value);
 
@@ -60,20 +105,39 @@
       return "";
     }
 
-    const dateObject =
-      new Date(dateText + "T00:00:00+09:00");
+    const [year, month, day] =
+      dateText
+        .split("-")
+        .map(Number);
 
-    return new Intl.DateTimeFormat("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      month: "numeric",
-      day: "numeric",
-      weekday: "short"
-    }).format(dateObject);
+    const dateObject = new Date(
+      year,
+      month - 1,
+      day
+    );
+
+    const weekdays = [
+      "日",
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土"
+    ];
+
+    return (
+      `${month}/${day}` +
+      `(${weekdays[dateObject.getDay()]})`
+    );
   };
 
   /*
+   * ==============================
    * 表示期間
+   * ==============================
    */
+
   const startDate =
     dates.length > 0
       ? getDateText(dates[0].value)
@@ -81,40 +145,71 @@
 
   const endDate =
     dates.length > 0
-      ? getDateText(dates[dates.length - 1].value)
+      ? getDateText(
+          dates[dates.length - 1].value
+        )
       : "";
 
   const periodLabel =
     startDate && endDate
-      ? formatShortDate(startDate) +
-        " 〜 " +
-        formatShortDate(endDate)
+      ? `${formatShortDate(startDate)} 〜 ${formatShortDate(endDate)}`
       : "";
 
   /*
-   * 変更対象を維持するためのクエリ
+   * ==============================
+   * 週送りクエリ
+   * ==============================
    */
-  const editQuery =
-    isEditMode
-      ? "&editReservationId=" +
-        encodeURIComponent(
-          String(changeReservationId)
-        )
-      : "";
+
+  let modeQuery = "";
+
+  if (isEditMode) {
+    modeQuery =
+      "&editReservationId=" +
+      encodeURIComponent(
+        String(changeReservationId)
+      );
+  } else if (isAddMode) {
+    modeQuery =
+      "&patientNumber=" +
+      encodeURIComponent(
+        selectedPatientNumber
+      );
+  }
 
   const previousWeekUrl =
     week > 0
       ? "/admin/reservations?week=" +
         (week - 1) +
-        editQuery
+        modeQuery
       : null;
 
   const nextWeekUrl =
     canGoNextWeek
       ? "/admin/reservations?week=" +
         (week + 1) +
-        editQuery
+        modeQuery
       : null;
+
+  /*
+   * ==============================
+   * 見出し
+   * ==============================
+   */
+
+  const pageEyebrow =
+    isEditMode
+      ? "予約変更"
+      : isAddMode
+        ? "予約追加"
+        : "予約管理";
+
+  const pageHeading =
+    isEditMode
+      ? "変更後の日時を選択"
+      : isAddMode
+        ? "予約日時を選択"
+        : "予約スケジュール";
 %>
 
 <div class="admin-page admin-reservations-page">
@@ -125,24 +220,31 @@
       <div>
 
         <p class="admin-page-eyebrow">
-          <%= isEditMode
-            ? "予約変更"
-            : "予約管理"
-          %>
+          <%= pageEyebrow %>
         </p>
 
         <h1>
-          <%= isEditMode
-            ? "変更後の日時を選択"
-            : "予約スケジュール"
-          %>
+          <%= pageHeading %>
         </h1>
 
         <p class="admin-page-description">
+
           担当医：
+
           <strong>
-            <%= doctor.displayName || doctor.name %>
+            <span
+              class="admin-doctor-label"
+              aria-label="担当医 <%= currentDoctorName %>"
+            >
+              <span
+                class="admin-doctor-dot <%= currentDoctorColorClass %>"
+                aria-hidden="true"
+              ></span>
+
+              <%= currentDoctorName %>
+            </span>
           </strong>
+
         </p>
 
       </div>
@@ -156,21 +258,121 @@
           変更を中止
         </a>
 
+      <% } else if (isAddMode) { %>
+
+       <a
+  class="admin-week-button"
+  href="/admin/reservation-add?keyword=<%= encodeURIComponent(selectedPatientNumber) %>"
+>
+  予約追加を中止
+</a>
+
       <% } %>
 
     </header>
 
     <% if (isEditMode) { %>
 
+  <%
+    const changeDoctor =
+      changeReservation.doctor ||
+      doctor;
+
+    const changeDoctorName =
+      changeDoctor.displayName ||
+      changeDoctor.name ||
+      currentDoctorName;
+
+    const changeDoctorColorClass =
+      Number(changeDoctor.id) === 1
+        ? "is-doctor-one"
+        : Number(changeDoctor.id) === 2
+          ? "is-doctor-two"
+          : "";
+  %>
+
+  <section class="admin-panel">
+
+    <h2 class="admin-panel-title">
+      変更対象の予約
+    </h2>
+
+    <div class="admin-table-wrapper">
+
+      <table class="admin-table admin-patient-table">
+
+        <thead>
+          <tr>
+            <th>患者番号</th>
+            <th>患者氏名</th>
+            <th>担当医</th>
+            <th>予約日</th>
+            <th>時間</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+
+            <td>
+              <strong>
+                <%= changeReservation.patientNumber %>
+              </strong>
+            </td>
+
+            <td>
+              <%= changeReservation.patient.name %>
+            </td>
+
+            <td>
+
+              <span
+                class="admin-doctor-label"
+                aria-label="担当医 <%= changeDoctorName %>"
+              >
+
+                <span
+                  class="admin-doctor-dot <%= changeDoctorColorClass %>"
+                  aria-hidden="true"
+                ></span>
+
+                <%= changeDoctorName %>
+
+              </span>
+
+            </td>
+
+            <td>
+              <%= formatShortDate(
+                changeReservation.date
+              ) %>
+            </td>
+
+            <td>
+              <%= getSlotLabel(
+                changeReservation.slot,
+                changeReservation.doctorId
+              ) %>
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+<% } else if (isAddMode) { %>
+
       <section class="admin-panel">
 
         <h2 class="admin-panel-title">
-          変更対象の予約
+          予約を追加する患者
         </h2>
-
-        <p class="admin-page-description">
-          新しい日時の「○」または「△」を選択してください。
-        </p>
 
         <div class="admin-list-table-shell">
 
@@ -178,11 +380,9 @@
 
             <thead>
               <tr>
-                <th>予約日</th>
-                <th>時間</th>
-                <th>担当医</th>
                 <th>患者番号</th>
                 <th>患者氏名</th>
+                <th>現在の予約</th>
               </tr>
             </thead>
 
@@ -190,40 +390,53 @@
               <tr>
 
                 <td>
-                  <%= formatShortDate(
-                    changeReservation.date
-                  ) %>
+                  <strong>
+                    <%= reservationPatient.patientNumber %>
+                  </strong>
                 </td>
 
                 <td>
-                  <%= getSlotLabel(
-                    changeReservation.slot,
-                    changeReservation.doctorId
-                  ) %>
+                  <%= reservationPatient.name %>
                 </td>
 
                 <td>
-                  <% if (changeReservation.doctor) { %>
 
-                    <%= changeReservation.doctor.displayName
-                      || changeReservation.doctor.name
-                    %>
+                  <%
+                    const currentReservations =
+                      Array.isArray(
+                        reservationPatient.reservations
+                      )
+                        ? reservationPatient.reservations
+                        : [];
+
+                    const currentReservation =
+                      currentReservations[0] || null;
+                  %>
+
+                  <% if (currentReservation) { %>
+
+                    <a
+                      class="admin-reservation-link"
+                      href="/admin/slot?date=<%= encodeURIComponent(getDateText(currentReservation.date)) %>&slot=<%= encodeURIComponent(currentReservation.slot) %>"
+                    >
+                      <%= formatShortDate(
+                        currentReservation.date
+                      ) %>
+
+                      <%= getSlotLabel(
+                        currentReservation.slot,
+                        currentReservation.doctorId
+                      ) %>
+                    </a>
 
                   <% } else { %>
 
-                    <%= doctor.displayName || doctor.name %>
+                    <span class="admin-no-reservation">
+                      予約なし
+                    </span>
 
                   <% } %>
-                </td>
 
-                <td>
-                  <%= changeReservation.patientNumber %>
-                </td>
-
-                <td>
-                  <strong>
-                    <%= changeReservation.patient.name %>
-                  </strong>
                 </td>
 
               </tr>
@@ -232,6 +445,10 @@
           </table>
 
         </div>
+
+        <p class="admin-panel-note">
+          空いている予約枠を選択してください。
+        </p>
 
       </section>
 
@@ -303,52 +520,6 @@
 
       </div>
 
-      <div
-        class="admin-status-guide"
-        aria-label="予約状況"
-      >
-
-        <span>
-          <b class="status-dot is-open">
-            ○
-          </b>
-
-          <%= isEditMode
-            ? "変更できます"
-            : "空きあり"
-          %>
-        </span>
-
-        <span>
-          <b class="status-dot is-few">
-            △
-          </b>
-          残り1人
-        </span>
-
-        <span>
-          <b class="status-dot is-full">
-            満
-          </b>
-          満員
-        </span>
-
-        <span>
-          <b class="status-dot is-closed">
-            休
-          </b>
-          休診
-        </span>
-
-        <span>
-          <b class="status-dot is-closed">
-            −
-          </b>
-          診療時間外
-        </span>
-
-      </div>
-
       <div class="admin-calendar-shell">
 
         <table class="admin-calendar-table">
@@ -366,21 +537,16 @@
                   const dateText =
                     getDateText(dateItem.value);
 
-                  const dateParts =
+                  const [year, month, day] =
                     dateText
                       .split("-")
                       .map(Number);
 
-                  const month =
-                    dateParts[1];
-
-                  const day =
-                    dateParts[2];
-
                   const dateObject =
                     new Date(
-                      dateText +
-                      "T00:00:00+09:00"
+                      year,
+                      month - 1,
+                      day
                     );
 
                   const dayNumber =
@@ -404,12 +570,12 @@
                   class="
                     admin-calendar-date-head
                     <%= dayNumber === 0
-                      ? 'is-sunday'
-                      : ''
+                      ? "is-sunday"
+                      : ""
                     %>
                     <%= dayNumber === 6
-                      ? 'is-saturday'
-                      : ''
+                      ? "is-saturday"
+                      : ""
                     %>
                   "
                 >
@@ -451,7 +617,7 @@
                       );
 
                     const settingKey =
-                      date + "_" + slot;
+                      `${date}_${slot}`;
 
                     const setting =
                       slotSettings[settingKey] || {
@@ -550,8 +716,16 @@
                       !isOutsidePeriod &&
                       !isFull;
 
+                    const canSelectAdd =
+                      isAddMode &&
+                      isScheduled &&
+                      isOpen &&
+                      !isPast &&
+                      !isOutsidePeriod &&
+                      !isFull;
+
                     const canOpenDetail =
-                      !isEditMode &&
+                      isNormalMode &&
                       isScheduled &&
                       !isPast &&
                       !isOutsidePeriod;
@@ -561,6 +735,20 @@
                       encodeURIComponent(date) +
                       "&slot=" +
                       encodeURIComponent(slot);
+
+                    /*
+                     * 患者指定の予約追加では、
+                     * 患者検索画面へ患者番号を引き継ぎます。
+                     */
+                    const addReservationUrl =
+                      "/admin/slot/patient-search?date=" +
+                      encodeURIComponent(date) +
+                      "&slot=" +
+                      encodeURIComponent(slot) +
+                      "&keyword=" +
+                      encodeURIComponent(
+                        selectedPatientNumber
+                      );
                   %>
 
                   <td
@@ -568,12 +756,16 @@
                       admin-calendar-slot
                       is-<%= status %>
                       <%= setting.isOverride
-                        ? 'has-override'
-                        : ''
+                        ? "has-override"
+                        : ""
                       %>
                       <%= canSelectChange
-                        ? 'is-change-selectable'
-                        : ''
+                        ? "is-change-selectable"
+                        : ""
+                      %>
+                      <%= canSelectAdd
+                        ? "is-add-selectable"
+                        : ""
                       %>
                     "
                   >
@@ -581,7 +773,7 @@
                     <% if (canSelectChange) { %>
 
                       <form
-                        method="POST"
+                        method="post"
                         action="/admin/edit/<%= changeReservationId %>/confirm"
                         class="admin-calendar-change-form"
                       >
@@ -615,6 +807,50 @@
                         </button>
 
                       </form>
+
+                    <% } else if (canSelectAdd) { %>
+
+  <form
+    method="post"
+    action="/admin/slot/patient-register-confirm"
+    class="admin-calendar-change-form"
+  >
+
+    <input
+      type="hidden"
+      name="patientNumber"
+      value="<%= reservationPatient.patientNumber %>"
+    >
+
+    <input
+      type="hidden"
+      name="date"
+      value="<%= date %>"
+    >
+
+    <input
+      type="hidden"
+      name="slot"
+      value="<%= slot %>"
+    >
+
+    <button
+      type="submit"
+      class="admin-calendar-slot-link admin-calendar-slot-button"
+      aria-label="<%= reservationPatient.name %>さんの予約を<%= formatShortDate(date) %> <%= getSlotLabel(slot, doctorId) %>に追加"
+    >
+
+      <span class="admin-calendar-status">
+        <%= statusLabel %>
+      </span>
+
+      <span class="admin-calendar-count">
+        <%= reservationCount %>/<%= capacity %>
+      </span>
+
+    </button>
+
+  </form>
 
                     <% } else if (canOpenDetail) { %>
 
@@ -667,6 +903,17 @@
                             <%= reservationCount %>/<%= capacity %>
                           </span>
 
+                        <% } else if (
+                          isScheduled &&
+                          !isOpen &&
+                          !isPast &&
+                          !isOutsidePeriod
+                        ) { %>
+
+                          <span class="admin-calendar-count">
+                            休診
+                          </span>
+
                         <% } %>
 
                       </span>
@@ -693,6 +940,10 @@
 
           「○」または「△」の枠をタップすると、変更確認画面へ進みます。
 
+        <% } else if (isAddMode) { %>
+
+          「○」または「△」の枠をタップすると、患者を選択した状態で予約追加へ進みます。
+
         <% } else { %>
 
           枠をタップすると、予約枠詳細を確認できます。
@@ -716,9 +967,22 @@
 
         <a
           class="admin-week-button"
-          href="/admin/slot?date=<%= encodeURIComponent(changeReservation.date) %>&slot=<%= encodeURIComponent(changeReservation.slot) %>"
+          href="/admin/slot?date=<%= encodeURIComponent(getDateText(changeReservation.date)) %>&slot=<%= encodeURIComponent(changeReservation.slot) %>"
         >
           元の予約枠へ戻る
+        </a>
+
+      </div>
+
+    <% } else if (isAddMode) { %>
+
+      <div class="admin-slot-footer-actions">
+
+        <a
+          class="admin-week-button"
+          href="/admin/patients?keyword=<%= encodeURIComponent(selectedPatientNumber) %>"
+        >
+          患者管理へ戻る
         </a>
 
       </div>

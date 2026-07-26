@@ -385,6 +385,11 @@ app.use(async (req, res, next) => {
 /* =========================
    共通関数
 ========================= */
+function getTodayText() {
+  return new Date().toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Tokyo",
+  });
+}
 
 function formatJapaneseDate(dateText) {
   const date = new Date(`${dateText}T00:00:00+09:00`);
@@ -622,17 +627,11 @@ async function createAuditLog(action, target = null, detail = null) {
 ========================= */
 
 app.use((req, res, next) => {
-  /*
-   * 患者側：年あり
-   * 例 2026年7月17日(金)
-   */
   res.locals.formatJapaneseDate = formatJapaneseDate;
 
-  /*
-   * 管理画面：年なし
-   * 例 7月17日(金)
-   */
   res.locals.formatJapaneseDateShort = formatJapaneseDateShort;
+
+  res.locals.getSlotLabel = config.getSlotLabel;
 
   return next();
 });
@@ -1511,26 +1510,42 @@ app.get("/admin/doctors", requireAdminLogin, async (req, res) => {
 });
 
 app.get("/admin/select-doctor", requireAdminLogin, async (req, res) => {
-  const doctorId = Number(req.query.doctorId);
+  try {
+    const doctorId = Number(req.query.doctorId);
 
-  if (!Number.isInteger(doctorId)) {
-    return res.redirect("/admin/doctors");
+    if (!isValidDoctorId(doctorId)) {
+      return res.redirect("/admin/doctors");
+    }
+
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
+    });
+
+    if (!doctor) {
+      return res.redirect("/admin/doctors");
+    }
+
+    /*
+     * 最初に選んだ担当医を
+     * 管理画面全体の担当医として保存します。
+     */
+    req.session.doctorId = doctor.id;
+
+    return res.redirect("/admin");
+  } catch (error) {
+    console.error("管理画面担当医選択エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "担当医選択",
+      heading: "担当医を選択できませんでした",
+      message: "担当医選択中にエラーが発生しました。",
+      detail: "",
+      backUrl: "/admin/doctors",
+    });
   }
-
-  const doctor = await prisma.doctor.findFirst({
-    where: {
-      id: doctorId,
-      isActive: true,
-    },
-  });
-
-  if (!doctor) {
-    return res.redirect("/admin/doctors");
-  }
-
-  req.session.doctorId = doctor.id;
-
-  return res.redirect("/admin");
 });
 
 app.get("/admin", requireAdminLogin, async (req, res) => {
@@ -1649,112 +1664,318 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
   }
 });
 app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
-  const editReservationId = Number(req.query.editReservationId || 0);
   try {
     const doctorId = Number(req.session.doctorId);
 
+    const reservationPatientId = Number(req.query.reservationPatientId);
+
+    const patientNumber = String(req.query.patientNumber || "").trim();
+
+    const editReservationId = Number(req.query.editReservationId || 0);
+
+    /*
+     * 選択中の担当医を確認
+     */
     if (!isValidDoctorId(doctorId)) {
       return res.redirect("/admin/doctors");
     }
 
-    const doctor = await prisma.doctor.findUnique({
-      where: { id: doctorId },
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
     });
 
-    if (!doctor || !doctor.isActive) {
+    if (!doctor) {
       req.session.doctorId = null;
+
       return res.redirect("/admin/doctors");
     }
 
+    /*
+     * ==============================
+     * 予約追加モード
+     * ==============================
+     *
+     * reservationPatientIdから
+     * 予約を追加する患者を取得します。
+     */
+    let reservationPatient = null;
+
+    if (Number.isInteger(reservationPatientId) && reservationPatientId > 0) {
+      reservationPatient = await prisma.patient.findUnique({
+        where: {
+          id: reservationPatientId,
+        },
+
+        include: {
+          reservations: {
+            where: {
+              date: {
+                gte: getTodayText(),
+              },
+            },
+
+            include: {
+              doctor: true,
+            },
+
+            orderBy: [
+              {
+                date: "asc",
+              },
+              {
+                slot: "asc",
+              },
+            ],
+
+            take: 1,
+          },
+        },
+      });
+
+      if (!reservationPatient) {
+        return res.status(404).render("error", {
+          title: "予約追加",
+          heading: "患者が見つかりません",
+          message: "選択された患者情報が見つかりませんでした。",
+          detail: "",
+          backUrl: "/admin/reservation-add",
+        });
+      }
+
+      if (
+        Array.isArray(reservationPatient.reservations) &&
+        reservationPatient.reservations.length > 0
+      ) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "すでに予約があります",
+          message:
+            "この患者には現在有効な予約があります。予約変更を行ってください。",
+          detail: "",
+          backUrl:
+            "/admin/reservation-add" +
+            `?keyword=${encodeURIComponent(reservationPatient.patientNumber)}`,
+        });
+      }
+    }
+
+    /*
+     * 以前のpatientNumber方式にも対応
+     */
+    let selectedPatient = reservationPatient || null;
+
+    if (patientNumber && !selectedPatient) {
+      selectedPatient = await prisma.patient.findUnique({
+        where: {
+          patientNumber,
+        },
+
+        include: {
+          reservations: {
+            where: {
+              date: {
+                gte: getTodayText(),
+              },
+            },
+
+            include: {
+              doctor: true,
+            },
+
+            orderBy: [
+              {
+                date: "asc",
+              },
+              {
+                slot: "asc",
+              },
+            ],
+
+            take: 1,
+          },
+        },
+      });
+
+      if (!selectedPatient) {
+        return res.redirect(
+          "/admin/reservation-add" + "?error=patient-not-found",
+        );
+      }
+    }
+
+    /*
+     * ==============================
+     * 予約変更モード
+     * ==============================
+     *
+     * editReservationIdから、
+     * 予約・患者・担当医をまとめて取得します。
+     */
     let editReservation = null;
 
-    if (editReservationId > 0) {
+    if (Number.isInteger(editReservationId) && editReservationId > 0) {
       editReservation = await prisma.reservation.findUnique({
         where: {
           id: editReservationId,
         },
+
         include: {
           patient: true,
+          doctor: true,
         },
       });
+
+      if (!editReservation) {
+        return res.status(404).render("error", {
+          title: "予約変更",
+          heading: "予約が見つかりません",
+          message: "変更対象の予約が削除されたか、存在しません。",
+          detail: "",
+          backUrl: "/admin/reservation-add",
+        });
+      }
+
+      /*
+       * 最初に選択した担当医に固定するため、
+       * 別の担当医の予約は変更できません。
+       */
+      if (Number(editReservation.doctorId) !== Number(doctorId)) {
+        return res.status(400).render("error", {
+          title: "予約変更",
+          heading: "予約を変更できません",
+          message:
+            "現在選択している担当医の予約ではありません。担当医を切り替えてから変更してください。",
+          detail: "",
+          backUrl:
+            "/admin/reservation-add" +
+            `?keyword=${encodeURIComponent(editReservation.patientNumber)}`,
+        });
+      }
+
+      /*
+       * 変更対象患者を選択患者として保持します。
+       */
+      selectedPatient = editReservation.patient;
     }
 
+    /*
+     * ==============================
+     * 表示する週
+     * ==============================
+     */
     const week = getWeekParam(req.query.week);
+
+    /*
+     * 日本時間の今日
+     */
+    const todayText = getTodayText();
+
+    const todayParts = todayText.split("-").map(Number);
+
+    const todayDate = new Date(todayParts[0], todayParts[1] - 1, todayParts[2]);
+
+    /*
+     * 表示する7日間
+     */
     const dates = [];
 
-    for (let i = week * 7; i < week * 7 + 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
+    for (let index = week * 7; index < week * 7 + 7; index++) {
+      const date = new Date(todayDate);
+
+      date.setDate(todayDate.getDate() + index);
+
+      const year = date.getFullYear();
+
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+
+      const day = String(date.getDate()).padStart(2, "0");
 
       const value = `${year}-${month}-${day}`;
-      const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
       dates.push({
         value,
-        label: `${d.getMonth() + 1}/${d.getDate()}(${weekdays[d.getDay()]})`,
+
+        label:
+          `${date.getMonth() + 1}/` +
+          `${date.getDate()}` +
+          `(${weekdays[date.getDay()]})`,
       });
     }
 
-    const today = new Date().toLocaleDateString("sv-SE");
+    /*
+     * 予約可能最終日
+     */
+    const maxReservableDate = new Date(todayDate);
 
-    const maxReservableDate = new Date();
     maxReservableDate.setDate(
       maxReservableDate.getDate() + config.RESERVATION_DAYS,
     );
 
     const maxReservableText = maxReservableDate.toLocaleDateString("sv-SE");
 
-    const nextWeekStart = new Date();
+    /*
+     * 次の週を表示できるか
+     */
+    const nextWeekStart = new Date(todayDate);
+
     nextWeekStart.setDate(nextWeekStart.getDate() + (week + 1) * 7);
 
     const nextWeekStartText = nextWeekStart.toLocaleDateString("sv-SE");
 
     const canGoNextWeek = nextWeekStartText <= maxReservableText;
 
+    /*
+     * 選択中担当医の表示枠
+     */
     const slots = config.getDisplaySlots(doctorId);
 
+    /*
+     * 表示期間内の予約
+     */
     const reservations = await prisma.reservation.findMany({
       where: {
         doctorId,
+
         date: {
           gte: dates[0].value,
           lte: dates[dates.length - 1].value,
         },
       },
+
       include: {
         patient: true,
         doctor: true,
       },
-      orderBy: [{ date: "asc" }, { slot: "asc" }, { id: "asc" }],
+
+      orderBy: [
+        {
+          date: "asc",
+        },
+        {
+          slot: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
     });
 
     /*
-     * キーの形式:
-     * 2026-07-16_10:00
-     *
-     * EJS側では
-     * slotSettings[`${date.value}_${slot}`]
-     * で取得します。
+     * 日付・時間ごとの診療設定
      */
     const slotSettings = {};
 
     await Promise.all(
-      dates.flatMap((dateItem) =>
-        slots.map(async (slot) => {
-          const key = `${dateItem.value}_${slot}`;
+      dates.flatMap((dateItem) => {
+        const availableSlots = config.getSlotsForDate(dateItem.value, doctorId);
 
-          /*
-           * 元々の診療時間ではない枠まで
-           * 設定取得しないようにします。
-           */
-          const availableSlots = config.getSlotsForDate(
-            dateItem.value,
-            doctorId,
-          );
+        return slots.map(async (slot) => {
+          const key = `${dateItem.value}_${slot}`;
 
           if (!availableSlots.includes(slot)) {
             slotSettings[key] = {
@@ -1771,43 +1992,84 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
 
           slotSettings[key] = {
             isScheduled: true,
-            isOpen: setting.isOpen,
-            isOverride: setting.isOverride,
-            capacity: setting.capacity,
+            isOpen: Boolean(setting.isOpen),
+            isOverride: Boolean(setting.isOverride),
+            capacity: Number(setting.capacity || 0),
           };
-        }),
-      ),
+        });
+      }),
     );
 
+    /*
+     * 予約変更を優先して判定します。
+     */
+    const isEditMode = Boolean(editReservation);
+
+    const isAddMode = !isEditMode && Boolean(selectedPatient);
+
     return res.render("admin-reservations", {
-      title: "予約スケジュール",
+      title: isEditMode
+        ? "予約変更"
+        : isAddMode
+          ? "予約追加"
+          : "予約スケジュール",
 
       isAdminPage: true,
       isAdminLoggedIn: true,
 
       doctor,
       doctorId,
+
+      /*
+       * 追加・変更対象患者
+       */
+      selectedPatient,
+
+      patientNumber: selectedPatient ? selectedPatient.patientNumber : "",
+
+      reservationPatient: reservationPatient || null,
+
+      reservationPatientId: reservationPatient ? reservationPatient.id : null,
+
+      /*
+       * 変更対象予約
+       */
+      editReservation,
+
+      editReservationId: editReservation ? editReservation.id : 0,
+
+      /*
+       * スケジュール
+       */
       reservations,
       week,
       dates,
       slots,
       slotSettings,
 
-      today,
+      today: todayText,
       maxReservableText,
       canGoNextWeek,
+
       formatJapaneseDateShort,
       getSlotLabel: config.getSlotLabel,
+
       isPastReservationSlot,
-      editReservationId,
-      editReservation,
     });
   } catch (error) {
     console.error("予約スケジュール表示エラー:", error);
 
-    return res
-      .status(500)
-      .send("予約スケジュールの表示中にエラーが発生しました。");
+    return res.status(500).render("error", {
+      title: "予約スケジュール表示エラー",
+
+      heading: "予約スケジュールを表示できませんでした",
+
+      message: "予約スケジュールの読み込み中にエラーが発生しました。",
+
+      detail: "",
+
+      backUrl: "/admin/reservation-add",
+    });
   }
 });
 
@@ -2681,33 +2943,22 @@ app.post(
   async (req, res) => {
     try {
       const doctorId = Number(req.session.doctorId);
-      const date = String(req.body.date || "").trim();
-      const slot = String(req.body.slot || "").trim();
 
       const patientNumber = String(req.body.patientNumber || "").trim();
 
-      const name = String(req.body.name || "")
-        .trim()
-        .replace(/\s+/g, " ");
+      const date = String(req.body.date || "").trim();
 
+      const slot = String(req.body.slot || "").trim();
+
+      const backUrl =
+        "/admin/reservations" +
+        `?patientNumber=${encodeURIComponent(patientNumber)}`;
+
+      /*
+       * 担当医チェック
+       */
       if (!isValidDoctorId(doctorId)) {
         return res.redirect("/admin/doctors");
-      }
-
-      if (!isValidDateText(date) || !isValidSlot(slot, doctorId)) {
-        return res.redirect("/admin/reservations");
-      }
-
-      if (isPastReservationSlot(date, slot)) {
-        return res.render("error", {
-          title: "患者登録",
-          heading: "受付終了しています",
-          message: "過去の予約枠には患者を登録できません。",
-          detail: "",
-          backUrl:
-            `/admin/slot?date=${encodeURIComponent(date)}` +
-            `&slot=${encodeURIComponent(slot)}`,
-        });
       }
 
       const doctor = await prisma.doctor.findFirst({
@@ -2723,20 +2974,147 @@ app.post(
         return res.redirect("/admin/doctors");
       }
 
-      const slotSetting = await getSlotSetting(date, slot, doctorId);
-
-      if (!slotSetting.isOpen) {
-        return res.render("error", {
-          title: "患者登録",
-          heading: "休診です",
-          message: "この予約枠は休診に設定されています。",
+      /*
+       * 入力値チェック
+       */
+      if (
+        !isValidPatientNumber(patientNumber) ||
+        !isValidDateText(date) ||
+        !isValidSlot(slot, doctorId) ||
+        !isWithinReservationPeriod(date)
+      ) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "予約を追加できません",
+          message: "患者情報または予約日時が正しくありません。",
           detail: "",
-          backUrl:
-            `/admin/slot?date=${encodeURIComponent(date)}` +
-            `&slot=${encodeURIComponent(slot)}`,
+          backUrl,
         });
       }
 
+      /*
+       * 過去の予約枠チェック
+       */
+      if (isPastReservationSlot(date, slot)) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "受付終了しています",
+          message: "過去の予約枠には予約を追加できません。",
+          detail: "",
+          backUrl,
+        });
+      }
+
+      /*
+       * 患者情報取得
+       */
+      const patient = await prisma.patient.findUnique({
+        where: {
+          patientNumber,
+        },
+      });
+
+      if (!patient) {
+        return res.status(404).render("error", {
+          title: "予約追加",
+          heading: "患者情報が見つかりません",
+          message: "指定された患者は登録されていません。",
+          detail: "",
+          backUrl: "/admin/patients",
+        });
+      }
+
+      /*
+       * 本来の診療枠か確認
+       */
+      const availableSlots = config.getSlotsForDate(date, doctorId);
+
+      if (!availableSlots.includes(slot)) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "予約できない日時です",
+          message: "選択された日時は診療時間ではありません。",
+          detail: "",
+          backUrl,
+        });
+      }
+
+      /*
+       * 診療設定・定員を取得
+       */
+      const setting = await getSlotSetting(date, slot, doctorId);
+
+      if (!setting.isOpen) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "休診の予約枠です",
+          message: "選択された予約枠は休診に設定されています。",
+          detail: "",
+          backUrl,
+        });
+      }
+
+      const capacity = Number(setting.capacity || 0);
+
+      if (!Number.isInteger(capacity) || capacity <= 0) {
+        return res.status(400).render("error", {
+          title: "予約追加",
+          heading: "予約を追加できません",
+          message: "選択された予約枠の定員が設定されていません。",
+          detail: "",
+          backUrl,
+        });
+      }
+
+      /*
+       * 同じ患者の未来予約を確認
+       */
+      const today = new Date().toLocaleDateString("sv-SE", {
+        timeZone: "Asia/Tokyo",
+      });
+
+      const existingReservation = await prisma.reservation.findFirst({
+        where: {
+          patientNumber,
+          date: {
+            gte: today,
+          },
+        },
+        include: {
+          doctor: true,
+        },
+        orderBy: [
+          {
+            date: "asc",
+          },
+          {
+            slot: "asc",
+          },
+        ],
+      });
+
+      if (existingReservation) {
+        return res.status(409).render("error", {
+          title: "予約追加",
+          heading: "すでに予約があります",
+          message:
+            "この患者には現在有効な予約があるため、新しい予約を追加できません。",
+          detail:
+            `${formatJapaneseDateShort(existingReservation.date)} ` +
+            `${config.getSlotLabel(
+              existingReservation.slot,
+              existingReservation.doctorId,
+            )}`,
+          backUrl:
+            "/admin/slot" +
+            `?date=${encodeURIComponent(existingReservation.date)}` +
+            `&slot=${encodeURIComponent(existingReservation.slot)}`,
+        });
+      }
+
+      /*
+       * 選択枠の現在の予約数を確認
+       */
       const reservationCount = await prisma.reservation.count({
         where: {
           doctorId,
@@ -2745,121 +3123,57 @@ app.post(
         },
       });
 
-      if (reservationCount >= slotSetting.capacity) {
-        return res.render("error", {
-          title: "患者登録",
-          heading: "満員です",
-          message: "この予約枠はすでに満員です。",
-          detail: "",
-          backUrl:
-            `/admin/slot?date=${encodeURIComponent(date)}` +
-            `&slot=${encodeURIComponent(slot)}`,
-        });
-      }
-
-      let registerError = null;
-
-      if (!patientNumber) {
-        registerError = "患者番号を入力してください。";
-      } else if (patientNumber.length > 50) {
-        registerError = "患者番号は50文字以内で入力してください。";
-      } else if (!name) {
-        registerError = "患者氏名を入力してください。";
-      } else if (name.length > 100) {
-        registerError = "患者氏名は100文字以内で入力してください。";
-      }
-
-      if (!registerError) {
-        const existingPatient = await prisma.patient.findUnique({
-          where: {
-            patientNumber,
-          },
-        });
-
-        if (existingPatient) {
-          registerError =
-            "この患者番号はすでに登録されています。患者検索から選択してください。";
-        }
-      }
-
-      if (registerError) {
-        return res.status(400).render("admin-slot-patient-search", {
+      if (reservationCount >= capacity) {
+        return res.status(409).render("error", {
           title: "予約追加",
-
-          isAdminPage: true,
-          isAdminLoggedIn: true,
-
-          doctor,
-          doctorId,
-          date,
-          slot,
-
-          slotLabel: config.getSlotLabel(slot, doctorId),
-
-          keyword: "",
-          patients: [],
-          hasSearched: false,
-
-          registerError,
-          registerSuccess: null,
-          confirmPatient: null,
-          registeredPatient: null,
-
-          newPatientNumber: patientNumber,
-          newPatientName: name,
-
-          formatJapaneseDateShort,
-          getSlotLabel: config.getSlotLabel,
+          heading: "予約枠が満員です",
+          message:
+            "選択された予約枠は満員になりました。別の日時を選択してください。",
+          detail: "",
+          backUrl,
         });
       }
 
-      return res.render("admin-slot-patient-search", {
-        title: "予約追加",
+      /*
+       * 予約確認画面を表示
+       */
+      return res.render("admin-patient-register-confirm", {
+        title: "予約追加確認",
 
         isAdminPage: true,
         isAdminLoggedIn: true,
 
+        patient,
+        patientNumber,
+
         doctor,
         doctorId,
+
         date,
         slot,
 
+        dateLabel: formatJapaneseDateShort(date),
+
         slotLabel: config.getSlotLabel(slot, doctorId),
 
-        keyword: "",
-        patients: [],
-        hasSearched: false,
+        capacity,
+        reservationCount,
 
-        registerError: null,
-        registerSuccess: null,
-
-        confirmPatient: {
-          patientNumber,
-          name,
-        },
-
-        registeredPatient: null,
-
-        newPatientNumber: patientNumber,
-        newPatientName: name,
-
-        formatJapaneseDateShort,
-        getSlotLabel: config.getSlotLabel,
+        backUrl,
       });
     } catch (error) {
-      console.error("患者登録確認エラー:", error);
+      console.error("患者予約追加確認エラー:", error);
 
       return res.status(500).render("error", {
-        title: "患者登録確認エラー",
-        heading: "エラーが発生しました",
-        message: "患者登録内容の確認中にエラーが発生しました。",
+        title: "予約追加エラー",
+        heading: "予約確認画面を表示できませんでした",
+        message: "予約内容の確認中にエラーが発生しました。",
         detail: "",
-        backUrl: "/admin/reservations",
+        backUrl: "/admin/patients",
       });
     }
   },
 );
-
 app.post(
   "/admin/slot/patient-register",
   requireAdminLogin,
@@ -3727,11 +4041,350 @@ app.post("/admin/edit/:id/complete", requireAdminLogin, async (req, res) => {
 
   return res.render("admin-complete", {
     title: "予約変更完了",
-    message: "予約を変更しました。",
-    buttonText: "予約スケジュールへ戻る",
-    buttonLink: "/admin/reservations",
+    heading: "予約を変更しました",
+    message: "以下の内容に変更しました。",
+
+    reservationTableTitle: "変更後の予約内容",
+
+    reservation: {
+      id,
+      date,
+      slot,
+      doctorId,
+
+      doctor: {
+        id: doctor.id,
+        name: doctor.name,
+        displayName: doctor.displayName,
+      },
+
+      patient: {
+        patientNumber: reservation.patient.patientNumber,
+        name: reservation.patient.name,
+      },
+    },
+
+    isAdminPage: true,
+    isAdminLoggedIn: true,
   });
 });
+
+app.get("/admin/reservation-add", requireAdminLogin, async (req, res) => {
+  try {
+    const doctorId = Number(req.session.doctorId);
+
+    if (!isValidDoctorId(doctorId)) {
+      return res.redirect("/admin/doctors");
+    }
+
+    const doctor = await prisma.doctor.findFirst({
+      where: {
+        id: doctorId,
+        isActive: true,
+      },
+    });
+
+    if (!doctor) {
+      req.session.doctorId = null;
+
+      return res.redirect("/admin/doctors");
+    }
+
+    const keyword = String(req.query.keyword || "").trim();
+
+    const hasSearched = keyword.length > 0;
+
+    let patients = [];
+
+    if (hasSearched) {
+      patients = await prisma.patient.findMany({
+        where: {
+          OR: [
+            {
+              patientNumber: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+            {
+              name: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
+
+        include: {
+          reservations: {
+            where: {
+              date: {
+                gte: getTodayText(),
+              },
+            },
+
+            include: {
+              doctor: true,
+            },
+
+            orderBy: [
+              {
+                date: "asc",
+              },
+              {
+                slot: "asc",
+              },
+            ],
+
+            take: 1,
+          },
+        },
+
+        orderBy: {
+          patientNumber: "asc",
+        },
+
+        take: 100,
+      });
+    }
+
+    return res.render("admin-reservation-add", {
+      title: "予約追加",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+
+      doctorId,
+      doctor,
+
+      path: req.path,
+
+      keyword,
+      hasSearched,
+      patients,
+
+      success: String(req.query.success || ""),
+
+      error: "",
+    });
+  } catch (error) {
+    console.error("予約追加患者検索エラー:", error);
+
+    return res.status(500).render("admin-reservation-add", {
+      title: "予約追加",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+
+      doctorId: "",
+      doctor: null,
+
+      path: req.path,
+
+      keyword: String(req.query.keyword || "").trim(),
+
+      hasSearched: false,
+      patients: [],
+
+      success: "",
+
+      error: "患者情報を取得できませんでした。時間をおいて再度お試しください。",
+    });
+  }
+});
+
+// ======================================================
+// 管理画面：予約追加から新規患者登録
+// ======================================================
+
+app.get(
+  "/admin/reservation-add/patient/new",
+  requireAdminLogin,
+  async (req, res) => {
+    try {
+      return res.render("admin-patient-add", {
+        title: "新規患者登録",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+
+        mode: "reservation",
+
+        patientNumber: "",
+        name: "",
+
+        birthYear: "",
+        birthMonth: "",
+        birthDay: "",
+
+        error: "",
+      });
+    } catch (error) {
+      console.error("予約追加新規患者画面エラー:", error);
+
+      return res.status(500).render("error", {
+        title: "新規患者登録",
+        heading: "画面を表示できません",
+        message: "新規患者登録画面を表示できませんでした。",
+        detail: "",
+        backUrl: "/admin/reservation-add",
+      });
+    }
+  },
+);
+
+// ======================================================
+// 管理画面：予約追加から新規患者登録
+// 登録後は週毎スケジュールへ移動
+// ======================================================
+
+app.post(
+  "/admin/reservation-add/patient/new",
+  requireAdminLogin,
+  async (req, res) => {
+    try {
+      const patientNumber = String(req.body.patientNumber || "").trim();
+
+      const name = String(req.body.name || "").trim();
+
+      const birthYear = String(req.body.birthYear || "").trim();
+
+      const birthMonth = String(req.body.birthMonth || "").trim();
+
+      const birthDay = String(req.body.birthDay || "").trim();
+
+      if (!patientNumber || !name) {
+        return res.status(400).render("admin-patient-add", {
+          title: "新規患者登録",
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+
+          mode: "reservation",
+
+          patientNumber,
+          name,
+
+          birthYear,
+          birthMonth,
+          birthDay,
+
+          error: "患者番号と患者氏名を入力してください。",
+        });
+      }
+
+      let birthDate = null;
+
+      const hasBirthDateInput =
+        birthYear !== "" || birthMonth !== "" || birthDay !== "";
+
+      if (hasBirthDateInput) {
+        const year = Number(birthYear);
+        const month = Number(birthMonth);
+        const day = Number(birthDay);
+
+        const isValidBirthDate =
+          Number.isInteger(year) &&
+          year >= 1900 &&
+          year <= 2100 &&
+          Number.isInteger(month) &&
+          month >= 1 &&
+          month <= 12 &&
+          Number.isInteger(day) &&
+          day >= 1 &&
+          day <= 31;
+
+        if (!isValidBirthDate) {
+          return res.status(400).render("admin-patient-add", {
+            title: "新規患者登録",
+
+            isAdminPage: true,
+            isAdminLoggedIn: true,
+
+            mode: "reservation",
+
+            patientNumber,
+            name,
+
+            birthYear,
+            birthMonth,
+            birthDay,
+
+            error: "生年月日を正しく入力してください。",
+          });
+        }
+
+        const monthText = String(month).padStart(2, "0");
+
+        const dayText = String(day).padStart(2, "0");
+
+        birthDate = `${year}-${monthText}-${dayText}`;
+      }
+
+      const existingPatient = await prisma.patient.findUnique({
+        where: {
+          patientNumber,
+        },
+      });
+
+      if (existingPatient) {
+        return res.status(400).render("admin-patient-add", {
+          title: "新規患者登録",
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+
+          mode: "reservation",
+
+          patientNumber,
+          name,
+
+          birthYear,
+          birthMonth,
+          birthDay,
+
+          error: "この患者番号はすでに登録されています。",
+        });
+      }
+
+      const patient = await prisma.patient.create({
+        data: {
+          patientNumber,
+          name,
+          birthDate,
+        },
+      });
+
+      return res.redirect(
+        `/admin/reservations?week=0` + `&reservationPatientId=${patient.id}`,
+      );
+    } catch (error) {
+      console.error("予約追加新規患者登録エラー:", error);
+
+      return res.status(500).render("admin-patient-add", {
+        title: "新規患者登録",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+
+        mode: "reservation",
+
+        patientNumber: String(req.body.patientNumber || "").trim(),
+
+        name: String(req.body.name || "").trim(),
+
+        birthYear: String(req.body.birthYear || "").trim(),
+
+        birthMonth: String(req.body.birthMonth || "").trim(),
+
+        birthDay: String(req.body.birthDay || "").trim(),
+
+        error:
+          "患者情報を登録できませんでした。時間をおいて再度お試しください。",
+      });
+    }
+  },
+);
 
 app.get("/admin/patients", requireAdminLogin, async (req, res) => {
   try {
@@ -3848,64 +4501,123 @@ app.get("/admin/patients/add", (req, res) => {
   });
 });
 
-app.post("/admin/patients/add", async (req, res) => {
-  if (!req.session.isAdmin) {
-    return res.redirect("/admin-login");
-  }
+app.post("/admin/patients/add", requireAdminLogin, async (req, res) => {
+  try {
+    const patientNumber = String(req.body.patientNumber || "").trim();
 
-  const patientNumber = String(req.body.patientNumber || "").trim();
-  const name = String(req.body.name || "").trim();
+    const name = String(req.body.name || "").trim();
 
-  const year = String(req.body.birthYear || "");
-  const month = String(req.body.birthMonth || "").padStart(2, "0");
-  const day = String(req.body.birthDay || "").padStart(2, "0");
+    const year = String(req.body.birthYear || "").trim();
 
-  const birthDateText = `${year}-${month}-${day}`;
-  const birthDate = new Date(birthDateText);
+    const birthMonth = String(req.body.birthMonth || "").trim();
 
-  if (
-    !isValidPatientNumber(patientNumber) ||
-    !name ||
-    !year ||
-    !month ||
-    !day ||
-    Number.isNaN(birthDate.getTime())
-  ) {
-    return res.render("patient-add", {
-      title: "患者登録",
-      error: "患者番号・氏名・生年月日を正しく入力してください。",
+    const birthDay = String(req.body.birthDay || "").trim();
+
+    const month = birthMonth.padStart(2, "0");
+    const day = birthDay.padStart(2, "0");
+
+    const birthDateText = `${year}-${month}-${day}`;
+    const birthDate = new Date(`${birthDateText}T00:00:00+09:00`);
+    const isValidBirthDate =
+      /^\d{4}-\d{2}-\d{2}$/.test(birthDateText) &&
+      !Number.isNaN(birthDate.getTime()) &&
+      birthDate.toLocaleDateString("sv-SE", {
+        timeZone: "Asia/Tokyo",
+      }) === birthDateText;
+
+    if (
+      !isValidPatientNumber(patientNumber) ||
+      !name ||
+      !year ||
+      !birthMonth ||
+      !birthDay ||
+      !isValidBirthDate
+    ) {
+      return res.status(400).render("patient-add", {
+        title: "患者登録",
+        error: "患者番号・氏名・生年月日を正しく入力してください。",
+        patientNumber,
+        name,
+        birthYear: year,
+        birthMonth,
+        birthDay,
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const existingPatient = await prisma.patient.findUnique({
+      where: {
+        patientNumber,
+      },
+    });
+
+    if (existingPatient) {
+      return res.status(409).render("patient-add", {
+        title: "患者登録",
+        error: "この患者番号はすでに登録されています。",
+        patientNumber,
+        name,
+        birthYear: year,
+        birthMonth,
+        birthDay,
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const patient = await prisma.patient.create({
+      data: {
+        patientNumber,
+        name,
+        birthDate,
+      },
+    });
+
+    await createAuditLog("患者登録", `患者番号:${patientNumber}`, name);
+
+    const today = new Date().toLocaleDateString("sv-SE", {
+      timeZone: "Asia/Tokyo",
+    });
+
+    const reservation = await prisma.reservation.findFirst({
+      where: {
+        patientNumber,
+        date: {
+          gte: today,
+        },
+      },
+      include: {
+        doctor: true,
+      },
+      orderBy: [
+        {
+          date: "asc",
+        },
+        {
+          slot: "asc",
+        },
+      ],
+    });
+
+    return res.render("patient-add-complete", {
+      title: "患者登録完了",
+      patient,
+      reservation,
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
+  } catch (error) {
+    console.error("患者登録エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "患者登録エラー",
+      heading: "患者情報を登録できませんでした",
+      message: "患者登録中にエラーが発生しました。もう一度お試しください。",
+      detail: "",
+      backUrl: "/admin/patients/add",
     });
   }
-
-  const existingPatient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
-  });
-
-  if (existingPatient) {
-    return res.render("patient-add", {
-      title: "患者登録",
-      error: "この患者番号はすでに登録されています。",
-    });
-  }
-
-  await prisma.patient.create({
-    data: {
-      patientNumber,
-      name,
-      birthDate,
-    },
-  });
-
-  await createAuditLog("患者登録", `患者番号:${patientNumber}`, name);
-
-  return res.render("admin-complete", {
-    title: "患者登録完了",
-    message: "患者情報を登録しました。",
-    buttonText: "患者管理へ戻る",
-    buttonLink: "/admin/patients",
-  });
 });
 
 app.get("/admin/patients/edit/:id", async (req, res) => {
@@ -4221,7 +4933,10 @@ app.post("/admin/cancel/:id", requireAdminLogin, async (req, res) => {
 
   const reservation = await prisma.reservation.findUnique({
     where: { id },
-    include: { patient: true },
+    include: {
+      patient: true,
+      doctor: true,
+    },
   });
 
   if (!reservation) {
@@ -4246,9 +4961,27 @@ app.post("/admin/cancel/:id", requireAdminLogin, async (req, res) => {
 
   return res.render("admin-complete", {
     title: "キャンセル完了",
-    message: "予約をキャンセルしました。",
-    buttonText: "予約一覧へ戻る",
-    buttonLink: "/admin",
+    heading: "予約をキャンセルしました",
+    message: "以下の内容をキャンセルしました。",
+
+    reservation: {
+      id: reservation.id,
+      date: reservation.date,
+      slot: reservation.slot,
+      doctorId: reservation.doctorId,
+
+      doctor: reservation.doctor,
+
+      patient: {
+        patientNumber: reservation.patient.patientNumber,
+        name: reservation.patient.name,
+      },
+    },
+
+    reservationTableTitle: "キャンセルした予約内容",
+
+    isAdminPage: true,
+    isAdminLoggedIn: true,
   });
 });
 

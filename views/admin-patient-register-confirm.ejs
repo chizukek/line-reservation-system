@@ -1,0 +1,190 @@
+
+<%- include("partials/header", {
+  title:
+    typeof title !== "undefined"
+      ? title
+      : "予約追加確認",
+  isAdminPage: true,
+  isAdminLoggedIn: true,
+  doctor
+}) %>
+
+<%
+  const patientData =
+    typeof patient !== "undefined" &&
+    patient
+      ? patient
+      : {};
+
+  const doctorData =
+    typeof doctor !== "undefined" &&
+    doctor
+      ? doctor
+      : {};
+
+  const displayPatientNumber =
+    patientData.patientNumber ||
+    patientNumber ||
+    "";
+
+  const displayPatientName =
+    patientData.name ||
+    "";
+
+  const displayDoctorName =
+    doctorData.displayName ||
+    doctorData.name ||
+    "";
+
+  const displayDate =
+    typeof dateLabel !== "undefined" &&
+    dateLabel
+      ? dateLabel
+      : date;
+
+  const displaySlot =
+    typeof slotLabel !== "undefined" &&
+    slotLabel
+      ? slotLabel
+      : slot;
+
+  const returnUrl =
+    typeof backUrl !== "undefined" &&
+    backUrl
+      ? backUrl
+      : "/admin/reservations";
+%>
+
+<div class="admin-page">
+  <div class="admin-card">
+
+    <header class="admin-page-header">
+
+      <div>
+
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          予約追加確認
+        </h1>
+
+        <p class="admin-page-description">
+          以下の内容で予約を追加します。
+        </p>
+
+      </div>
+
+    </header>
+
+    <section class="admin-panel">
+
+  <h2 class="admin-panel-title">
+    予約内容
+  </h2>
+
+  <div class="admin-table-wrapper">
+
+    <table class="admin-table admin-patient-table">
+
+      <thead>
+
+        <tr>
+          <th>患者番号</th>
+          <th>患者氏名</th>
+          <th>担当医</th>
+          <th>予約日</th>
+          <th>時間</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            <strong>
+              <%= displayPatientNumber %>
+            </strong>
+          </td>
+
+          <td>
+            <%= displayPatientName %>
+          </td>
+
+          <td>
+            <%= displayDoctorName %>
+          </td>
+
+          <td>
+            <%= displayDate %>
+          </td>
+
+          <td>
+            <%= displaySlot %>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+    <form
+      method="post"
+      action="/admin/slot/complete"
+      class="admin-confirm-form"
+    >
+
+      <input
+        type="hidden"
+        name="patientNumber"
+        value="<%= displayPatientNumber %>"
+      >
+
+      <input
+        type="hidden"
+        name="date"
+        value="<%= date %>"
+      >
+
+      <input
+        type="hidden"
+        name="slot"
+        value="<%= slot %>"
+      >
+
+      <div class="admin-slot-footer-actions">
+
+        <a
+          class="admin-week-button"
+          href="<%= returnUrl %>"
+        >
+          日時選択へ戻る
+        </a>
+
+        <button
+          class="admin-primary-button"
+          type="submit"
+        >
+          この内容で予約を追加
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>
+

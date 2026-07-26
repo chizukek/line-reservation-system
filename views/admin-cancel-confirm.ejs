@@ -1,64 +1,171 @@
 <%- include("partials/header", {
-  title: "予約キャンセル確認"
+  title: "予約キャンセル確認",
+  isAdminPage: true,
+  isAdminLoggedIn
 }) %>
 
-<div class="admin-page">
+<%
+  const reservationDoctor =
+    reservation.doctor || {};
+
+  const doctorName =
+    reservationDoctor.displayName ||
+    reservationDoctor.name ||
+    "";
+
+  const doctorColorClass =
+    Number(reservationDoctor.id) === 1
+      ? "is-doctor-one"
+      : "is-doctor-two";
+
+  const patient =
+    reservation.patient || {};
+
+  const patientNumber =
+    reservation.patientNumber ||
+    patient.patientNumber ||
+    "";
+
+  const patientName =
+    patient.name || "";
+%>
+
+<div class="admin-page admin-cancel-confirm-page">
   <div class="admin-card">
 
-    <div class="admin-header">
+    <header class="admin-page-header">
+
       <div>
-        <h1>予約キャンセル確認</h1>
+
+        <p class="admin-page-eyebrow">
+          予約管理
+        </p>
+
+        <h1>
+          予約キャンセル確認
+        </h1>
+
+        <p class="admin-page-description">
+          キャンセルする予約内容をご確認ください。
+        </p>
+
       </div>
+
+    </header>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        キャンセルする予約
+      </h2>
+
+      <div class="admin-list-table-shell">
+
+        <table class="admin-info-table">
+
+          <thead>
+            <tr>
+              <th>予約日</th>
+              <th>時間</th>
+              <th>担当医</th>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+
+              <td>
+                <%= formatJapaneseDateShort(
+                  reservation.date
+                ) %>
+              </td>
+
+              <td>
+                <%= typeof getSlotLabel === "function"
+                  ? getSlotLabel(
+                      reservation.slot,
+                      reservation.doctorId
+                    )
+                  : reservation.slot
+                %>
+              </td>
+
+              <td>
+
+                <span
+                  class="admin-doctor-label"
+                  aria-label="担当医 <%= doctorName %>"
+                >
+
+                  <span
+                    class="admin-doctor-dot <%= doctorColorClass %>"
+                    aria-hidden="true"
+                  ></span>
+
+                  <%= doctorName %>
+
+                </span>
+
+              </td>
+
+              <td>
+                <%= patientNumber %>
+              </td>
+
+              <td>
+                <strong>
+                  <%= patientName %>
+                </strong>
+              </td>
+
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <div
+      class="admin-confirm-notice is-danger"
+      role="alert"
+    >
+      この予約をキャンセルします。よろしいですか？
     </div>
 
-    <section class="admin-section">
-  <div class="admin-table-wrapper">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>予約日</th>
-          <th>時間</th>
-          <th>担当医師</th>
-          <th>患者番号</th>
-          <th>患者氏名</th>
-        </tr>
-      </thead>
+    <div class="admin-complete-actions">
 
-      <tbody>
-        <tr>
-          <td><%= formatJapaneseDate(reservation.date) %></td>
-          <td><%= reservation.slot %></td>
-          <td><%= reservation.doctor.displayName || reservation.doctor.name %></td>
-          <td><%= reservation.patientNumber %></td>
-          <td><%= reservation.patient.name %></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+      <form
+        action="/admin/cancel/<%= reservation.id %>"
+        method="POST"
+        class="admin-footer-form"
+      >
 
-<div class="clinic-error" style="margin-top:20px;">
-  この予約をキャンセルします。よろしいですか？
-</div>
+        <button
+          type="submit"
+          class="clinic-danger-button admin-complete-button"
+        >
+          予約をキャンセルする
+        </button>
 
-<form
-  action="/admin/cancel/<%= reservation.id %>"
-  method="POST"
-  class="clinic-actions"
->
-  <button class="clinic-danger-button">
-    キャンセルする
-  </button>
+      </form>
 
-  <a
-    class="clinic-sub-button"
-    href="/admin/slot?doctorId=<%= reservation.doctorId %>&date=<%= reservation.date %>&slot=<%= encodeURIComponent(reservation.slot) %>"
-  >
-    戻る
-  </a>
-</form>
+      <a
+        class="admin-week-button admin-complete-button"
+        href="/admin/slot?doctorId=<%= reservation.doctorId %>&date=<%= encodeURIComponent(reservation.date) %>&slot=<%= encodeURIComponent(reservation.slot) %>"
+      >
+        キャンセルせずに戻る
+      </a>
+
+    </div>
 
   </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn
+}) %>
