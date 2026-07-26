@@ -4495,7 +4495,7 @@ app.get("/admin/patients/add", (req, res) => {
     return res.redirect("/admin-login");
   }
 
-  res.render("patient-add", {
+  res.render("admin-patient-add", {
     title: "患者登録",
     error: null,
   });
@@ -4533,7 +4533,7 @@ app.post("/admin/patients/add", requireAdminLogin, async (req, res) => {
       !birthDay ||
       !isValidBirthDate
     ) {
-      return res.status(400).render("patient-add", {
+      return res.status(400).render("admin-patient-add", {
         title: "患者登録",
         error: "患者番号・氏名・生年月日を正しく入力してください。",
         patientNumber,
@@ -4553,7 +4553,7 @@ app.post("/admin/patients/add", requireAdminLogin, async (req, res) => {
     });
 
     if (existingPatient) {
-      return res.status(409).render("patient-add", {
+      return res.status(409).render("admin-patient-add", {
         title: "患者登録",
         error: "この患者番号はすでに登録されています。",
         patientNumber,
