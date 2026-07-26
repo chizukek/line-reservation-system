@@ -1351,6 +1351,7 @@ small,
   grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.8fr) 104px;
   gap: 9px;
   align-items: end;
+  margin:20px 0;
 }
 
 .admin-form-card {
@@ -3540,6 +3541,7 @@ small,
 .admin-empty-state,
 .admin-empty {
   padding: 24px 12px !important;
+  margin:20px 0;
   color: var(--muted);
   text-align: center;
   border-top: 1px solid var(--border);

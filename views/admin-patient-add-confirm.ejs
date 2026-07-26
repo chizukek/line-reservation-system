@@ -1,0 +1,132 @@
+<%- include("partials/header", {
+  title: "患者登録確認",
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>
+
+<div class="admin-page">
+
+  <div class="admin-card">
+
+    <header class="admin-page-header">
+
+      <div>
+
+        <p class="admin-page-eyebrow">
+          患者管理
+        </p>
+
+        <h1>
+          患者登録確認
+        </h1>
+
+        <p class="admin-page-description">
+          以下の内容で患者情報を登録します。
+        </p>
+
+      </div>
+
+    </header>
+
+    <section class="admin-panel">
+
+      <h2 class="admin-panel-title">
+        患者情報
+      </h2>
+
+      <div class="confirm-table">
+
+        <div class="confirm-row">
+
+          <div class="confirm-label">
+            患者番号
+          </div>
+
+          <div class="confirm-value">
+            <%= patientNumber %>
+          </div>
+
+        </div>
+
+        <div class="confirm-row">
+
+          <div class="confirm-label">
+            患者氏名
+          </div>
+
+          <div class="confirm-value">
+            <%= name %>
+          </div>
+
+        </div>
+
+        <div class="confirm-row">
+
+          <div class="confirm-label">
+            生年月日
+          </div>
+
+          <div class="confirm-value">
+            <%= birthYear %>年
+            <%= birthMonth %>月
+            <%= birthDay %>日
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <form
+      action="/admin/reservation-add/patient/complete"
+      method="post"
+    >
+
+      <input
+        type="hidden"
+        name="patientNumber"
+        value="<%= patientNumber %>"
+      >
+
+      <input
+        type="hidden"
+        name="name"
+        value="<%= name %>"
+      >
+
+      <input
+        type="hidden"
+        name="birthDate"
+        value="<%= birthDateText %>"
+      >
+
+      <div class="clinic-actions">
+
+        <button
+          type="submit"
+          class="admin-primary-button"
+        >
+          この内容で登録する
+        </button>
+
+        <button
+          type="button"
+          class="clinic-sub-button"
+          onclick="history.back()"
+        >
+          入力内容を修正する
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<%- include("partials/footer", {
+  isAdminPage: true,
+  isAdminLoggedIn: true
+}) %>

@@ -1,356 +1,575 @@
 <%- include("partials/header", {
-  title: "予約追加",
-  isAdminPage: true,
-  isAdminLoggedIn: true
+title: "予約追加",
+isAdminPage: true,
+isAdminLoggedIn: true
 }) %>
 
-
 <%
-  const getDoctorColorClass = (reservation) => {
-    if (!reservation) {
-      return "";
-    }
+const currentYear =
+new Date().getFullYear();
 
-    const reservationDoctorId =
-      Number(
-        reservation.doctorId ||
-        reservation.doctor?.id
-      );
+const getDoctorColorClass = (reservation) => {
+if (!reservation) {
+return "";
+}
 
-    if (reservationDoctorId === 1) {
-      return "color_A";
-    }
 
-    if (reservationDoctorId === 2) {
-      return "color_B";
-    }
+const reservationDoctorId =
+  Number(
+    reservation.doctorId ||
+    reservation.doctor?.id
+  );
 
-    return "";
-  };
+if (reservationDoctorId === 1) {
+  return "color_A";
+}
 
-  const getDoctorName = (reservation) => {
-    if (
-      !reservation ||
-      !reservation.doctor
-    ) {
-      return "";
-    }
+if (reservationDoctorId === 2) {
+  return "color_B";
+}
 
-    return (
-      reservation.doctor.displayName ||
-      reservation.doctor.name ||
-      ""
-    );
-  };
+return "";
 
-  const patientList =
-    Array.isArray(patients)
-      ? patients
-      : [];
 
-  const searchKeyword =
-    typeof keyword !== "undefined"
-      ? String(keyword || "")
-      : "";
+};
+
+const getDoctorName = (reservation) => {
+if (
+!reservation ||
+!reservation.doctor
+) {
+return "";
+}
+
+
+return (
+  reservation.doctor.displayName ||
+  reservation.doctor.name ||
+  ""
+);
+
+
+};
+
+const patientList =
+Array.isArray(patients)
+? patients
+: [];
+
+const searchKeyword =
+typeof keyword !== "undefined"
+? String(keyword || "")
+: "";
+
+/*
+
+* 新規患者登録フォームの入力値
+*
+* 入力エラーで同じ画面を再表示した場合も、
+* 入力内容が消えないようにします。
+  */
+  const inputPatientNumber =
+  typeof patientNumber !== "undefined"
+  ? String(patientNumber || "")
+  : "";
+
+const inputPatientName =
+typeof name !== "undefined"
+? String(name || "")
+: "";
+
+const inputBirthYear =
+typeof birthYear !== "undefined"
+? Number(birthYear)
+: 0;
+
+const inputBirthMonth =
+typeof birthMonth !== "undefined"
+? Number(birthMonth)
+: 0;
+
+const inputBirthDay =
+typeof birthDay !== "undefined"
+? Number(birthDay)
+: 0;
 %>
 
 <div class="admin-page">
 
   <div class="admin-card">
 
-    <header class="admin-page-header">
 
-      <div>
+<header class="admin-page-header">
 
-        <p class="admin-page-eyebrow">
-          予約管理
-        </p>
+  <div>
 
-        <h1>
-          予約追加
-        </h1>
+    <h1>
+      予約追加
+    </h1>
 
-        <p class="admin-page-description">
-          予約を追加する患者を、患者番号または氏名で検索してください。
-        </p>
+  </div>
 
-      </div>
+</header>
 
-      <a
-        class="admin-primary-button"
-        href="/admin/reservation-add/patient/new"
+<% if (
+  typeof error !== "undefined" &&
+  error
+) { %>
+
+  <div
+    class="clinic-error"
+    role="alert"
+  >
+    <%= error %>
+  </div>
+
+<% } %>
+
+<!-- =========================
+     患者検索
+========================== -->
+
+<section class="admin-panel">
+
+  <h2 class="admin-panel-title">
+    患者検索
+  </h2>
+
+  <p class="admin-page-description">
+    予約を追加する患者を、患者番号または氏名で検索してください。
+  </p>
+
+  <form
+    class="admin-search-form"
+    action="/admin/reservation-add"
+    method="get"
+  >
+
+    <label class="admin-search-field">
+
+      <input
+        type="search"
+        name="keyword"
+        value="<%= searchKeyword %>"
+        placeholder="例：12345 または 山田"
+        autocomplete="off"
       >
-        ＋ 新規患者登録
-      </a>
 
-    </header>
+    </label>
 
-    <% if (
-      typeof error !== "undefined" &&
-      error
-    ) { %>
+    <button
+      class="admin-primary-button"
+      type="submit"
+    >
+      検索
+    </button>
 
-      <div
-        class="clinic-error"
-        role="alert"
-      >
-        <%= error %>
-      </div>
+  </form>
 
-    <% } %>
+</section>
 
-    <section class="admin-panel">
+<!-- =========================
+     検索結果
+========================== -->
+
+<% if (searchKeyword) { %>
+
+  <section class="admin-panel">
+
+    <div class="admin-section-title-row">
 
       <h2 class="admin-panel-title">
-        患者検索
+        検索結果
       </h2>
 
-      <form
-        class="admin-search-form"
-        action="/admin/reservation-add"
-        method="get"
-      >
+      <span class="admin-result-count">
+        <%= patientList.length %>件
+      </span>
 
-        <label class="admin-search-field">
+    </div>
 
-          <span>
-            患者番号または氏名
-          </span>
+    <% if (patientList.length === 0) { %>
 
-          <input
-            type="search"
-            name="keyword"
-            value="<%= searchKeyword %>"
-            placeholder="例：12345 または 山田"
-            autocomplete="off"
-          >
-
-        </label>
-
-        <button
-          class="admin-primary-button"
-          type="submit"
-        >
-          検索
-        </button>
-
-      </form>
-
-    </section>
-
-    <% if (searchKeyword) { %>
-
-      <section class="admin-panel">
-
-        <div class="admin-section-title-row">
-
-          <h2 class="admin-panel-title">
-            検索結果
-          </h2>
-
-          <span class="admin-result-count">
-            <%= patientList.length %>件
-          </span>
-
-        </div>
-
-        <% if (patientList.length === 0) { %>
-
-          <div class="admin-empty">
-            「<%= searchKeyword %>」に一致する患者はいません。
-          </div>
-
-        <% } else { %>
-
-          <div class="admin-table-wrapper">
-
-            <table class="admin-table admin-patient-table">
-
-              <thead>
-
-                <tr>
-                  <th>患者番号</th>
-                  <th>患者氏名</th>
-                  <th>担当医</th>
-                  <th>予約日</th>
-                  <th>時間</th>
-                  <th>操作</th>
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                <% patientList.forEach((patient) => { %>
-
-                  <%
-                    const reservation =
-                      Array.isArray(patient.reservations) &&
-                      patient.reservations.length > 0
-                        ? patient.reservations[0]
-                        : null;
-
-                    const doctorClass =
-                      getDoctorColorClass(reservation);
-
-                    const reservationDoctorName =
-                      getDoctorName(reservation);
-                  %>
-
-                  <tr>
-
-                    <td>
-
-                      <strong>
-                        <%= patient.patientNumber %>
-                      </strong>
-
-                    </td>
-
-                    <td>
-                      <%= patient.name %>
-                    </td>
-
-                    <td>
-
-                      <% if (
-                        reservation &&
-                        reservation.doctor
-                      ) { %>
-
-                        <span
-                          class="admin-doctor-label"
-                          aria-label="担当医 <%= reservationDoctorName %>"
-                        >
-
-                          <span
-                            class="admin-doctor-dot <%= doctorClass %>"
-                            aria-hidden="true"
-                          ></span>
-
-                          <%= reservationDoctorName %>
-
-                        </span>
-
-                      <% } else { %>
-
-                        −
-
-                      <% } %>
-
-                    </td>
-
-                    <td>
-
-                      <% if (reservation) { %>
-
-                        <a
-                          class="admin-reservation-link"
-                          href="/admin/slot?date=<%= encodeURIComponent(reservation.date) %>&slot=<%= encodeURIComponent(reservation.slot) %>"
-                          aria-label="予約枠詳細を表示"
-                        >
-                          <%= formatJapaneseDateShort(
-                            reservation.date
-                          ) %>
-                        </a>
-
-                      <% } else { %>
-
-                        −
-
-                      <% } %>
-
-                    </td>
-
-                    <td>
-
-                      <% if (reservation) { %>
-
-                        <a
-                          class="admin-reservation-link"
-                          href="/admin/slot?date=<%= encodeURIComponent(reservation.date) %>&slot=<%= encodeURIComponent(reservation.slot) %>"
-                          aria-label="予約枠詳細を表示"
-                        >
-                          <%= typeof getSlotLabel === "function"
-                            ? getSlotLabel(
-                                reservation.slot,
-                                reservation.doctorId
-                              )
-                            : reservation.slot
-                          %>
-                        </a>
-
-                      <% } else { %>
-
-                        −
-
-                      <% } %>
-
-                    </td>
-
-                    <td>
-
-                      <div class="admin-table-actions">
-
-                        <% if (reservation) { %>
-
-                          <a
-  class="admin-row-button"
-  href="/admin/reservations?week=0&editReservationId=<%= reservation.id %>"
->
-  予約変更
-</a>
-
-                          <a
-                            class="admin-danger-button"
-                            href="/admin/cancel-confirm/<%= reservation.id %>"
-                          >
-                            キャンセル
-                          </a>
-
-                        <% } else { %>
-
-                          <a
-  class="admin-primary-button"
-  href="/admin/reservations?week=0&reservationPatientId=<%= patient.id %>"
->
-  予約追加
-</a>
-
-                        <% } %>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                <% }) %>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        <% } %>
-
-      </section>
+      <div class="admin-empty">
+        「<%= searchKeyword %>」に一致する患者はいません。
+      </div>
 
     <% } else { %>
 
-      <div class="admin-empty">
-        検索条件を入力すると、患者情報が表示されます。
+      <div class="admin-table-wrapper">
+
+        <table class="admin-table admin-patient-table">
+
+          <thead>
+
+            <tr>
+              <th>患者番号</th>
+              <th>患者氏名</th>
+              <th>担当医</th>
+              <th>予約日</th>
+              <th>時間</th>
+              <th>操作</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <% patientList.forEach((patient) => { %>
+
+              <%
+                const reservation =
+                  Array.isArray(patient.reservations) &&
+                  patient.reservations.length > 0
+                    ? patient.reservations[0]
+                    : null;
+
+                const doctorClass =
+                  getDoctorColorClass(reservation);
+
+                const reservationDoctorName =
+                  getDoctorName(reservation);
+
+                const slotDetailUrl =
+                  reservation
+                    ? (
+                        `/admin/slot?doctorId=${encodeURIComponent(
+                          reservation.doctorId
+                        )}` +
+                        `&date=${encodeURIComponent(
+                          reservation.date
+                        )}` +
+                        `&slot=${encodeURIComponent(
+                          reservation.slot
+                        )}`
+                      )
+                    : "";
+              %>
+
+              <tr>
+
+                <td>
+
+                  <strong>
+                    <%= patient.patientNumber %>
+                  </strong>
+
+                </td>
+
+                <td>
+                  <%= patient.name %>
+                </td>
+
+                <td>
+
+                  <% if (
+                    reservation &&
+                    reservation.doctor
+                  ) { %>
+
+                    <span
+                      class="admin-doctor-label"
+                      aria-label="担当医 <%= reservationDoctorName %>"
+                    >
+
+                      <span
+                        class="admin-doctor-dot <%= doctorClass %>"
+                        aria-hidden="true"
+                      ></span>
+
+                      <%= reservationDoctorName %>
+
+                    </span>
+
+                  <% } else { %>
+
+                    −
+
+                  <% } %>
+
+                </td>
+
+                <td>
+
+                  <% if (reservation) { %>
+
+                    <a
+                      class="admin-reservation-link"
+                      href="<%= slotDetailUrl %>"
+                      aria-label="予約枠詳細を表示"
+                    >
+                      <%= formatJapaneseDateShort(
+                        reservation.date
+                      ) %>
+                    </a>
+
+                  <% } else { %>
+
+                    −
+
+                  <% } %>
+
+                </td>
+
+                <td>
+
+                  <% if (reservation) { %>
+
+                    <a
+                      class="admin-reservation-link"
+                      href="<%= slotDetailUrl %>"
+                      aria-label="予約枠詳細を表示"
+                    >
+                      <%= typeof getSlotLabel === "function"
+                        ? getSlotLabel(
+                            reservation.slot,
+                            reservation.doctorId
+                          )
+                        : reservation.slot
+                      %>
+                    </a>
+
+                  <% } else { %>
+
+                    −
+
+                  <% } %>
+
+                </td>
+
+                <td>
+
+                  <div class="admin-table-actions">
+
+                    <% if (reservation) { %>
+
+                      <a
+                        class="admin-row-button"
+                        href="/admin/reservations?week=0&editReservationId=<%= reservation.id %>"
+                      >
+                        予約変更
+                      </a>
+
+                      <a
+                        class="admin-danger-button"
+                        href="/admin/cancel-confirm/<%= reservation.id %>"
+                      >
+                        キャンセル
+                      </a>
+
+                    <% } else { %>
+
+                      <a
+                        class="admin-primary-button"
+                        href="/admin/reservations?week=0&reservationPatientId=<%= patient.id %>"
+                      >
+                        予約追加
+                      </a>
+
+                    <% } %>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            <% }) %>
+
+          </tbody>
+
+        </table>
+
       </div>
 
     <% } %>
+
+  </section>
+
+<% } else { %>
+
+  <div class="admin-empty">
+    検索条件を入力すると、患者情報が表示されます。
+  </div>
+
+<% } %>
+
+<!-- =========================
+     新規患者登録
+========================== -->
+
+<section class="admin-panel">
+
+  <h2 class="admin-panel-title">
+    新規患者登録
+  </h2>
+
+  <p class="admin-page-description">
+    患者情報が登録されていない場合は、こちらから登録してください。
+  </p>
+
+  <form
+    class="admin-form-card"
+    action="/admin/reservation-add/patient/confirm"
+    method="post"
+  >
+
+    <label>
+
+      <span>
+        患者番号
+      </span>
+
+      <input
+        type="text"
+        name="patientNumber"
+        value="<%= inputPatientNumber %>"
+        inputmode="numeric"
+        maxlength="5"
+        autocomplete="off"
+        placeholder="例：12345"
+        required
+      >
+
+    </label>
+
+    <label>
+
+      <span>
+        患者氏名
+      </span>
+
+      <input
+        type="text"
+        name="name"
+        value="<%= inputPatientName %>"
+        autocomplete="name"
+        placeholder="例：山田 花子"
+        required
+      >
+
+    </label>
+
+    <label>
+
+      <span>
+        生年月日
+      </span>
+
+      <div class="birth-select">
+
+        <select
+          name="birthYear"
+          required
+        >
+
+          <option value="">
+            年
+          </option>
+
+          <% for (
+            let year = currentYear;
+            year >= 1900;
+            year--
+          ) { %>
+
+            <option
+              value="<%= year %>"
+              <%= inputBirthYear === year
+                ? "selected"
+                : ""
+              %>
+            >
+              <%= year %>年
+            </option>
+
+          <% } %>
+
+        </select>
+
+        <select
+          name="birthMonth"
+          required
+        >
+
+          <option value="">
+            月
+          </option>
+
+          <% for (
+            let month = 1;
+            month <= 12;
+            month++
+          ) { %>
+
+            <option
+              value="<%= month %>"
+              <%= inputBirthMonth === month
+                ? "selected"
+                : ""
+              %>
+            >
+              <%= month %>月
+            </option>
+
+          <% } %>
+
+        </select>
+
+        <select
+          name="birthDay"
+          required
+        >
+
+          <option value="">
+            日
+          </option>
+
+          <% for (
+            let day = 1;
+            day <= 31;
+            day++
+          ) { %>
+
+            <option
+              value="<%= day %>"
+              <%= inputBirthDay === day
+                ? "selected"
+                : ""
+              %>
+            >
+              <%= day %>日
+            </option>
+
+          <% } %>
+
+        </select>
+
+      </div>
+
+    </label>
+
+    <div class="clinic-actions">
+
+      <button
+        class="admin-primary-button"
+        type="submit"
+      >
+        確認画面へ進む
+      </button>
+
+    </div>
+
+  </form>
+
+</section>
+
 
   </div>
 
 </div>
 
 <%- include("partials/footer", {
-  isAdminPage: true,
-  isAdminLoggedIn: true
+isAdminPage: true,
+isAdminLoggedIn: true
 }) %>
-

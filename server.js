@@ -4450,20 +4450,20 @@ app.get(
     }
   },
 );
-
 // ======================================================
-// 管理画面：予約追加から新規患者登録
-// 登録後は週毎スケジュールへ移動
+// 予約追加画面：新規患者登録確認
 // ======================================================
 
 app.post(
-  "/admin/reservation-add/patient/new",
+  "/admin/reservation-add/patient/confirm",
   requireAdminLogin,
   async (req, res) => {
     try {
       const patientNumber = String(req.body.patientNumber || "").trim();
 
-      const name = String(req.body.name || "").trim();
+      const name = String(req.body.name || "")
+        .trim()
+        .replace(/\s+/g, " ");
 
       const birthYear = String(req.body.birthYear || "").trim();
 
@@ -4471,92 +4471,62 @@ app.post(
 
       const birthDay = String(req.body.birthDay || "").trim();
 
-      if (!patientNumber || !name) {
-        return res.status(400).render("admin-patient-add", {
-          title: "新規患者登録",
+      const renderInputError = (error) => {
+        return res.status(400).render("admin-reservation-add", {
+          title: "予約追加",
 
           isAdminPage: true,
           isAdminLoggedIn: true,
 
-          mode: "reservation",
+          keyword: "",
+          hasSearched: false,
+          patients: [],
 
           patientNumber,
           name,
-
           birthYear,
           birthMonth,
           birthDay,
 
-          error: "患者番号と患者氏名を入力してください。",
+          success: "",
+          error,
         });
+      };
+
+      if (
+        !isValidPatientNumber(patientNumber) ||
+        !name ||
+        !birthYear ||
+        !birthMonth ||
+        !birthDay
+      ) {
+        return renderInputError(
+          "患者番号・氏名・生年月日を正しく入力してください。",
+        );
       }
 
-      let birthDate = null;
+      const year = Number(birthYear);
+      const month = Number(birthMonth);
+      const day = Number(birthDay);
 
-      const hasBirthDateInput =
-        birthYear !== "" || birthMonth !== "" || birthDay !== "";
+      const birthDate = new Date(Date.UTC(year, month - 1, day));
 
-      if (hasBirthDateInput) {
-        const year = Number(birthYear);
-        const month = Number(birthMonth);
-        const day = Number(birthDay);
+      const isValidBirthDate =
+        Number.isInteger(year) &&
+        year >= 1900 &&
+        year <= new Date().getFullYear() &&
+        Number.isInteger(month) &&
+        month >= 1 &&
+        month <= 12 &&
+        Number.isInteger(day) &&
+        day >= 1 &&
+        day <= 31 &&
+        birthDate.getUTCFullYear() === year &&
+        birthDate.getUTCMonth() + 1 === month &&
+        birthDate.getUTCDate() === day;
 
-        const isValidBirthDate =
-          Number.isInteger(year) &&
-          year >= 1900 &&
-          year <= 2100 &&
-          Number.isInteger(month) &&
-          month >= 1 &&
-          month <= 12 &&
-          Number.isInteger(day) &&
-          day >= 1 &&
-          day <= 31;
-
-        if (!isValidBirthDate) {
-          return res.status(400).render("admin-patient-add", {
-            title: "新規患者登録",
-
-            isAdminPage: true,
-            isAdminLoggedIn: true,
-
-            mode: "reservation",
-
-            patientNumber,
-            name,
-
-            birthYear,
-            birthMonth,
-            birthDay,
-
-            error: "生年月日を正しく入力してください。",
-          });
-        }
-
-        const monthText = String(month).padStart(2, "0");
-
-        const dayText = String(day).padStart(2, "0");
-
-        birthDate = new Date(`${year}-${monthText}-${dayText}T00:00:00+09:00`);
-
-        if (Number.isNaN(birthDate.getTime())) {
-          return res.status(400).render("admin-patient-add", {
-            title: "新規患者登録",
-
-            isAdminPage: true,
-            isAdminLoggedIn: true,
-
-            mode: "reservation",
-
-            patientNumber,
-            name,
-
-            birthYear,
-            birthMonth,
-            birthDay,
-
-            error: "生年月日を正しく入力してください。",
-          });
-        }
+      if (!isValidBirthDate) {
+        return renderInputError("生年月日を正しく入力してください。");
       }
 
       const existingPatient = await prisma.patient.findUnique({
@@ -4566,22 +4536,130 @@ app.post(
       });
 
       if (existingPatient) {
-        return res.status(400).render("admin-patient-add", {
-          title: "新規患者登録",
+        return renderInputError(
+          "この患者番号はすでに登録されています。患者検索から選択してください。",
+        );
+      }
+
+      const birthDateText =
+        `${year}-` +
+        `${String(month).padStart(2, "0")}-` +
+        `${String(day).padStart(2, "0")}`;
+
+      return res.render("admin-patient-add-confirm", {
+        title: "患者登録確認",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+
+        patientNumber,
+        name,
+
+        birthYear: year,
+        birthMonth: month,
+        birthDay: day,
+        birthDateText,
+
+        backUrl: "/admin/reservation-add",
+      });
+    } catch (error) {
+      console.error("予約追加患者登録確認エラー:", error);
+
+      return res.status(500).render("error", {
+        title: "患者登録確認",
+        heading: "患者情報を確認できませんでした",
+        message: "時間をおいて、もう一度お試しください。",
+        detail: "",
+        backUrl: "/admin/reservation-add",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+  },
+);
+
+// ======================================================
+// 予約追加画面：新規患者登録実行
+// ======================================================
+
+app.post(
+  "/admin/reservation-add/patient/complete",
+  requireAdminLogin,
+  async (req, res) => {
+    try {
+      const patientNumber = String(req.body.patientNumber || "").trim();
+
+      const name = String(req.body.name || "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+      const birthDateText = String(req.body.birthDate || "").trim();
+
+      if (
+        !isValidPatientNumber(patientNumber) ||
+        !name ||
+        !isValidDateText(birthDateText)
+      ) {
+        return res.status(400).render("error", {
+          title: "患者登録",
+          heading: "登録内容が不正です",
+          message: "入力画面へ戻り、患者情報をもう一度確認してください。",
+          detail: "",
+          backUrl: "/admin/reservation-add",
 
           isAdminPage: true,
           isAdminLoggedIn: true,
+        });
+      }
 
-          mode: "reservation",
+      const birthParts = birthDateText.split("-").map(Number);
 
+      const birthDate = new Date(
+        Date.UTC(birthParts[0], birthParts[1] - 1, birthParts[2]),
+      );
+
+      const isValidBirthDate =
+        birthDate.getUTCFullYear() === birthParts[0] &&
+        birthDate.getUTCMonth() + 1 === birthParts[1] &&
+        birthDate.getUTCDate() === birthParts[2];
+
+      if (!isValidBirthDate) {
+        return res.status(400).render("error", {
+          title: "患者登録",
+          heading: "生年月日が不正です",
+          message: "入力画面へ戻り、生年月日を確認してください。",
+          detail: "",
+          backUrl: "/admin/reservation-add",
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+        });
+      }
+
+      const existingPatient = await prisma.patient.findUnique({
+        where: {
           patientNumber,
-          name,
+        },
+      });
 
-          birthYear,
-          birthMonth,
-          birthDay,
+      /*
+       * 確認画面の表示後に、別の操作で同じ患者番号が
+       * 登録される可能性があるため、登録直前にも確認します。
+       */
+      if (existingPatient) {
+        return res.status(409).render("error", {
+          title: "患者登録",
+          heading: "患者番号が重複しています",
+          message:
+            "この患者番号はすでに登録されています。患者検索から選択してください。",
+          detail: "",
+          backUrl:
+            `/admin/reservation-add?keyword=` +
+            encodeURIComponent(patientNumber),
 
-          error: "この患者番号はすでに登録されています。",
+          isAdminPage: true,
+          isAdminLoggedIn: true,
         });
       }
 
@@ -4593,32 +4671,47 @@ app.post(
         },
       });
 
-      return res.redirect(
-        `/admin/reservations?week=0` + `&reservationPatientId=${patient.id}`,
-      );
-    } catch (error) {
-      console.error("予約追加新規患者登録エラー:", error);
+      await createAuditLog("患者登録", `患者番号:${patientNumber}`, name);
 
-      return res.status(500).render("admin-patient-add", {
-        title: "新規患者登録",
+      return res.render("patient-add-complete", {
+        title: "患者登録完了",
+
+        patient,
+        reservation: null,
+
+        showReservationAddButton: true,
+
+        reservationAddUrl:
+          `/admin/reservations?week=0` + `&reservationPatientId=${patient.id}`,
 
         isAdminPage: true,
         isAdminLoggedIn: true,
+      });
+    } catch (error) {
+      console.error("予約追加患者登録エラー:", error);
 
-        mode: "reservation",
+      if (error.code === "P2002") {
+        return res.status(409).render("error", {
+          title: "患者登録",
+          heading: "患者番号が重複しています",
+          message: "この患者番号はすでに登録されています。",
+          detail: "",
+          backUrl: "/admin/reservation-add",
 
-        patientNumber: String(req.body.patientNumber || "").trim(),
+          isAdminPage: true,
+          isAdminLoggedIn: true,
+        });
+      }
 
-        name: String(req.body.name || "").trim(),
+      return res.status(500).render("error", {
+        title: "患者登録エラー",
+        heading: "患者情報を登録できませんでした",
+        message: "時間をおいて、もう一度お試しください。",
+        detail: "",
+        backUrl: "/admin/reservation-add",
 
-        birthYear: String(req.body.birthYear || "").trim(),
-
-        birthMonth: String(req.body.birthMonth || "").trim(),
-
-        birthDay: String(req.body.birthDay || "").trim(),
-
-        error:
-          "患者情報を登録できませんでした。時間をおいて再度お試しください。",
+        isAdminPage: true,
+        isAdminLoggedIn: true,
       });
     }
   },
