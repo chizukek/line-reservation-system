@@ -770,11 +770,10 @@ app.post("/verify", patientVerifyLimiter, async (req, res) => {
 
     req.session.verifyFailureCount = failureCount;
 
-    /*
-     * 2回目の失敗
-     */
     if (failureCount >= 2) {
       req.session.verifyFailureCount = 2;
+
+      const clinicPhone = String(process.env.CLINIC_PHONE || "").trim();
 
       return req.session.save((saveError) => {
         if (saveError) {
@@ -783,6 +782,13 @@ app.post("/verify", patientVerifyLimiter, async (req, res) => {
 
         return res.status(403).render("phone-reservation", {
           title: "お電話でのご予約",
+
+          heading: "本人確認が一時中断されました",
+
+          message:
+            "ログイン試行回数が一定数を超えたため、本人確認が一時中断されました。お手数ですが、お電話にてご予約ください。",
+
+          clinicPhone,
         });
       });
     }

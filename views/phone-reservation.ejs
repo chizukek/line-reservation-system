@@ -1,48 +1,100 @@
 <%- include("partials/header", {
-  title: title || "お電話でのご予約"
+  title:
+    typeof title !== "undefined"
+      ? title
+      : "お電話でのご予約"
 }) %>
 
+<%
+  const phoneNumber =
+    typeof clinicPhone !== "undefined"
+      ? String(clinicPhone || "").trim()
+      : "";
+
+  /*
+   * telリンク用に、
+   * 数字と先頭の+以外を取り除きます。
+   */
+  const phoneHref =
+    phoneNumber
+      ? phoneNumber.replace(/[^\d+]/g, "")
+      : "";
+%>
+
 <div class="clinic-page">
-  <div class="clinic-card">
 
-    <section class="clinic-section phone-reservation-section">
+  <div class="clinic-card login-card">
 
-      <h1>
-        本人確認ができませんでした
-      </h1>
+    <h1>
+      <%= typeof heading !== "undefined"
+        ? heading
+        : "本人確認が一時中断されました"
+      %>
+    </h1>
 
-      <p class="clinic-lead">
-        申し訳ございませんが、入力いただいた情報では
-        本人確認ができませんでした。
-      </p>
+    <div
+      class="clinic-error"
+      role="alert"
+    >
 
       <p>
-        患者情報の確認が必要となるため、
-        お手数ですがお電話にてご予約をお願いいたします。
+        <%= typeof message !== "undefined"
+          ? message
+          : "ログイン試行回数が一定数を超えたため、本人確認が一時中断されました。お手数ですが、お電話にてご予約ください。"
+        %>
       </p>
 
-      <div class="clinic-notice">
-        <strong>お電話の際にお伝えください</strong>
+    </div>
 
-        <ul>
-          <li>患者番号</li>
-          <li>お名前</li>
-          <li>ご希望の予約日時</li>
-        </ul>
+    <% if (phoneNumber) { %>
+
+      <section class="clinic-section">
+
+        <h2>
+          ご予約・お問い合わせ
+        </h2>
+
+        <div class="clinic-phone-box">
+
+          <span class="clinic-phone-label">
+            電話番号
+          </span>
+
+          <a
+            class="clinic-phone-number"
+            href="tel:<%= phoneHref %>"
+          >
+            <%= phoneNumber %>
+          </a>
+
+        </div>
+
+      </section>
+
+    <% } else { %>
+
+      <div
+        class="clinic-error"
+        role="alert"
+      >
+        医院の電話番号が設定されていません。
       </div>
 
-      <div class="clinic-actions">
-        <a
-          href="/psychiatry"
-          class="clinic-button clinic-button-secondary"
-        >
-          最初の画面へ戻る
-        </a>
-      </div>
+    <% } %>
 
-    </section>
+    <div class="clinic-actions">
+
+      <a
+        class="clinic-sub-button"
+        href="/psychiatry"
+      >
+        最初の画面へ戻る
+      </a>
+
+    </div>
 
   </div>
+
 </div>
 
 <%- include("partials/footer") %>
