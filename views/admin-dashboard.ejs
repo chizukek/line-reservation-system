@@ -1,218 +1,240 @@
 <%- include("partials/header", {
-  title,
-  isAdminPage,
-  isAdminLoggedIn,
-  doctor,
-  doctors
+title,
+isAdminPage,
+isAdminLoggedIn,
+doctor,
+doctors
 }) %>
 
 <%
-  /*
-   * 表示中の日付
-   */
+/*
+
+* 表示中の日付
+  */
   const selectedDateText =
-    typeof selectedDate === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/.test(selectedDate)
-      ? selectedDate
-      : today;
+  typeof selectedDate === "string" &&
+  /^\d{4}-\d{2}-\d{2}$/.test(selectedDate)
+  ? selectedDate
+  : today;
 
-  const selectedDateObject =
-    new Date(`${selectedDateText}T00:00:00+09:00`);
+const selectedDateObject =
+new Date(`${selectedDateText}T00:00:00+09:00`);
 
-  const formattedSelectedDate =
-    new Intl.DateTimeFormat("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      month: "long",
-      day: "numeric",
-      weekday: "short"
-    }).format(selectedDateObject);
+const formattedSelectedDate =
+new Intl.DateTimeFormat("ja-JP", {
+timeZone: "Asia/Tokyo",
+month: "long",
+day: "numeric",
+weekday: "short"
+}).format(selectedDateObject);
 
-  const formattedUpdatedAt =
-    new Intl.DateTimeFormat("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
-    }).format(updatedAt);
+const formattedUpdatedAt =
+new Intl.DateTimeFormat("ja-JP", {
+timeZone: "Asia/Tokyo",
+hour: "2-digit",
+minute: "2-digit",
+second: "2-digit",
+hour12: false
+}).format(updatedAt);
 
-  /*
-   * 現在の日本時間
-   */
+/*
+
+* 現在の日本時間
+  */
   const currentTime =
-    new Intl.DateTimeFormat("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    })
-      .format(new Date())
-      .replace("24:", "00:");
+  new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false
+  })
+  .format(new Date())
+  .replace("24:", "00:");
 
-  /*
-   * 日付をYYYY-MM-DD形式にする
-   */
+/*
+
+* 日付をYYYY-MM-DD形式にする
+  */
   const formatDateValue = (date) => {
-    return new Intl.DateTimeFormat("sv-SE", {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).format(date);
+  return new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+  }).format(date);
   };
 
-  /*
-   * 前日・翌日
-   */
+/*
+
+* 前日・翌日
+  */
   const previousDateObject =
-    new Date(selectedDateObject);
+  new Date(selectedDateObject);
 
-  previousDateObject.setDate(
-    previousDateObject.getDate() - 1
-  );
+previousDateObject.setDate(
+previousDateObject.getDate() - 1
+);
 
-  const nextDateObject =
-    new Date(selectedDateObject);
+const nextDateObject =
+new Date(selectedDateObject);
 
-  nextDateObject.setDate(
-    nextDateObject.getDate() + 1
-  );
+nextDateObject.setDate(
+nextDateObject.getDate() + 1
+);
 
-  const previousDate =
-    formatDateValue(previousDateObject);
+const previousDate =
+formatDateValue(previousDateObject);
 
-  const nextDate =
-    formatDateValue(nextDateObject);
+const nextDate =
+formatDateValue(nextDateObject);
 
-  const isToday =
-    selectedDateText === today;
+const isToday =
+selectedDateText === today;
 
-  const isPastDate =
-    selectedDateText < today;
+const isPastDate =
+selectedDateText < today;
 
-  /*
-   * 「10:00〜11:00」や「10:00」から
-   * 開始時刻だけ取得する
-   */
+/*
+
+* 「10:00〜11:00」や「10:00」から
+* 開始時刻だけ取得する
+  */
   const getSlotStartTime = (slot) => {
-    return String(slot || "")
-      .split(/[〜～-]/)[0]
-      .trim();
+  return String(slot || "")
+  .split(/[〜～-]/)[0]
+  .trim();
   };
 
-  /*
-   * 予約日をYYYY-MM-DD形式にする
-   */
+/*
+
+* 予約日をYYYY-MM-DD形式にする
+  */
   const getReservationDateText = (
+  reservationDate
+  ) => {
+  if (!reservationDate) {
+  return "";
+  }
+
+
+if (
+
+
+
+  typeof reservationDate === "string" &&
+  /^\d{4}-\d{2}-\d{2}/.test(
     reservationDate
-  ) => {
-    if (!reservationDate) {
-      return "";
-    }
+  )
+) {
+  return reservationDate.slice(0, 10);
+}
 
-    if (
-      typeof reservationDate === "string" &&
-      /^\d{4}-\d{2}-\d{2}/.test(
-        reservationDate
-      )
-    ) {
-      return reservationDate.slice(0, 10);
-    }
+const date =
+  new Date(reservationDate);
 
-    const date =
-      new Date(reservationDate);
+if (Number.isNaN(date.getTime())) {
+  return "";
+}
 
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
+return formatDateValue(date);
 
-    return formatDateValue(date);
-  };
 
-  /*
-   * 表示中の日付の予約だけ取得する
-   */
+};
+
+/*
+
+* 表示中の日付の予約だけ取得する
+  */
   const selectedDateReservations =
-    reservations.filter((reservation) => {
-      return (
-        getReservationDateText(
-          reservation.date
-        ) === selectedDateText
-      );
-    });
+  reservations.filter((reservation) => {
+  return (
+  getReservationDateText(
+  reservation.date
+  ) === selectedDateText
+  );
+  });
 
-  /*
-   * 表示日が今日の場合のみ、
-   * 現在時刻以降の予約数を数える
-   */
+/*
+
+* 表示日が今日の場合のみ、
+* 現在時刻以降の予約数を数える
+  */
   const remainingReservationCount =
-    isPastDate
-      ? 0
-      : selectedDateReservations.filter(
-          (reservation) => {
-            const startTime =
-              getSlotStartTime(
-                reservation.slot
-              );
+  isPastDate
+  ? 0
+  : selectedDateReservations.filter(
+  (reservation) => {
+  const startTime =
+  getSlotStartTime(
+  reservation.slot
+  );
 
-            if (!startTime) {
-              return false;
-            }
+  
+     if (!startTime) {
+       return false;
+     }
 
-            if (!isToday) {
-              return true;
-            }
+     if (!isToday) {
+       return true;
+     }
 
-            return startTime >= currentTime;
-          }
-        ).length;
+     return startTime >= currentTime;
+   }
+  
 
-  /*
-   * 各時間帯の最大定員
-   */
+  ).length;
+
+/*
+
+* 診療中の枠の最大定員
+  */
   const maxCapacity =
-    slots.length > 0
-      ? Math.max(
-          ...slots.map((slot) => {
-            return getCapacityForSlot(
-              selectedDateText,
-              slot,
-              doctorId
-            );
-          })
-        )
-      : 0;
+  slots.length > 0
+  ? Math.max(
+  1,
+  ...slots.map((slot) => {
+  const setting =
+  slotSettings &&
+  slotSettings[slot]
+  ? slotSettings[slot]
+  : null;
 
-  const circledNumbers = [
-    "①",
-    "②",
-    "③",
-    "④",
-    "⑤",
-    "⑥",
-    "⑦",
-    "⑧",
-    "⑨",
-    "⑩"
-  ];
+  
+     return setting && setting.isOpen
+       ? Number(setting.capacity || 0)
+       : 0;
+   })
+  
 
-  const getPatientColumnLabel = (
-    index
-  ) => {
-    return (
-      circledNumbers[index] ||
-      String(index + 1)
-    );
-  };
+  )
+  : 1;
+
+const circledNumbers = [
+"①",
+"②",
+"③",
+"④",
+"⑤",
+"⑥",
+"⑦",
+"⑧",
+"⑨",
+"⑩"
+];
+
+const getPatientColumnLabel = (
+index
+) => {
+return (
+circledNumbers[index] ||
+String(index + 1)
+);
+};
 %>
 
 <div class="admin-page-header">
 
   <div>
-    <p class="admin-page-eyebrow">
-      予約管理
-    </p>
-
     <h1>
       日毎スケジュール
     </h1>
@@ -224,63 +246,51 @@
 
   <div class="admin-date-navigation">
 
-    <a
-      class="admin-week-button"
-      href="/admin?date=<%= encodeURIComponent(previousDate) %>"
-    >
-      ‹ 前日
-    </a>
 
-    <form
-      class="admin-date-search-form"
-      method="get"
-      action="/admin"
-    >
+<a
+  class="admin-week-button"
+  href="/admin?date=<%= encodeURIComponent(previousDate) %>"
+>
+  ‹ 前日
+</a>
 
-      <label for="admin-schedule-date">
-        日付
-      </label>
+<form
+  id="admin-date-search-form"
+  class="admin-date-search-form"
+  method="get"
+  action="/admin"
+>
 
-      <input
-        id="admin-schedule-date"
-        type="date"
-        name="date"
-        value="<%= selectedDateText %>"
-        required
-      >
+  <label for="admin-schedule-date">
+    日付
+  </label>
 
-      <button
-        class="admin-primary-button"
-        type="submit"
-      >
-        表示
-      </button>
+  <input
+    id="admin-schedule-date"
+    type="date"
+    name="date"
+    value="<%= selectedDateText %>"
+    required
+  >
 
-    </form>
+  <a
+    class="admin-primary-button"
+    href="/admin?date=<%= encodeURIComponent(today) %>"
+  >
+    今日の予約に戻る
+  </a>
 
-    <a
-      class="admin-week-button"
-      href="/admin?date=<%= encodeURIComponent(nextDate) %>"
-    >
-      翌日 ›
-    </a>
+</form>
+
+<a
+  class="admin-week-button"
+  href="/admin?date=<%= encodeURIComponent(nextDate) %>"
+>
+  翌日 ›
+</a>
+
 
   </div>
-
-  <% if (!isToday) { %>
-
-    <div class="admin-today-link-row">
-
-      <a
-        class="admin-row-button"
-        href="/admin?date=<%= encodeURIComponent(today) %>"
-      >
-        今日に戻る
-      </a>
-
-    </div>
-
-  <% } %>
 
 </section>
 
@@ -288,309 +298,384 @@
 
   <div class="admin-dashboard-heading">
 
-    <div>
 
-      <h2>
-        <%= formattedSelectedDate %>の予約状況
-      </h2>
+<div>
 
-      <p class="admin-dashboard-doctor">
-        担当医：
-        <strong>
-          <%= doctor.displayName || doctor.name %>
-        </strong>
-      </p>
+  <h2>
+    <%= formattedSelectedDate %>の予約状況
+  </h2>
 
-    </div>
+  <p class="admin-dashboard-doctor">
+    担当医：
+    <strong>
+      <%= doctor.displayName || doctor.name %>
+    </strong>
+  </p>
 
-    <div class="admin-update-row">
+</div>
 
-      <span class="admin-updated-at">
-        最終更新
-        <strong>
-          <%= formattedUpdatedAt %>
-        </strong>
-      </span>
+<div class="admin-update-row">
 
-      <button
-        class="admin-refresh-button"
-        type="button"
-        onclick="location.reload()"
-      >
-        更新する
-      </button>
+  <span class="admin-updated-at">
+    最終更新
+    <strong>
+      <%= formattedUpdatedAt %>
+    </strong>
+  </span>
 
-    </div>
+  <button
+    class="admin-refresh-button"
+    type="button"
+    onclick="location.reload()"
+  >
+    更新する
+  </button>
+
+</div>
+
 
   </div>
 
-  <% if (isPastDate) { %>
+<% if (isPastDate) { %>
 
-    <div
-      class="admin-notice"
-      role="status"
-    >
-      過去の日付です。予約内容の確認のみできます。
-    </div>
 
-  <% } %>
+<div
+  class="admin-notice"
+  role="status"
+>
+  過去の日付です。予約内容の確認のみできます。
+</div>
+
+
+<% } %>
 
   <div class="admin-summary-row">
 
-    <div class="admin-summary-item">
 
-      <span class="admin-summary-label">
-        <%= isToday ? "本日の予約" : "予約数" %>
-      </span>
+<div class="admin-summary-item">
 
-      <strong class="admin-summary-value">
-        <%= selectedDateReservations.length %>
-      </strong>
+  <span class="admin-summary-label">
+    <%= isToday ? "本日の予約" : "予約数" %>
+  </span>
 
-      <span class="admin-summary-unit">
-        件
-      </span>
+  <strong class="admin-summary-value">
+    <%= selectedDateReservations.length %>
+  </strong>
 
-    </div>
+  <span class="admin-summary-unit">
+    件
+  </span>
 
-    <div class="admin-summary-item">
+</div>
 
-      <span class="admin-summary-label">
-        <%= isToday
-          ? "本日の残りの診療数"
-          : isPastDate
-            ? "残りの診療数"
-            : "予定されている診療数"
-        %>
-      </span>
+<div class="admin-summary-item">
 
-      <strong class="admin-summary-value">
-        <%= remainingReservationCount %>
-      </strong>
+  <span class="admin-summary-label">
+    <%= isToday
+      ? "本日の残りの診療数"
+      : isPastDate
+        ? "残りの診療数"
+        : "予定されている診療数"
+    %>
+  </span>
 
-      <span class="admin-summary-unit">
-        件
-      </span>
+  <strong class="admin-summary-value">
+    <%= remainingReservationCount %>
+  </strong>
 
-    </div>
+  <span class="admin-summary-unit">
+    件
+  </span>
+
+</div>
+
 
   </div>
 
   <div class="reservation-table-wrapper">
 
-    <table
-      class="
-        reservation-table
-        today-reservation-table
-      "
-    >
 
-      <thead>
-        <tr>
+<table
+  class="
+    reservation-table
+    today-reservation-table
+  "
+>
 
-          <th class="today-time-column">
-            時間
+  <thead>
+    <tr>
+
+      <th class="today-time-column">
+        時間
+      </th>
+
+      <% for (
+        let index = 0;
+        index < maxCapacity;
+        index++
+      ) { %>
+
+        <th>
+          患者<%= getPatientColumnLabel(index) %>
+        </th>
+
+      <% } %>
+
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <% if (slots.length === 0) { %>
+
+      <tr>
+        <td
+          colspan="<%= maxCapacity + 1 %>"
+          class="admin-empty-message"
+        >
+          この日の診療予定はありません。
+        </td>
+      </tr>
+
+    <% } else { %>
+
+      <% slots.forEach((slot) => { %>
+
+        <%
+          const slotStartTime =
+            getSlotStartTime(slot);
+
+          const setting =
+            slotSettings &&
+            slotSettings[slot]
+              ? slotSettings[slot]
+              : {
+                  isOpen: false,
+                  capacity: 0,
+                  isOverride: false
+                };
+
+          const isClosed =
+            !setting.isOpen;
+
+          /*
+           * 過去日または今日の開始済み枠
+           */
+          const isPastSlot =
+            !isClosed &&
+            (
+              isPastDate ||
+              (
+                isToday &&
+                Boolean(slotStartTime) &&
+                slotStartTime < currentTime
+              )
+            );
+
+          const slotReservations =
+            selectedDateReservations.filter(
+              (reservation) => {
+                return (
+                  getSlotStartTime(
+                    reservation.slot
+                  ) === slotStartTime
+                );
+              }
+            );
+
+          const capacity =
+            isClosed
+              ? 0
+              : Number(setting.capacity || 0);
+
+          const slotUrl =
+            `/admin/slot?doctorId=${encodeURIComponent(doctorId)}` +
+            `&date=${encodeURIComponent(selectedDateText)}` +
+            `&slot=${encodeURIComponent(slot)}`;
+        %>
+
+        <tr
+          class="<%=
+            isClosed
+              ? 'is-closed-slot-row'
+              : isPastSlot
+                ? 'is-past-slot-row'
+                : ''
+          %>"
+        >
+
+          <th
+            class="
+              time-cell
+              <%= isClosed
+                ? 'is-closed-slot-cell'
+                : isPastSlot
+                  ? 'is-reception-ended'
+                  : ''
+              %>
+            "
+          >
+
+            <a
+              class="today-time-link"
+              href="<%= slotUrl %>"
+              aria-label="<%= slot %>の予約枠詳細を開く"
+            >
+              <%= slot %>
+            </a>
+
           </th>
 
           <% for (
-            let index = 0;
-            index < maxCapacity;
-            index++
+            let patientIndex = 0;
+            patientIndex < maxCapacity;
+            patientIndex++
           ) { %>
 
-            <th>
-              患者<%= getPatientColumnLabel(index) %>
-            </th>
+            <%
+              const reservation =
+                slotReservations[
+                  patientIndex
+                ] || null;
+
+              const isAvailableColumn =
+                patientIndex < capacity;
+
+              const cellClass =
+                isClosed
+                  ? "closed-patient-cell"
+                  : isPastSlot
+                    ? "reception-ended-patient-cell"
+                    : reservation
+                      ? "reserved-patient-cell"
+                      : isAvailableColumn
+                        ? "empty-patient-cell"
+                        : "unavailable-patient-cell";
+            %>
+
+            <td class="<%= cellClass %>">
+
+              <a
+                class="today-slot-link"
+                href="<%= slotUrl %>"
+                aria-label="<%= slot %>の予約枠詳細を開く"
+              >
+
+                <% if (isClosed) { %>
+
+                  <% if (patientIndex === 0) { %>
+
+                    <span class="today-closed-label">
+                      休診
+                    </span>
+
+                  <% } else { %>
+
+                    <span class="today-unavailable-label">
+                      ―
+                    </span>
+
+                  <% } %>
+
+                <% } else if (isPastSlot) { %>
+
+                  <% if (reservation) { %>
+
+                    <span class="today-patient-name">
+                      <%= reservation.patient.name %>
+                    </span>
+
+                    <span class="today-reception-ended-label">
+                      受付終了
+                    </span>
+
+                  <% } else { %>
+
+                    <span class="today-reception-ended-label">
+                      受付終了
+                    </span>
+
+                  <% } %>
+
+                <% } else if (!isAvailableColumn) { %>
+
+                  <span class="today-unavailable-label">
+                    ―
+                  </span>
+
+                <% } else if (reservation) { %>
+
+                  <span class="today-patient-name">
+                    <%= reservation.patient.name %>
+                  </span>
+
+                <% } else { %>
+
+                  <span class="today-empty-label">
+                    空き
+                  </span>
+
+                <% } %>
+
+                <span
+                  class="today-cell-arrow"
+                  aria-hidden="true"
+                >
+                  ›
+                </span>
+
+              </a>
+
+            </td>
 
           <% } %>
 
         </tr>
-      </thead>
 
-      <tbody>
+      <% }) %>
 
-        <% if (slots.length === 0) { %>
+    <% } %>
 
-          <tr>
-            <td
-              colspan="<%= Math.max(maxCapacity + 1, 1) %>"
-              class="admin-empty-message"
-            >
-              この日の診療予定はありません。
-            </td>
-          </tr>
+  </tbody>
 
-        <% } else { %>
+</table>
 
-          <% slots.forEach((slot) => { %>
-
-            <%
-              const slotStartTime =
-                getSlotStartTime(slot);
-
-              /*
-               * 過去日または今日の開始済み枠
-               */
-              const isPastSlot =
-                isPastDate ||
-                (
-                  isToday &&
-                  Boolean(slotStartTime) &&
-                  slotStartTime < currentTime
-                );
-
-              const slotReservations =
-                selectedDateReservations.filter(
-                  (reservation) => {
-                    return (
-                      getSlotStartTime(
-                        reservation.slot
-                      ) === slotStartTime
-                    );
-                  }
-                );
-
-              const capacity =
-                getCapacityForSlot(
-                  selectedDateText,
-                  slot,
-                  doctorId
-                );
-
-              const slotUrl =
-                `/admin/slot?doctorId=${encodeURIComponent(doctorId)}` +
-                `&date=${encodeURIComponent(selectedDateText)}` +
-                `&slot=${encodeURIComponent(slot)}`;
-            %>
-
-            <tr
-              class="<%= isPastSlot
-                ? 'is-past-slot-row'
-                : ''
-              %>"
-            >
-
-              <th
-                class="
-                  time-cell
-                  <%= isPastSlot
-                    ? 'is-reception-ended'
-                    : ''
-                  %>
-                "
-              >
-
-                <a
-                  class="today-time-link"
-                  href="<%= slotUrl %>"
-                  aria-label="<%= slot %>の予約枠詳細を開く"
-                >
-                  <%= slot %>
-                </a>
-
-              </th>
-
-              <% for (
-                let patientIndex = 0;
-                patientIndex < maxCapacity;
-                patientIndex++
-              ) { %>
-
-                <%
-                  const reservation =
-                    slotReservations[
-                      patientIndex
-                    ] || null;
-
-                  const isAvailableColumn =
-                    patientIndex < capacity;
-
-                  const cellClass =
-                    isPastSlot
-                      ? "reception-ended-patient-cell"
-                      : reservation
-                        ? "reserved-patient-cell"
-                        : isAvailableColumn
-                          ? "empty-patient-cell"
-                          : "unavailable-patient-cell";
-                %>
-
-                <td class="<%= cellClass %>">
-
-                  <a
-                    class="today-slot-link"
-                    href="<%= slotUrl %>"
-                    aria-label="<%= slot %>の予約枠詳細を開く"
-                  >
-
-                    <% if (isPastSlot) { %>
-
-                      <% if (reservation) { %>
-
-                        <span class="today-patient-name">
-                          <%= reservation.patient.name %>
-                        </span>
-
-                        <span class="today-reception-ended-label">
-                          受付終了
-                        </span>
-
-                      <% } else { %>
-
-                        <span class="today-reception-ended-label">
-                          受付終了
-                        </span>
-
-                      <% } %>
-
-                    <% } else if (!isAvailableColumn) { %>
-
-                      <span class="today-unavailable-label">
-                        ―
-                      </span>
-
-                    <% } else if (reservation) { %>
-
-                      <span class="today-patient-name">
-                        <%= reservation.patient.name %>
-                      </span>
-
-                    <% } else { %>
-
-                      <span class="today-empty-label">
-                        空き
-                      </span>
-
-                    <% } %>
-
-                    <span
-                      class="today-cell-arrow"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-
-                  </a>
-
-                </td>
-
-              <% } %>
-
-            </tr>
-
-          <% }) %>
-
-        <% } %>
-
-      </tbody>
-
-    </table>
 
   </div>
 
 </section>
 
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const dateInput =
+    document.getElementById(
+      "admin-schedule-date"
+    );
+
+  const dateForm =
+    document.getElementById(
+      "admin-date-search-form"
+    );
+
+  if (!dateInput || !dateForm) {
+    return;
+  }
+
+  /*
+   * 日付を選択した時点で
+   * 自動的にその日の予約を表示する
+   */
+  dateInput.addEventListener("change", () => {
+    if (!dateInput.value) {
+      return;
+    }
+
+    dateForm.submit();
+  });
+});
+</script>
+
 <%- include("partials/footer", {
-  isAdminPage: true,
-  isAdminLoggedIn
+isAdminPage: true,
+isAdminLoggedIn
 }) %>

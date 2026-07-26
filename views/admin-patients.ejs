@@ -236,11 +236,11 @@
                     <td>
 
                       <a
-                        class="admin-row-button"
-                        href="/admin/patients/edit/<%= patient.id %>"
-                      >
-                        編集
-                      </a>
+  href="/admin/patients/edit/<%= patient.id %>?keyword=<%= encodeURIComponent(keyword || '') %>"
+  class="clinic-small-button"
+>
+  編集
+</a>
 
                     </td>
 

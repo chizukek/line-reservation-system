@@ -110,6 +110,11 @@ small,
   font-size: 14px;
 }
 
+.admin-date-navigation{
+    display: flex;
+    justify-content: space-between;
+}
+
 .container {
   width: 100%;
   max-width: 960px;
@@ -3638,20 +3643,39 @@ small,
 }
 
 .admin-calendar-slot-button {
-  width: 100%;
-  height: 56px;
-  padding: 0;
-
-  color: inherit;
-  background: transparent;
-
-  border: 0;
-  border-radius: 0;
-
-  font: inherit;
   appearance: none;
   -webkit-appearance: none;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 64px;
+  padding: 8px;
+
+  margin: 0;
+
+  border: none;
+  border-radius: var(--radius);
+
+  background: transparent;
+
   cursor: pointer;
+
+  font: inherit;
+  color: inherit;
+  line-height: 1.2;
+
+  text-decoration: none;
+
+  box-sizing: border-box;
+}
+
+.admin-calendar-slot-button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
 }
 
 .admin-calendar-slot-button:hover,
@@ -4814,4 +4838,29 @@ small,
 
 .admin-patient-table th:nth-child(5) {
   width: 15%;
+}
+
+.is-closed-slot-row {
+  background: #f3f3f3;
+}
+
+.is-closed-slot-cell,
+.closed-patient-cell {
+  background: #eeeeee;
+}
+
+.today-closed-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #555555;
+  background: #dddddd;
+}
+
+.closed-patient-cell .today-cell-arrow {
+  opacity: 0.45;
 }

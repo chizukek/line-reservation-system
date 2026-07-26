@@ -335,14 +335,23 @@ app.use((req, res, next) => {
 /* =========================
    EJS共通変数
 ========================= */
-
 app.use(async (req, res, next) => {
   res.locals.isPatientLoggedIn = Boolean(req.session.patientNumber);
-
   res.locals.isAdminLoggedIn = Boolean(req.session.isAdmin);
 
+  /*
+   * ログイン画面と担当医選択画面では、
+   * 管理画面用のヘッダー・サイドメニューを表示しない。
+   */
+  const hideAdminNavigationPaths = [
+    "/admin-login",
+    "/admin/doctors",
+    "/admin/select-doctor",
+  ];
+
   res.locals.isAdminPage =
-    req.path === "/admin-login" || req.path.startsWith("/admin");
+    req.path.startsWith("/admin") &&
+    !hideAdminNavigationPaths.includes(req.path);
 
   res.locals.doctor = null;
   res.locals.doctors = [];
@@ -1654,19 +1663,47 @@ app.get("/admin-logout", async (req, res) => {
 });
 
 app.get("/admin/doctors", requireAdminLogin, async (req, res) => {
-  const doctors = await prisma.doctor.findMany({
-    where: {
-      isActive: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
+  try {
+    req.session.doctorId = null;
 
-  res.render("admin-select-doctor", {
-    title: "担当医選択",
-    doctors,
-  });
+    const doctors = await prisma.doctor.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: [
+        {
+          sortOrder: "asc",
+        },
+        {
+          id: "asc",
+        },
+      ],
+    });
+
+    return res.render("admin-select-doctor", {
+      title: "担当医選択",
+
+      isAdminPage: false,
+      isAdminLoggedIn: true,
+
+      doctor: null,
+      doctors,
+    });
+  } catch (error) {
+    console.error("担当医選択画面表示エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "担当医選択",
+      heading: "担当医を表示できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
+      detail: "",
+      backUrl: "/admin-login",
+
+      isAdminPage: false,
+      isAdminLoggedIn: true,
+      isPatientLoggedIn: false,
+    });
+  }
 });
 
 app.get("/admin/select-doctor", requireAdminLogin, async (req, res) => {
@@ -1780,9 +1817,32 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
     });
 
     /*
-     * 指定日の診療枠を取得
+     * 選択中の担当医が表示する全時間枠
+     *
+     * getSlotsForDateだけを使うと、
+     * 休診に変更された枠や通常診療外の枠を
+     * 一覧に表示できないため、表示用枠を使用します。
      */
-    const slots = config.getSlotsForDate(selectedDate, doctorId);
+    const slots = config.getDisplaySlots(doctorId);
+
+    /*
+     * 日付・時間ごとの診療設定を取得
+     *
+     * 管理画面で休診や定員変更をした内容も反映します。
+     */
+    const slotSettings = {};
+
+    await Promise.all(
+      slots.map(async (slot) => {
+        const setting = await getSlotSetting(selectedDate, slot, doctorId);
+
+        slotSettings[slot] = {
+          isOpen: Boolean(setting.isOpen),
+          capacity: Number(setting.capacity || 0),
+          isOverride: Boolean(setting.isOverride),
+        };
+      }),
+    );
 
     return res.render("admin-dashboard", {
       title: "日毎スケジュール",
@@ -1794,13 +1854,11 @@ app.get("/admin", requireAdminLogin, async (req, res) => {
       doctor,
       doctors,
 
-      /*
-       * 今日の日付と、表示中の日付を分けて渡す
-       */
       today,
       selectedDate,
 
       slots,
+      slotSettings,
       reservations,
 
       formatJapaneseDateShort,
@@ -4800,127 +4858,220 @@ app.post("/admin/patients/add", requireAdminLogin, async (req, res) => {
   }
 });
 
-app.get("/admin/patients/edit/:id", async (req, res) => {
-  if (!req.session.isAdmin) {
-    return res.redirect("/admin-login");
-  }
+app.get("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
 
-  const id = Number(req.params.id);
+    const keyword = String(req.query.keyword || "").trim();
 
-  const patient = await prisma.patient.findUnique({
-    where: { id },
-  });
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.redirect(
+        `/admin/patients?keyword=${encodeURIComponent(keyword)}`,
+      );
+    }
 
-  if (!patient) {
-    return res.render("error", {
-      title: "エラー",
-      heading: "エラー",
-      message: "患者が見つかりません。",
+    const patient = await prisma.patient.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!patient) {
+      return res.render("error", {
+        title: "患者編集",
+        heading: "患者が見つかりません",
+        message: "選択された患者情報が見つかりませんでした。",
+        detail: "",
+        backUrl: `/admin/patients?keyword=${encodeURIComponent(keyword)}`,
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const birth = patient.birthDate ? new Date(patient.birthDate) : new Date();
+
+    return res.render("patient-edit", {
+      title: "患者編集",
+
+      patient,
+
+      birthYear: birth.getUTCFullYear(),
+      birthMonth: birth.getUTCMonth() + 1,
+      birthDay: birth.getUTCDate(),
+
+      currentYear: new Date().getFullYear(),
+
+      keyword,
+
+      error: null,
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
+  } catch (error) {
+    console.error("患者編集画面表示エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "患者編集",
+      heading: "患者情報を表示できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
       detail: "",
       backUrl: "/admin/patients",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
     });
   }
-
-  const birth = patient.birthDate ? new Date(patient.birthDate) : new Date();
-
-  res.render("patient-edit", {
-    title: "患者編集",
-    patient,
-    birthYear: birth.getFullYear(),
-    birthMonth: birth.getMonth() + 1,
-    birthDay: birth.getDate(),
-    currentYear: new Date().getFullYear(),
-    error: null,
-  });
 });
 
-app.post("/admin/patients/edit/:id", async (req, res) => {
-  if (!req.session.isAdmin) {
-    return res.redirect("/admin-login");
-  }
+app.post("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
 
-  const id = Number(req.params.id);
-  const patientNumber = String(req.body.patientNumber || "").trim();
-  const name = String(req.body.name || "").trim();
+    const keyword = String(req.body.keyword || "").trim();
 
-  const year = String(req.body.birthYear || "");
-  const month = String(req.body.birthMonth || "").padStart(2, "0");
-  const day = String(req.body.birthDay || "").padStart(2, "0");
-  const birthDateText = `${year}-${month}-${day}`;
-  const birthDate = new Date(birthDateText);
+    const patientNumber = String(req.body.patientNumber || "").trim();
 
-  const patient = await prisma.patient.findUnique({
-    where: { id },
-  });
+    const name = String(req.body.name || "").trim();
 
-  if (!patient) {
-    return res.render("error", {
-      title: "エラー",
-      heading: "エラー",
-      message: "患者が見つかりません。",
+    const year = String(req.body.birthYear || "");
+    const month = String(req.body.birthMonth || "").padStart(2, "0");
+    const day = String(req.body.birthDay || "").padStart(2, "0");
+
+    const birthDateText = `${year}-${month}-${day}`;
+    const birthDate = new Date(`${birthDateText}T00:00:00.000Z`);
+
+    const patient = await prisma.patient.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!patient) {
+      return res.render("error", {
+        title: "患者編集",
+        heading: "患者が見つかりません",
+        message: "選択された患者情報が見つかりませんでした。",
+        detail: "",
+        backUrl: `/admin/patients?keyword=${encodeURIComponent(keyword)}`,
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const yearNumber = Number(year);
+    const monthNumber = Number(month);
+    const dayNumber = Number(day);
+
+    const isValidBirthDate =
+      !Number.isNaN(birthDate.getTime()) &&
+      birthDate.getUTCFullYear() === yearNumber &&
+      birthDate.getUTCMonth() + 1 === monthNumber &&
+      birthDate.getUTCDate() === dayNumber;
+
+    if (
+      !isValidPatientNumber(patientNumber) ||
+      !name ||
+      !/^\d{4}$/.test(year) ||
+      !/^\d{2}$/.test(month) ||
+      !/^\d{2}$/.test(day) ||
+      !isValidBirthDate
+    ) {
+      return res.render("patient-edit", {
+        title: "患者編集",
+
+        patient: {
+          ...patient,
+          patientNumber,
+          name,
+        },
+
+        birthYear: yearNumber || new Date(patient.birthDate).getUTCFullYear(),
+
+        birthMonth:
+          monthNumber || new Date(patient.birthDate).getUTCMonth() + 1,
+
+        birthDay: dayNumber || new Date(patient.birthDate).getUTCDate(),
+
+        currentYear: new Date().getFullYear(),
+
+        keyword,
+
+        error: "患者番号・氏名・生年月日を正しく入力してください。",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const duplicate = await prisma.patient.findFirst({
+      where: {
+        patientNumber,
+
+        id: {
+          not: id,
+        },
+      },
+    });
+
+    if (duplicate) {
+      return res.render("patient-edit", {
+        title: "患者編集",
+
+        patient: {
+          ...patient,
+          patientNumber,
+          name,
+        },
+
+        birthYear: yearNumber,
+        birthMonth: monthNumber,
+        birthDay: dayNumber,
+
+        currentYear: new Date().getFullYear(),
+
+        keyword,
+
+        error: "この患者番号はすでに使われています。",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    return res.render("patient-edit-confirm", {
+      title: "患者編集確認",
+
+      patient,
+
+      newPatient: {
+        id,
+        patientNumber,
+        name,
+        birthDateText,
+      },
+
+      keyword,
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
+  } catch (error) {
+    console.error("患者編集確認エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "患者編集",
+      heading: "患者情報を確認できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
       detail: "",
       backUrl: "/admin/patients",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
     });
   }
-
-  if (
-    !isValidPatientNumber(patientNumber) ||
-    !name ||
-    !year ||
-    !month ||
-    !day ||
-    Number.isNaN(birthDate.getTime())
-  ) {
-    return res.render("patient-edit", {
-      title: "患者編集",
-      patient: {
-        ...patient,
-        patientNumber,
-        name,
-      },
-      birthYear: Number(year) || new Date(patient.birthDate).getFullYear(),
-      birthMonth: Number(month) || new Date(patient.birthDate).getMonth() + 1,
-      birthDay: Number(day) || new Date(patient.birthDate).getDate(),
-      currentYear: new Date().getFullYear(),
-      error: "患者番号・氏名・生年月日を正しく入力してください。",
-    });
-  }
-
-  const duplicate = await prisma.patient.findFirst({
-    where: {
-      patientNumber,
-      id: {
-        not: id,
-      },
-    },
-  });
-
-  if (duplicate) {
-    return res.render("patient-edit", {
-      title: "患者編集",
-      patient: {
-        ...patient,
-        patientNumber,
-        name,
-      },
-      birthYear: Number(year),
-      birthMonth: Number(month),
-      birthDay: Number(day),
-      currentYear: new Date().getFullYear(),
-      error: "この患者番号はすでに使われています。",
-    });
-  }
-
-  return res.render("patient-edit-confirm", {
-    title: "患者編集確認",
-    patient,
-    newPatient: {
-      id,
-      patientNumber,
-      name,
-      birthDateText,
-    },
-  });
 });
 
 app.post("/admin/patients/edit/:id/complete", async (req, res) => {

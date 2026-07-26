@@ -12,7 +12,11 @@
     <% } %>
 
     <form action="/admin/patients/edit/<%= patient.id %>" method="POST" class="admin-form-card">
-
+      <input
+  type="hidden"
+  name="keyword"
+  value="<%= typeof keyword !== 'undefined' ? keyword : '' %>"
+>
       <label>
         <span>患者番号</span>
         <input
@@ -69,9 +73,14 @@
           保存する
         </button>
 
-        <a class="clinic-sub-button" href="/admin/patients">
-          戻る
-        </a>
+        <a
+  class="clinic-sub-button"
+  href="/admin/patients?keyword=<%= encodeURIComponent(
+    typeof keyword !== "undefined" ? keyword : ""
+  ) %>"
+>
+  検索結果へ戻る
+</a>
       </div>
 
     </form>
