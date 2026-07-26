@@ -654,127 +654,158 @@ app.get("/verify", (req, res) => {
     return res.redirect("/mypage");
   }
 
-  res.render("verify", {
+  return res.render("verify", {
     title: "本人確認",
+    error: null,
   });
 });
 
-app.post("/verify", async (req, res) => {
+app.post("/verify", patientVerifyLimiter, async (req, res) => {
   try {
     const patientNumber = String(req.body.patientNumber || "").trim();
-    const birthDate = String(req.body.birthDate || "").trim();
 
-    if (!patientNumber || !birthDate) {
+    const birthYear = String(req.body.birthYear || "").trim();
+    const birthMonth = String(req.body.birthMonth || "").trim();
+    const birthDay = String(req.body.birthDay || "").trim();
+
+    /*
+     * 入力形式の確認
+     */
+    if (
+      !isValidPatientNumber(patientNumber) ||
+      !/^\d{4}$/.test(birthYear) ||
+      !/^\d{1,2}$/.test(birthMonth) ||
+      !/^\d{1,2}$/.test(birthDay)
+    ) {
       return res.status(400).render("verify", {
         title: "本人確認",
-        error: "患者番号と生年月日を入力してください。",
+        error: "患者番号と生年月日を正しく入力してください。",
       });
     }
 
-    const patient = await prisma.patient.findFirst({
+    const year = Number(birthYear);
+    const month = Number(birthMonth);
+    const day = Number(birthDay);
+
+    /*
+     * 実在する日付か確認
+     */
+    const inputDate = new Date(Date.UTC(year, month - 1, day));
+
+    const isValidBirthDate =
+      inputDate.getUTCFullYear() === year &&
+      inputDate.getUTCMonth() + 1 === month &&
+      inputDate.getUTCDate() === day;
+
+    if (!isValidBirthDate) {
+      return res.status(400).render("verify", {
+        title: "本人確認",
+        error: "生年月日を正しく入力してください。",
+      });
+    }
+
+    /*
+     * 患者番号から患者情報を取得
+     */
+    const patient = await prisma.patient.findUnique({
       where: {
         patientNumber,
-        birthDate,
       },
     });
 
-    // 本人確認成功
-    if (patient) {
-      req.session.verifyFailureCount = 0;
+    let isVerified = false;
 
-      req.session.patientId = patient.id;
-      req.session.patientNumber = patient.patientNumber;
-      req.session.isPatientLoggedIn = true;
+    if (patient && patient.birthDate) {
+      const registeredDate = new Date(patient.birthDate);
 
-      return res.redirect("/select-doctor");
+      /*
+       * PrismaのDateTimeをUTCの年月日に分解して比較
+       */
+      const sameBirthday =
+        registeredDate.getUTCFullYear() === year &&
+        registeredDate.getUTCMonth() + 1 === month &&
+        registeredDate.getUTCDate() === day;
+
+      isVerified = sameBirthday;
     }
 
-    // 本人確認失敗
+    /*
+     * 本人確認成功
+     */
+    if (isVerified) {
+      req.session.verifyFailureCount = 0;
+      req.session.patientNumber = patient.patientNumber;
+      req.session.patientId = patient.id;
+
+      return req.session.save((saveError) => {
+        if (saveError) {
+          console.error("患者本人確認セッション保存エラー:", saveError);
+
+          return res.status(500).render("error", {
+            title: "本人確認エラー",
+            heading: "本人確認を完了できませんでした",
+            message: "時間をおいて、もう一度お試しください。",
+            detail: "",
+            backUrl: "/verify",
+          });
+        }
+
+        return res.redirect("/mypage");
+      });
+    }
+
+    /*
+     * 本人確認失敗
+     */
     const failureCount = Number(req.session.verifyFailureCount || 0) + 1;
 
     req.session.verifyFailureCount = failureCount;
 
-    // 2回目の失敗
+    /*
+     * 2回目の失敗
+     */
     if (failureCount >= 2) {
-      req.session.verifyFailureCount = 0;
+      req.session.verifyFailureCount = 2;
 
-      return res.status(403).render("phone-reservation", {
-        title: "お電話でのご予約",
+      return req.session.save((saveError) => {
+        if (saveError) {
+          console.error("本人確認失敗回数保存エラー:", saveError);
+        }
+
+        return res.status(403).render("phone-reservation", {
+          title: "お電話でのご予約",
+        });
       });
     }
 
-    // 1回目の失敗
-    return res.status(401).render("verify", {
-      title: "本人確認",
-      error:
-        "本人確認ができませんでした。患者番号と生年月日をご確認のうえ、もう一度お試しください。",
+    /*
+     * 1回目の失敗
+     */
+    return req.session.save((saveError) => {
+      if (saveError) {
+        console.error("本人確認失敗回数保存エラー:", saveError);
+      }
+
+      return res.status(401).render("verify", {
+        title: "本人確認",
+        error:
+          "本人確認ができませんでした。患者番号と生年月日をご確認のうえ、もう一度お試しください。",
+      });
     });
   } catch (error) {
     console.error("本人確認エラー:", error);
 
     return res.status(500).render("error", {
-      title: "エラー",
-      heading: "本人確認を行えませんでした",
-      message: "時間をおいて再度お試しいただくか、お電話にてご予約ください。",
-      detail: "",
-      backUrl: "/psychiatry",
+      title: "本人確認エラー",
+      heading: "エラーが発生しました",
+      message: "時間をおいて、もう一度お試しください。",
+      detail:
+        process.env.NODE_ENV === "production"
+          ? ""
+          : String(error.message || error),
+      backUrl: "/verify",
     });
   }
-});
-
-app.post("/mypage", patientVerifyLimiter, async (req, res) => {
-  const { patientNumber, birthYear, birthMonth, birthDay } = req.body;
-
-  const birthDate = `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`;
-
-  const patient = await prisma.patient.findUnique({
-    where: {
-      patientNumber,
-    },
-    include: {
-      reservations: true,
-    },
-  });
-
-  if (!patient || !patient.birthDate) {
-    return res.render("verify", {
-      title: "本人確認",
-      error: "患者番号または生年月日が違います。",
-    });
-  }
-
-  const canModifyReservation = reservation
-    ? canCancelReservation(reservation.date)
-    : false;
-
-  return res.render("mypage", {
-    title: "マイページ",
-    isPatientLoggedIn: true,
-
-    patient,
-    reservation,
-
-    canModifyReservation,
-  });
-
-  const inputDate = new Date(birthDate);
-  const patientDate = new Date(patient.birthDate);
-
-  const sameBirthday =
-    inputDate.getFullYear() === patientDate.getFullYear() &&
-    inputDate.getMonth() === patientDate.getMonth() &&
-    inputDate.getDate() === patientDate.getDate();
-
-  if (!sameBirthday) {
-    return res.render("verify", {
-      title: "本人確認",
-      error: "患者番号または生年月日が違います。",
-    });
-  }
-
-  req.session.patientNumber = patient.patientNumber;
-
-  res.redirect("/mypage");
 });
 
 app.get("/logout", (req, res) => {
@@ -856,11 +887,17 @@ app.get("/mypage", async (req, res) => {
       req.session.changeReservationId = null;
     }
 
+    const canModifyReservation = reservation
+      ? canCancelReservation(reservation.date)
+      : false;
+
     return res.render("mypage", {
       title: "マイページ",
       isPatientLoggedIn: true,
+
       patient,
       reservation,
+      canModifyReservation,
     });
   } catch (error) {
     console.error("マイページ表示エラー:", error);
