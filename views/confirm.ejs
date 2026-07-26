@@ -132,12 +132,40 @@
             医院電話番号
           </span>
 
-          <a
-            class="clinic-phone-link"
-            href="tel:0000000000"
-          >
-            00-0000-0000
-          </a>
+          <%
+  const phoneNumber =
+    typeof clinicPhone !== "undefined"
+      ? String(clinicPhone || "").trim()
+      : "";
+
+  const phoneHref =
+    phoneNumber.replace(/[^\d+]/g, "");
+%>
+
+<p class="clinic-phone-area">
+
+  <span class="clinic-phone-label">
+    医院電話番号
+  </span>
+
+  <% if (phoneNumber) { %>
+
+    <a
+      class="clinic-phone-link"
+      href="tel:<%= phoneHref %>"
+    >
+      <%= phoneNumber %>
+    </a>
+
+  <% } else { %>
+
+    <span class="clinic-phone-link">
+      未設定
+    </span>
+
+  <% } %>
+
+</p>
         </p>
 
         <% if (isChangeMode) { %>
