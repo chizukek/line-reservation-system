@@ -221,10 +221,6 @@ app.use(
 
     secret: process.env.SESSION_SECRET,
 
-    /*
-     * Renderの再起動でログイン状態が壊れないよう、
-     * PostgreSQLにセッションを保存します。
-     */
     store: new PgSession({
       pool: sessionPool,
       createTableIfMissing: true,
@@ -663,6 +659,69 @@ app.get("/verify", (req, res) => {
   });
 });
 
+app.post("/verify", async (req, res) => {
+  try {
+    const patientNumber = String(req.body.patientNumber || "").trim();
+    const birthDate = String(req.body.birthDate || "").trim();
+
+    if (!patientNumber || !birthDate) {
+      return res.status(400).render("verify", {
+        title: "本人確認",
+        error: "患者番号と生年月日を入力してください。",
+      });
+    }
+
+    const patient = await prisma.patient.findFirst({
+      where: {
+        patientNumber,
+        birthDate,
+      },
+    });
+
+    // 本人確認成功
+    if (patient) {
+      req.session.verifyFailureCount = 0;
+
+      req.session.patientId = patient.id;
+      req.session.patientNumber = patient.patientNumber;
+      req.session.isPatientLoggedIn = true;
+
+      return res.redirect("/select-doctor");
+    }
+
+    // 本人確認失敗
+    const failureCount = Number(req.session.verifyFailureCount || 0) + 1;
+
+    req.session.verifyFailureCount = failureCount;
+
+    // 2回目の失敗
+    if (failureCount >= 2) {
+      req.session.verifyFailureCount = 0;
+
+      return res.status(403).render("phone-reservation", {
+        title: "お電話でのご予約",
+      });
+    }
+
+    // 1回目の失敗
+    return res.status(401).render("verify", {
+      title: "本人確認",
+      error:
+        "本人確認ができませんでした。患者番号と生年月日をご確認のうえ、もう一度お試しください。",
+    });
+  } catch (error) {
+    console.error("本人確認エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "エラー",
+      heading: "本人確認を行えませんでした",
+      message: "時間をおいて再度お試しいただくか、お電話にてご予約ください。",
+      detail: "",
+      backUrl: "/psychiatry",
+    });
+  }
+});
+
 app.post("/mypage", patientVerifyLimiter, async (req, res) => {
   const { patientNumber, birthYear, birthMonth, birthDay } = req.body;
 
@@ -683,6 +742,20 @@ app.post("/mypage", patientVerifyLimiter, async (req, res) => {
       error: "患者番号または生年月日が違います。",
     });
   }
+
+  const canModifyReservation = reservation
+    ? canCancelReservation(reservation.date)
+    : false;
+
+  return res.render("mypage", {
+    title: "マイページ",
+    isPatientLoggedIn: true,
+
+    patient,
+    reservation,
+
+    canModifyReservation,
+  });
 
   const inputDate = new Date(birthDate);
   const patientDate = new Date(patient.birthDate);
@@ -924,31 +997,81 @@ app.get("/api/admin/slots", requireAdminLogin, async (req, res) => {
 });
 
 app.get("/change", async (req, res) => {
-  const patientNumber = req.session.patientNumber;
+  try {
+    const patientNumber = req.session.patientNumber;
 
-  if (!patientNumber) {
-    return res.redirect("/psychiatry");
-  }
+    if (!patientNumber) {
+      return res.redirect("/psychiatry");
+    }
 
-  const today = new Date().toLocaleDateString("sv-SE");
+    const reservation = await prisma.reservation.findFirst({
+      where: {
+        patientNumber,
 
-  const reservation = await prisma.reservation.findFirst({
-    where: {
-      patientNumber,
-      date: {
-        gt: today,
+        date: {
+          gte: getTodayText(),
+        },
       },
-    },
-    orderBy: [{ date: "asc" }, { slot: "asc" }],
-  });
 
-  if (!reservation) {
-    return res.redirect("/mypage");
+      include: {
+        doctor: true,
+      },
+
+      orderBy: [
+        {
+          date: "asc",
+        },
+        {
+          slot: "asc",
+        },
+      ],
+    });
+
+    if (!reservation) {
+      req.session.changeReservationId = null;
+
+      return res.redirect("/mypage");
+    }
+
+    /*
+     * キャンセルと同じ期限を予約変更にも適用します。
+     * 現在の設定では、予約日前日の23:59を過ぎると変更不可です。
+     */
+    if (!canCancelReservation(reservation.date)) {
+      req.session.changeReservationId = null;
+
+      return res.status(400).render("error", {
+        title: "予約変更不可",
+        heading: "予約を変更できません",
+        message: "予約変更の受付期限を過ぎています。",
+        detail:
+          "当日の予約変更はできません。必要な場合は医院へ直接ご連絡ください。",
+        backUrl: "/mypage",
+
+        isAdminPage: false,
+        isAdminLoggedIn: false,
+        isPatientLoggedIn: true,
+      });
+    }
+
+    req.session.changeReservationId = reservation.id;
+
+    return res.redirect("/select-doctor");
+  } catch (error) {
+    console.error("患者予約変更開始エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "予約変更エラー",
+      heading: "予約変更を開始できませんでした",
+      message: "時間をおいて、もう一度お試しください。",
+      detail: "",
+      backUrl: "/mypage",
+
+      isAdminPage: false,
+      isAdminLoggedIn: false,
+      isPatientLoggedIn: true,
+    });
   }
-
-  req.session.changeReservationId = reservation.id;
-
-  res.redirect("/select-doctor");
 });
 
 app.get("/terms", (req, res) => {
@@ -4318,7 +4441,27 @@ app.post(
 
         const dayText = String(day).padStart(2, "0");
 
-        birthDate = `${year}-${monthText}-${dayText}`;
+        birthDate = new Date(`${year}-${monthText}-${dayText}T00:00:00+09:00`);
+
+        if (Number.isNaN(birthDate.getTime())) {
+          return res.status(400).render("admin-patient-add", {
+            title: "新規患者登録",
+
+            isAdminPage: true,
+            isAdminLoggedIn: true,
+
+            mode: "reservation",
+
+            patientNumber,
+            name,
+
+            birthYear,
+            birthMonth,
+            birthDay,
+
+            error: "生年月日を正しく入力してください。",
+          });
+        }
       }
 
       const existingPatient = await prisma.patient.findUnique({

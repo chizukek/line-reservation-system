@@ -1,0 +1,48 @@
+<%- include("partials/header", {
+  title: title || "お電話でのご予約"
+}) %>
+
+<div class="clinic-page">
+  <div class="clinic-card">
+
+    <section class="clinic-section phone-reservation-section">
+
+      <h1>
+        本人確認ができませんでした
+      </h1>
+
+      <p class="clinic-lead">
+        申し訳ございませんが、入力いただいた情報では
+        本人確認ができませんでした。
+      </p>
+
+      <p>
+        患者情報の確認が必要となるため、
+        お手数ですがお電話にてご予約をお願いいたします。
+      </p>
+
+      <div class="clinic-notice">
+        <strong>お電話の際にお伝えください</strong>
+
+        <ul>
+          <li>患者番号</li>
+          <li>お名前</li>
+          <li>ご希望の予約日時</li>
+        </ul>
+      </div>
+
+      <div class="clinic-actions">
+        <a
+          href="/psychiatry"
+          class="clinic-button clinic-button-secondary"
+        >
+          最初の画面へ戻る
+        </a>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>

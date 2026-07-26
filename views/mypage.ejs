@@ -1,64 +1,149 @@
-<%- include("partials/header", { title: "マイページ" }) %>
+<%- include("partials/header", {
+  title: "マイページ"
+}) %>
 
 <div class="clinic-page">
+
   <div class="clinic-card mypage-card">
 
-    <h1>マイページ</h1>
+    <h1>
+      マイページ
+    </h1>
 
     <p class="clinic-lead">
-      <strong><%= patient.name %></strong> 様
+
+      <strong>
+        <%= patient.name %>
+      </strong>
+      様
+
       （患者番号：<%= patient.patientNumber %>）
+
     </p>
 
     <section class="clinic-section">
-      <h2>現在の予約状況</h2>
+
+      <h2>
+        現在の予約状況
+      </h2>
 
       <div class="reservation-box">
 
         <% if (reservation) { %>
 
           <div class="info-row">
-            <span>診療日</span>
-            <strong><%= formatJapaneseDate(reservation.date) %></strong>
+
+            <span>
+              診療日
+            </span>
+
+            <strong>
+              <%= formatJapaneseDate(
+                reservation.date
+              ) %>
+            </strong>
+
           </div>
 
           <div class="info-row">
-            <span>時間</span>
-            <strong><%= reservation.slot %></strong>
+
+            <span>
+              時間
+            </span>
+
+            <strong>
+              <%= typeof getSlotLabel === "function"
+                ? getSlotLabel(
+                    reservation.slot,
+                    reservation.doctorId
+                  )
+                : reservation.slot
+              %>
+            </strong>
+
           </div>
 
           <div class="info-row">
-            <span>診療科</span>
-            <strong>心療内科</strong>
+
+            <span>
+              診療科
+            </span>
+
+            <strong>
+              心療内科
+            </strong>
+
           </div>
-<% if (reservation.doctor) { %>
-  <div class="info-row">
-    <span>担当医</span>
-    <strong>
-      <%= reservation.doctor.displayName || reservation.doctor.name %>
-    </strong>
-  </div>
-<% } %>
 
+          <% if (reservation.doctor) { %>
 
-          <p class="clinic-note">
-            予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
-          </p>
+            <div class="info-row">
 
-          <div class="clinic-actions">
-            <a class="clinic-main-button" href="/change">
-              予約を変更する
-            </a>
+              <span>
+                担当医
+              </span>
 
-            <form method="POST" action="/cancel">
-              <input type="hidden" name="id" value="<%= reservation.id %>">
-              <input type="hidden" name="from" value="mypage">
+              <strong>
+                <%= reservation.doctor.displayName ||
+                    reservation.doctor.name
+                %>
+              </strong>
 
-              <button class="clinic-sub-button" type="submit">
-                予約をキャンセルする
-              </button>
-            </form>
-          </div>
+            </div>
+
+          <% } %>
+
+          <% if (canModifyReservation) { %>
+
+            <p class="clinic-note">
+              予約を変更する場合も、新しい予約が確定するまで現在の予約は保持されます。
+            </p>
+
+            <div class="clinic-actions">
+
+              <a
+                class="clinic-main-button"
+                href="/change"
+              >
+                予約を変更
+              </a>
+
+              <form
+                method="post"
+                action="/cancel"
+              >
+
+                <input
+                  type="hidden"
+                  name="id"
+                  value="<%= reservation.id %>"
+                >
+
+                <input
+                  type="hidden"
+                  name="from"
+                  value="mypage"
+                >
+
+                <button
+                  class="clinic-sub-button"
+                  type="submit"
+                >
+                  予約をキャンセルする
+                </button>
+
+              </form>
+
+            </div>
+
+          <% } else { %>
+
+            <p class="clinic-note">
+              当日の予約変更・キャンセルはできません。
+              必要な場合は医院へ直接ご連絡ください。
+            </p>
+
+          <% } %>
 
         <% } else { %>
 
@@ -71,16 +156,24 @@
       </div>
 
       <% if (!reservation) { %>
+
         <div class="clinic-actions">
-          <a class="clinic-main-button" href="/new">
+
+          <a
+            class="clinic-main-button"
+            href="/new"
+          >
             新しい予約をとる
           </a>
+
         </div>
+
       <% } %>
 
     </section>
 
   </div>
+
 </div>
 
 <%- include("partials/footer") %>
