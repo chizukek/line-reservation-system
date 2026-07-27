@@ -1,0 +1,130 @@
+<%- include("partials/header", {
+title: title || "担当医切替確認",
+isAdminPage: true,
+isAdminLoggedIn: true
+}) %>
+
+<%
+const reservationData =
+typeof editReservation !== "undefined" &&
+editReservation
+? editReservation
+: {};
+
+const currentDoctorData =
+typeof currentDoctor !== "undefined" &&
+currentDoctor
+? currentDoctor
+: null;
+
+const reservationDoctorData =
+reservationData.doctor || null;
+
+const currentDoctorName =
+currentDoctorData
+? (
+currentDoctorData.displayName ||
+currentDoctorData.name ||
+"現在選択中の担当医"
+)
+: "現在選択中の担当医";
+
+const reservationDoctorName =
+reservationDoctorData
+? (
+reservationDoctorData.displayName ||
+reservationDoctorData.name ||
+"予約担当医"
+)
+: "予約担当医";
+
+const patientData =
+reservationData.patient || null;
+
+const cancelUrl =
+typeof backUrl !== "undefined" && backUrl
+? backUrl
+: "/admin/patients";
+%>
+
+<div class="admin-page">
+
+  <div class="admin-card">
+
+
+<header class="admin-page-header">
+
+  <div>
+
+    <h1>
+      担当医を切り替えますか？
+    </h1>
+
+    <p class="admin-page-description">
+      この予約は、現在選択している担当医とは別の担当医の予約です。
+    </p>
+
+  </div>
+
+</header>
+
+<section class="admin-panel">
+
+  <div
+    class="clinic-warning"
+    role="alert"
+  >
+    <strong>
+      担当医を「<%= reservationDoctorName %>」へ切り替えて、
+      予約変更を続けますか？
+    </strong>
+  </div>
+
+</section>
+
+<div class="admin-confirm-actions">
+
+  <form
+    action="/admin/change-doctor/continue"
+    method="post"
+  >
+
+    <input
+      type="hidden"
+      name="doctorId"
+      value="<%= reservationData.doctorId || "" %>"
+    >
+
+    <input
+      type="hidden"
+      name="editReservationId"
+      value="<%= reservationData.id || "" %>"
+    >
+
+    <button
+      class="admin-primary-button"
+      type="submit"
+    >
+      はい、切り替えて次へ進む
+    </button>
+
+  </form>
+
+  <a
+    class="admin-back-button"
+    href="<%= cancelUrl %>"
+  >
+    操作を中断する
+  </a>
+
+</div>
+
+
+  </div>
+
+</div>
+
+<%- include("partials/footer", {
+isAdminPage: true,
+isAdminLoggedIn: true
+}) %>

@@ -462,6 +462,18 @@ function isPastReservationSlot(date, slot) {
   return slotDateTime.getTime() <= Date.now();
 }
 
+function getCurrentReservation(reservations) {
+  if (!Array.isArray(reservations)) {
+    return null;
+  }
+
+  return (
+    reservations.find((reservation) => {
+      return !isPastReservationSlot(reservation.date, reservation.slot);
+    }) || null
+  );
+}
+
 function isValidDoctorId(doctorId) {
   return Number.isInteger(doctorId) && doctorId > 0;
 }
@@ -878,16 +890,18 @@ app.get("/mypage", async (req, res) => {
       return res.redirect("/psychiatry");
     }
 
-    const reservation = await prisma.reservation.findFirst({
+    const reservationCandidates = await prisma.reservation.findMany({
       where: {
         patientNumber,
         date: {
           gte: today,
         },
       },
+
       include: {
         doctor: true,
       },
+
       orderBy: [
         {
           date: "asc",
@@ -897,6 +911,8 @@ app.get("/mypage", async (req, res) => {
         },
       ],
     });
+
+    const reservation = getCurrentReservation(reservationCandidates);
 
     if (!reservation) {
       req.session.changeReservationId = null;
@@ -1056,7 +1072,7 @@ app.get("/change", async (req, res) => {
       return res.redirect("/psychiatry");
     }
 
-    const reservation = await prisma.reservation.findFirst({
+    const reservationCandidates = await prisma.reservation.findMany({
       where: {
         patientNumber,
 
@@ -1079,6 +1095,7 @@ app.get("/change", async (req, res) => {
       ],
     });
 
+    const reservation = getCurrentReservation(reservationCandidates);
     if (!reservation) {
       req.session.changeReservationId = null;
 
@@ -1488,17 +1505,30 @@ app.post("/reserve", async (req, res) => {
           return;
         }
 
-        const todayText = new Date().toLocaleDateString("sv-SE");
+        const todayText = getTodayText();
 
-        const existingReservation = await tx.reservation.findFirst({
+        const existingReservationCandidates = await tx.reservation.findMany({
           where: {
             patientNumber,
+
             date: {
               gte: todayText,
             },
           },
-          orderBy: [{ date: "asc" }, { slot: "asc" }],
+
+          orderBy: [
+            {
+              date: "asc",
+            },
+            {
+              slot: "asc",
+            },
+          ],
         });
+
+        const existingReservation = getCurrentReservation(
+          existingReservationCandidates,
+        );
 
         if (existingReservation) {
           throw new Error(
@@ -1954,8 +1984,6 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
                 slot: "asc",
               },
             ],
-
-            take: 1,
           },
         },
       });
@@ -1970,10 +1998,11 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
         });
       }
 
-      if (
-        Array.isArray(reservationPatient.reservations) &&
-        reservationPatient.reservations.length > 0
-      ) {
+      const currentReservation = getCurrentReservation(
+        reservationPatient.reservations,
+      );
+
+      if (currentReservation) {
         return res.status(400).render("error", {
           title: "予約追加",
           heading: "すでに予約があります",
@@ -1981,7 +2010,7 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
             "この患者には現在有効な予約があります。予約変更を行ってください。",
           detail: "",
           backUrl:
-            "/admin/reservation-add" +
+            "/admin/patients" +
             `?keyword=${encodeURIComponent(reservationPatient.patientNumber)}`,
         });
       }
@@ -2018,8 +2047,6 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
                 slot: "asc",
               },
             ],
-
-            take: 1,
           },
         },
       });
@@ -2029,6 +2056,20 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
           "/admin/reservation-add" + "?error=patient-not-found",
         );
       }
+    }
+
+    const selectedCurrentReservation = selectedPatient
+      ? getCurrentReservation(selectedPatient.reservations)
+      : null;
+
+    if (selectedPatient) {
+      selectedPatient = {
+        ...selectedPatient,
+
+        reservations: selectedCurrentReservation
+          ? [selectedCurrentReservation]
+          : [],
+      };
     }
 
     /*
@@ -2068,15 +2109,21 @@ app.get("/admin/reservations", requireAdminLogin, async (req, res) => {
        * 別の担当医の予約は変更できません。
        */
       if (Number(editReservation.doctorId) !== Number(doctorId)) {
-        return res.status(400).render("error", {
-          title: "予約変更",
-          heading: "予約を変更できません",
+        return res.render("admin-change-doctor-confirm", {
+          title: "担当医切替確認",
+
+          doctorId,
+          editReservation,
+
           message:
-            "現在選択している担当医の予約ではありません。担当医を切り替えてから変更してください。",
-          detail: "",
+            "現在選択している担当医の予約ではありません。担当医を切り替えて予約変更を続けますか？",
+
           backUrl:
-            "/admin/reservation-add" +
+            "/admin/patients" +
             `?keyword=${encodeURIComponent(editReservation.patientNumber)}`,
+
+          isAdminPage: true,
+          isAdminLoggedIn: true,
         });
       }
 
@@ -2485,17 +2532,30 @@ app.post("/admin/add/complete", requireAdminLogin, async (req, res) => {
   try {
     await prisma.$transaction(
       async (tx) => {
-        const todayText = new Date().toLocaleDateString("sv-SE");
+        const todayText = getTodayText();
 
-        const existingReservation = await tx.reservation.findFirst({
+        const existingReservationCandidates = await tx.reservation.findMany({
           where: {
             patientNumber,
+
             date: {
               gte: todayText,
             },
           },
-          orderBy: [{ date: "asc" }, { slot: "asc" }],
+
+          orderBy: [
+            {
+              date: "asc",
+            },
+            {
+              slot: "asc",
+            },
+          ],
         });
+
+        const existingReservation = getCurrentReservation(
+          existingReservationCandidates,
+        );
 
         if (existingReservation) {
           throw new Error(
@@ -3107,8 +3167,6 @@ app.get("/admin/slot/patient-search", requireAdminLogin, async (req, res) => {
                 slot: "asc",
               },
             ],
-
-            take: 1,
           },
         },
 
@@ -4360,8 +4418,6 @@ app.get("/admin/reservation-add", requireAdminLogin, async (req, res) => {
                 slot: "asc",
               },
             ],
-
-            take: 1,
           },
         },
 
@@ -4752,7 +4808,7 @@ app.get("/admin/patients", requireAdminLogin, async (req, res) => {
       },
     });
 
-    const patients = keyword
+    const foundPatients = keyword
       ? await prisma.patient.findMany({
           where: {
             OR: [
@@ -4772,9 +4828,16 @@ app.get("/admin/patients", requireAdminLogin, async (req, res) => {
 
           include: {
             reservations: {
+              where: {
+                date: {
+                  gte: today,
+                },
+              },
+
               include: {
                 doctor: true,
               },
+
               orderBy: [
                 {
                   date: "asc",
@@ -4783,7 +4846,6 @@ app.get("/admin/patients", requireAdminLogin, async (req, res) => {
                   slot: "asc",
                 },
               ],
-              take: 1,
             },
           },
 
@@ -4794,6 +4856,16 @@ app.get("/admin/patients", requireAdminLogin, async (req, res) => {
           take: 50,
         })
       : [];
+
+    const patients = foundPatients.map((patient) => {
+      const currentReservation = getCurrentReservation(patient.reservations);
+
+      return {
+        ...patient,
+
+        reservations: currentReservation ? [currentReservation] : [],
+      };
+    });
 
     return res.render("admin-patients", {
       title: "患者管理",
@@ -4991,7 +5063,7 @@ app.get("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
 
     const birth = patient.birthDate ? new Date(patient.birthDate) : new Date();
 
-    return res.render("patient-edit", {
+    return res.render("admin-patient-edit", {
       title: "患者編集",
 
       patient,
@@ -5079,7 +5151,7 @@ app.post("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
       !/^\d{2}$/.test(day) ||
       !isValidBirthDate
     ) {
-      return res.render("patient-edit", {
+      return res.render("admin-patient-edit", {
         title: "患者編集",
 
         patient: {
@@ -5117,7 +5189,7 @@ app.post("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
     });
 
     if (duplicate) {
-      return res.render("patient-edit", {
+      return res.render("admin-patient-edit", {
         title: "患者編集",
 
         patient: {
@@ -5141,7 +5213,7 @@ app.post("/admin/patients/edit/:id", requireAdminLogin, async (req, res) => {
       });
     }
 
-    return res.render("patient-edit-confirm", {
+    return res.render("admin-patient-edit-confirm", {
       title: "患者編集確認",
 
       patient,
@@ -5254,6 +5326,108 @@ app.post("/admin/patients/edit/:id/complete", async (req, res) => {
     buttonText: "患者一覧へ戻る",
     buttonLink: "/admin/patients",
   });
+});
+
+app.get("/admin/patients/:id", requireAdminLogin, async (req, res) => {
+  try {
+    const patientId = Number(req.params.id);
+
+    if (!Number.isInteger(patientId) || patientId <= 0) {
+      return res.status(400).render("error", {
+        title: "患者情報エラー",
+        heading: "患者情報を表示できません",
+        message: "患者情報が正しく指定されていません。",
+        detail: "",
+        backUrl: "/admin/patients",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const patient = await prisma.patient.findUnique({
+      where: {
+        id: patientId,
+      },
+    });
+
+    if (!patient) {
+      return res.status(404).render("error", {
+        title: "患者情報エラー",
+        heading: "患者が見つかりません",
+        message: "指定された患者情報は存在しません。",
+        detail: "",
+        backUrl: "/admin/patients",
+
+        isAdminPage: true,
+        isAdminLoggedIn: true,
+      });
+    }
+
+    const allReservations = await prisma.reservation.findMany({
+      where: {
+        patientNumber: patient.patientNumber,
+      },
+
+      include: {
+        doctor: true,
+      },
+
+      orderBy: [
+        {
+          date: "asc",
+        },
+        {
+          slot: "asc",
+        },
+      ],
+    });
+
+    const reservation = getCurrentReservation(allReservations);
+
+    const pastReservations = allReservations
+      .filter((reservationItem) => {
+        return isPastReservationSlot(
+          reservationItem.date,
+          reservationItem.slot,
+        );
+      })
+      .sort((a, b) => {
+        const dateCompare = String(b.date).localeCompare(String(a.date));
+
+        if (dateCompare !== 0) {
+          return dateCompare;
+        }
+
+        return String(b.slot).localeCompare(String(a.slot));
+      });
+
+    return res.render("admin-patient-detail", {
+      title: "患者詳細",
+
+      patient,
+      reservation,
+      pastReservations,
+
+      keyword: String(req.query.keyword || ""),
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
+  } catch (error) {
+    console.error("患者詳細表示エラー:", error);
+
+    return res.status(500).render("error", {
+      title: "患者情報エラー",
+      heading: "患者情報を表示できません",
+      message: "患者情報の読み込み中にエラーが発生しました。",
+      detail: "",
+      backUrl: "/admin/patients",
+
+      isAdminPage: true,
+      isAdminLoggedIn: true,
+    });
+  }
 });
 
 app.get("/admin/patients/delete/:id", async (req, res) => {
@@ -5615,6 +5789,17 @@ async function handleLineEvent(event) {
     ],
   });
 }
+
+app.post("/admin/change-doctor/continue", requireAdminLogin, (req, res) => {
+  req.session.doctorId = Number(req.body.doctorId);
+
+  return req.session.save(() => {
+    return res.redirect(
+      "/admin/reservations?week=0&editReservationId=" +
+        encodeURIComponent(req.body.editReservationId),
+    );
+  });
+});
 
 /* =========================
    404エラー

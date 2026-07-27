@@ -11,7 +11,7 @@
         class="admin-side-link"
         href="/admin?doctorId=<%= doctorId %>"
       >
-        <span>日毎スケジュール</span>
+        <span>日ごとスケジュール</span>
         <span aria-hidden="true">›</span>
       </a>
 
@@ -19,15 +19,7 @@
         class="admin-side-link"
         href="/admin/reservations?doctorId=<%= doctorId %>&week=0"
       >
-        <span>週毎スケジュール</span>
-        <span aria-hidden="true">›</span>
-      </a>
-
-      <a
-        class="admin-side-link"
-        href="/admin/reservation-add"
-      >
-        <span>予約追加</span>
+        <span>週ごとスケジュール</span>
         <span aria-hidden="true">›</span>
       </a>
 
@@ -35,7 +27,15 @@
         class="admin-side-link"
         href="/admin/patients"
       >
-        <span>患者管理</span>
+        <span>患者検索</span>
+        <span aria-hidden="true">›</span>
+      </a>
+
+      <a
+        class="admin-side-link"
+        href="/admin/patients/add"
+      >
+        <span>新規患者登録</span>
         <span aria-hidden="true">›</span>
       </a>
 

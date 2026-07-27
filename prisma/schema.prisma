@@ -10,24 +10,22 @@ datasource db {
 model Reservation {
   id              Int      @id @default(autoincrement())
   patientNumber   String
-  doctorId        Int
   date            String
   slot            String
   reservationCode String?
   createdAt       DateTime @default(now())
-
-  patient Patient @relation(fields: [patientNumber], references: [patientNumber])
-  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  doctorId        Int
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  patient         Patient  @relation(fields: [patientNumber], references: [patientNumber])
 }
 
 model Patient {
-  id            Int       @id @default(autoincrement())
-  patientNumber String    @unique
+  id            Int           @id @default(autoincrement())
+  patientNumber String        @unique
   name          String
+  createdAt     DateTime      @default(now())
   birthDate     DateTime?
-  createdAt     DateTime  @default(now())
-
-  reservations Reservation[]
+  reservations  Reservation[]
 }
 
 model AuditLog {
@@ -39,13 +37,12 @@ model AuditLog {
 }
 
 model Doctor {
-  id        Int      @id @default(autoincrement())
-  name      String
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id            Int            @id @default(autoincrement())
+  name          String
+  sortOrder     Int            @default(0)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   reservations  Reservation[]
   slotOverrides SlotOverride[]
 }
@@ -59,10 +56,17 @@ model SlotOverride {
   capacity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, date, slot])
   @@index([date])
   @@index([doctorId, date])
+}
+
+model user_sessions {
+  sid    String   @id(map: "session_pkey") @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
 }
