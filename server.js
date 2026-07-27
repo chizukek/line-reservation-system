@@ -1387,7 +1387,7 @@ app.get("/confirm", async (req, res) => {
     doctorId,
     slot,
     isChangeMode: Boolean(req.session.changeReservationId),
-    clinicPhone: String(process.env.CLINIC_PHONE || "").trim(),
+    clinicPhone: process.env.CLINIC_PHONE || "",
   });
 });
 

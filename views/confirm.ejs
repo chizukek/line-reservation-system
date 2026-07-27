@@ -127,12 +127,7 @@
           期限を過ぎた場合は、医院までお電話でご連絡ください。
         </p>
 
-        <p class="clinic-phone-area">
-          <span class="clinic-phone-label">
-            医院電話番号
-          </span>
-
-          <%
+        <%
   const phoneNumber =
     typeof clinicPhone !== "undefined"
       ? String(clinicPhone || "").trim()
@@ -142,7 +137,7 @@
     phoneNumber.replace(/[^\d+]/g, "");
 %>
 
-<p class="clinic-phone-area">
+<div class="clinic-phone-area">
 
   <span class="clinic-phone-label">
     医院電話番号
@@ -165,8 +160,7 @@
 
   <% } %>
 
-</p>
-        </p>
+</div>
 
         <% if (isChangeMode) { %>
           <p>
