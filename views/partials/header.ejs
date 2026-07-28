@@ -11,13 +11,16 @@
 
   <title><%= title %></title>
 
-  <link
-    rel="stylesheet"
-    href="/style.css"
-  >
+  <link rel="stylesheet" href="/common.css">
+
+<% if (isAdminPage) { %>
+  <link rel="stylesheet" href="/admin.css">
+<% } else { %>
+  <link rel="stylesheet" href="/patient.css">
+<% } %>
 </head>
 
-<body>
+<body class="<%= isAdminPage ? 'admin-body' : 'patient-body' %>">
 
 <%
   const adminPage =

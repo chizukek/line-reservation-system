@@ -1,0 +1,278 @@
+/* 共通スタイル：患者側・管理側の両方で読み込みます */
+
+:root {
+  --primary: #087b35;
+  --primary-dark: #055f28;
+  --primary-soft: #edf7f1;
+  --text: #202421;
+  --muted: #59635d;
+  --white: #ffffff;
+  --page-bg: #f5f6f5;
+  --surface-muted: #f1f3f2;
+  --border: #d4dad6;
+  --border-strong: #aeb8b2;
+  --danger: #c62828;
+  --danger-dark: #a91f1f;
+  --danger-soft: #fff1f1;
+  --warning: #9a6300;
+  --warning-soft: #fff8e8;
+  --color_A: #2f80c9;
+  --color_B: #e07a32;
+  --radius: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background: var(--white);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+h2 {
+  margin: 0 0 18px;
+  padding-left: 12px;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  border-left: 5px solid var(--primary);
+}
+
+h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+small,
+.site-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 18px 14px;
+}
+
+.site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header-inner {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+}
+
+.site-logo img {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+}
+
+.site-brand-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-name {
+  color: var(--primary);
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.site-subtitle {
+  font-weight: 600;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.main-button,
+.sub-button,
+.cancel-link,
+.header-primary-link {
+  width: auto;
+  min-height: 42px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.main-button,
+.header-primary-link {
+  color: var(--white);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.main-button:hover,
+.header-primary-link:hover {
+  color: var(--white);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.sub-button,
+.cancel-link {
+  color: var(--primary);
+  background: var(--white);
+  border: 1px solid var(--border-strong);
+}
+
+.sub-button:hover,
+.cancel-link:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  h1 {
+
+    font-size: 24px;
+
+  }
+
+  h2 {
+
+    font-size: 18px;
+
+  }
+
+  .container {
+
+    max-width: none;
+
+    padding: 0;
+
+  }
+
+  .site-header-inner {
+
+    padding: 10px;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+  }
+
+  .site-logo img {
+
+    width: 42px;
+
+    height: 42px;
+
+  }
+
+  .site-name {
+
+    font-size: 19px;
+
+  }
+
+  .main-button,
+
+  .sub-button,
+
+  .cancel-link {
+
+    width: 100%;
+
+    max-width: none;
+
+  }
+}
+
+.is-closed-slot-row {
+  background: #f3f3f3;
+}
+
+.is-closed-slot-cell,
+.closed-patient-cell {
+  background: #eeeeee;
+}

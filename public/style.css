@@ -33,8 +33,23 @@ body {
   color: var(--text);
   background: var(--white);
   font-family: "Yu Gothic UI", "Meiryo", sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* 患者画面 */
+.patient-body {
+    background-image: url("/images/patient-bg.png");
+    background-repeat: repeat;
+    background-size: 360px auto;
+    background-attachment: fixed;
+    background-color: #f8fff6;
+}
+
+/* 管理画面 */
+.admin-body {
+    background: #f7f8fa;
 }
 
 button,
@@ -332,7 +347,6 @@ small,
   padding: 34px 14px;
   display: flex;
   justify-content: center;
-  background: var(--white);
 }
 
 .clinic-card {
@@ -1513,7 +1527,7 @@ small,
 
 @media (max-width: 600px) {
   h1 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   h2 {
@@ -2358,23 +2372,6 @@ style.css
   --radius: 6px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-}
-
-body {
-  margin: 0;
-  color: var(--text);
-  background: var(--white);
-  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
 button,
 input,
 select,
@@ -2408,6 +2405,7 @@ h1 {
   color: var(--text);
   font-size: 28px;
   line-height: 1.35;
+  text-align: center;
 }
 
 h2,
@@ -2665,7 +2663,6 @@ small,
   padding: 34px 14px;
   display: flex;
   justify-content: center;
-  background: var(--white);
 }
 
 .clinic-card {
