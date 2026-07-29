@@ -4,20 +4,32 @@
   <div class="clinic-card login-card">
 
     <h1>心療内科再診予約</h1>
+
     <div class="reservation-box">
       <p>
-        ・この予約サイトは、<strong>心療内科の再診患者様専用です。</strong>
+        ・この予約サイトは、
+        <strong>心療内科の再診患者様専用です。</strong>
       </p>
+
       <p>
-        ・初診の方は、お電話または医院受付窓口にてご予約ください。
+        ・初診の方は、
+        <% if (CLINIC_PHONE) { %>
+          <a href="tel:<%= CLINIC_PHONE.replace(/\D/g, "") %>">
+            お電話（<%= CLINIC_PHONE %>）
+          </a>
+        <% } else { %>
+          お電話
+        <% } %>
+        にてご予約ください。
       </p>
     </div>
 
     <div class="clinic-actions">
       <a class="clinic-main-button" href="/verify">
-        予約を開始する
+        予約情報を確認する
       </a>
     </div>
+
   </div>
 </div>
 

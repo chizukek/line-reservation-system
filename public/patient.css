@@ -1366,3 +1366,32 @@
 
   }
 }
+
+.patient-number-help {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.patient-number-help > span:first-child {
+  flex: 0 0 auto;
+  color: var(--warning);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.patient-number-unknown {
+  margin: -10px 0 0;
+  font-size: 14px;
+}
+
+.patient-number-unknown a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

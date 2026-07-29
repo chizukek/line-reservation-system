@@ -1,4 +1,4 @@
-<%- include("partials/header", { title: "本人確認" }) %>
+<%- include("partials/header", { title: "予約情報の確認" }) %>
 
 <%
 const currentYear = new Date().getFullYear();
@@ -6,91 +6,96 @@ const currentYear = new Date().getFullYear();
 
 <div class="clinic-page">
   <div class="clinic-card login-card">
-<h1>本人確認</h1>
 
-<p class="clinic-lead">
-  患者番号と生年月日を入力してください。
-</p>
+    <h1>予約情報の確認</h1>
 
-<% if (typeof error !== "undefined" && error) { %>
-  <div class="clinic-error" role="alert">
-    <%= error %>
-  </div>
-<% } %>
+    <p class="clinic-lead">
+      現在の予約状況を確認するため、患者番号と生年月日を患者データと照合します。
+    </p>
 
-<form method="POST" action="/verify" class="clinic-form">
+    <% if (typeof error !== "undefined" && error) { %>
+      <div class="clinic-error" role="alert">
+        <%= error %>
+      </div>
+    <% } %>
 
-  <label>
-    <span>患者番号</span>
+    <form method="POST" action="/verify" class="clinic-form">
 
-    <input
-      type="text"
-      name="patientNumber"
-      inputmode="numeric"
-      maxlength="5"
-      autocomplete="off"
-      placeholder="例：10001"
-      required
-    >
-  </label>
+      <label for="patientNumber">
+        患者番号
 
-  <label>
-    <span>生年月日</span>
+        <input
+          id="patientNumber"
+          name="patientNumber"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]{5}"
+          maxlength="5"
+          autocomplete="off"
+          required
+        >
 
-    <div class="birth-select">
+        <span class="patient-number-help">
+          <span aria-hidden="true">！</span>
+          患者番号は、診療カードに記載されている患者番号です。
+        </span>
+      </label>
 
-      <select
-        id="birthYear"
-        name="birthYear"
-        required
-      >
-        <% for (let y = currentYear; y >= 1900; y--) { %>
-          <option value="<%= y %>">
-            <%= y %>年
-          </option>
-        <% } %>
-      </select>
+      <p class="patient-number-unknown">
+        <a href="/phone-reservation">
+          患者番号が分からない方はこちら
+        </a>
+      </p>
 
-      <select
-        name="birthMonth"
-        required
-      >
-        <% for (let m = 1; m <= 12; m++) { %>
-          <option value="<%= m %>">
-            <%= m %>月
-          </option>
-        <% } %>
-      </select>
+      <label>
+        <span>生年月日</span>
 
-      <select
-        name="birthDay"
-        required
-      >
-        <% for (let d = 1; d <= 31; d++) { %>
-          <option value="<%= d %>">
-            <%= d %>日
-          </option>
-        <% } %>
-      </select>
+        <div class="birth-select">
+          <select
+            id="birthYear"
+            name="birthYear"
+            required
+          >
+            <% for (let y = currentYear; y >= 1900; y--) { %>
+              <option value="<%= y %>">
+                <%= y %>年
+              </option>
+            <% } %>
+          </select>
 
-    </div>
-  </label>
+          <select
+            name="birthMonth"
+            required
+          >
+            <% for (let m = 1; m <= 12; m++) { %>
+              <option value="<%= m %>">
+                <%= m %>月
+              </option>
+            <% } %>
+          </select>
 
-  <button
-    type="submit"
-    class="clinic-main-button"
-  >
-    次へ
-  </button>
+          <select
+            name="birthDay"
+            required
+          >
+            <% for (let d = 1; d <= 31; d++) { %>
+              <option value="<%= d %>">
+                <%= d %>日
+              </option>
+            <% } %>
+          </select>
+        </div>
+      </label>
 
-  <a
-    class="clinic-sub-button"
-    href="/psychiatry"
-  >
-    戻る
-  </a>
+      <button type="submit" class="clinic-main-button">
+        現在の予約を確認する
+      </button>
 
-</form>
+      <a class="clinic-sub-button" href="/psychiatry">
+        戻る
+      </a>
+
+    </form>
 
   </div>
 </div>
