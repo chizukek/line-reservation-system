@@ -238,6 +238,13 @@ String(index + 1)
     <h1>
       日毎スケジュール
     </h1>
+     <p class="admin-dashboard-doctor">
+    担当医：
+    <strong>
+      <%= doctor.displayName || doctor.name %>
+    </strong>
+  </p>
+
   </div>
 
 </div>
@@ -305,13 +312,7 @@ String(index + 1)
     <%= formattedSelectedDate %>の予約状況
   </h2>
 
-  <p class="admin-dashboard-doctor">
-    担当医：
-    <strong>
-      <%= doctor.displayName || doctor.name %>
-    </strong>
-  </p>
-
+ 
 </div>
 
 <div class="admin-update-row">

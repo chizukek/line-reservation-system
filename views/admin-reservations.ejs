@@ -244,19 +244,14 @@ isEditMode
 : "予約スケジュール";
 %>
 
-<div class="admin-page admin-reservations-page">
+<div class="admin-reservations-page">
 
-  <div class="admin-card">
+  <div class="">
 
 
 <header class="admin-page-header">
 
   <div>
-
-    <p class="admin-page-eyebrow">
-      <%= pageEyebrow %>
-    </p>
-
     <h1>
       <%= pageHeading %>
     </h1>
@@ -750,7 +745,7 @@ isEditMode
 
                 /*
                  * 表示する記号は、
-                 * ●・▲・満だけ。
+                 * 〇・△・満だけ。
                  *
                  * 休診・診療対象外・過去枠は
                  * 空欄にします。
@@ -785,13 +780,13 @@ isEditMode
                       "few";
 
                     statusLabel =
-                      "▲";
+                      "△";
                   } else {
                     status =
                       "open";
 
                     statusLabel =
-                      "●";
+                      "〇";
                   }
                 }
 
@@ -973,15 +968,15 @@ isEditMode
 
     <% if (isEditMode) { %>
 
-      「●」または「▲」の枠をタップすると、変更確認画面へ進みます。
+      「〇」または「△」の枠をタップすると、変更確認画面へ進みます。
 
     <% } else if (isAddMode) { %>
 
-      「●」または「▲」の枠をタップすると、予約追加確認画面へ進みます。
+      「〇」または「△」の枠をタップすると、予約追加確認画面へ進みます。
 
     <% } else { %>
 
-      「●」「▲」「満」の枠をタップすると、予約枠詳細を確認できます。
+      「〇」「△」「満」の枠をタップすると、予約枠詳細を確認できます。
 
     <% } %>
 

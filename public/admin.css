@@ -1,7 +1,7 @@
 /* 管理側：iPad横画面（1024px幅）を基準にしたスタイル */
 
 .admin-body {
-  background: #f7f8fa;
+  /*background: #f7f8fa;*/
 }
 
 .admin-date-navigation {
@@ -384,6 +384,13 @@
   white-space: nowrap;
 }
 
+.doctor-card{
+  display: flex;
+  justify-content: center;
+  padding:14px;
+  background: #f0f0f0;margin-bottom:14px;
+}
+
 .doctor-selector {
   position: relative;
 }
@@ -524,16 +531,9 @@
   font-size: 14px;
 }
 
-.admin-page,
-.admin-card {
-  width: 100%;
-  padding: 0;
-  background: transparent;
-}
-
-.admin-card {
-  border: 0;
-}
+/* =========================
+   管理画面カード
+========================= */
 
 .admin-page-header {
   min-height: 48px;
@@ -547,6 +547,7 @@
 .admin-page-header h1 {
   margin: 0;
   font-size: 23px;
+  text-align:left;
 }
 
 .admin-page-eyebrow {

@@ -1,3 +1,17 @@
+<%
+  const adminPage =
+    typeof isAdminPage !== "undefined" &&
+    Boolean(isAdminPage);
+
+  const adminLoggedIn =
+    typeof isAdminLoggedIn !== "undefined" &&
+    Boolean(isAdminLoggedIn);
+
+  const patientLoggedIn =
+    typeof isPatientLoggedIn !== "undefined" &&
+    Boolean(isPatientLoggedIn);
+%>
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -13,28 +27,15 @@
 
   <link rel="stylesheet" href="/common.css">
 
-<% if (isAdminPage) { %>
-  <link rel="stylesheet" href="/admin.css">
-<% } else { %>
-  <link rel="stylesheet" href="/patient.css">
-<% } %>
+  <% if (adminPage) { %>
+    <link rel="stylesheet" href="/admin.css">
+  <% } else { %>
+    <link rel="stylesheet" href="/patient.css">
+  <% } %>
 </head>
 
-<body class="<%= isAdminPage ? 'admin-body' : 'patient-body' %>">
-
+<body class="<%= adminPage ? 'admin-body' : 'patient-body' %>">
 <%
-  const adminPage =
-    typeof isAdminPage !== "undefined" &&
-    Boolean(isAdminPage);
-
-  const adminLoggedIn =
-    typeof isAdminLoggedIn !== "undefined" &&
-    Boolean(isAdminLoggedIn);
-
-  const patientLoggedIn =
-    typeof isPatientLoggedIn !== "undefined" &&
-    Boolean(isPatientLoggedIn);
-
   const selectedDoctor =
     typeof doctor !== "undefined" &&
     doctor
@@ -250,22 +251,36 @@
       </div>
 
     <% } else if (
-      !adminPage &&
-      patientLoggedIn
-    ) { %>
+  !adminPage &&
+  patientLoggedIn
+) { %>
 
-      <nav
-        class="site-nav patient-site-nav"
-        aria-label="患者メニュー"
-      >
+  <nav
+    class="site-nav patient-site-nav"
+    aria-label="患者メニュー"
+  >
 
-        <a href="/mypage">
-          マイページ
-        </a>
+    <a
+  href="tel:<%= CLINIC_PHONE.replace(/\D/g, '') %>"
+  class="header-phone-link"
+  aria-label="医院に電話する"
+>
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M6.6 10.8c1.8 3.5 4.1 5.8 7.6 7.6l2.5-2.5c.3-.3.8-.4 1.2-.3 1 .3 2 .5 3.1.5.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.5 22 2 13.5 2 3c0-.6.4-1 1-1h3.9c.6 0 1 .4 1 1 0 1.1.2 2.1.5 3.1.1.4 0 .9-.3 1.2l-2.5 2.5z"/>
+  </svg>
 
-      </nav>
+  <span>電話</span>
+</a>
 
-    <% } %>
+  </nav>
+
+<% } %>
 
   </div>
 

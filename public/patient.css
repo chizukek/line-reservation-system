@@ -2,7 +2,7 @@
 
 .patient-body {
   background-color: #f8fff6;
-  background-image: url("/images/patient-bg.png");
+  /*background-image: url("/images/patient-bg.png");*/
   background-repeat: repeat;
   background-size: 360px auto;
   background-attachment: scroll;
@@ -14,7 +14,7 @@
 .reservation-week-button {
   width: auto;
   min-height: 42px;
-  padding: 8px 14px;
+  padding: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1394,4 +1394,26 @@
 .patient-number-unknown a {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.header-phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-size:12px;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.header-phone-link:hover {
+  background: #27863a;
+}
+
+.header-phone-link svg {
+  flex-shrink: 0;
 }

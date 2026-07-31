@@ -1,4 +1,8 @@
-<%- include("partials/header", { title: "担当医選択" }) %>
+<%- include("partials/header", {
+  title: "担当医選択",
+  isAdminPage: true,
+  isAdminLoggedIn: false
+}) %>
 
 <div class="admin-page">
   <div class="admin-card">
@@ -16,7 +20,6 @@
           class="doctor-card"
         >
           <p><%= doctor.displayName || doctor.name %></p>
-          <span>＞</span>
         </a>
       <% }) %>
     </div>

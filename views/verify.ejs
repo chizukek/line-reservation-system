@@ -7,11 +7,11 @@ const currentYear = new Date().getFullYear();
 <div class="clinic-page">
   <div class="clinic-card login-card">
 
-    <h1>予約情報の確認</h1>
+    <h1>ログイン</h1>
 
-    <p class="clinic-lead">
-      現在の予約状況を確認するため、患者番号と生年月日を患者データと照合します。
-    </p>
+    <!--<p class="clinic-lead">
+      現在の予約状況を確認するため、マイページにログインします。
+    </p>-->
 
     <% if (typeof error !== "undefined" && error) { %>
       <div class="clinic-error" role="alert">
@@ -41,11 +41,11 @@ const currentYear = new Date().getFullYear();
         </span>
       </label>
 
-      <p class="patient-number-unknown">
+      <!--<p class="patient-number-unknown">
         <a href="/phone-reservation">
           患者番号が分からない方はこちら
         </a>
-      </p>
+      </p>-->
 
       <label>
         <span>生年月日</span>
@@ -88,7 +88,7 @@ const currentYear = new Date().getFullYear();
       </label>
 
       <button type="submit" class="clinic-main-button">
-        現在の予約を確認する
+        ログイン
       </button>
 
       <a class="clinic-sub-button" href="/psychiatry">
